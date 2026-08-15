@@ -30,7 +30,7 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/v1/reviews")
 @RequiredArgsConstructor
-@Tag(name = "7. Danh gia")
+@Tag(name = "7. Đánh giá")
 public class ReviewController {
 
     private final ReviewRepository reviewRepository;
@@ -53,7 +53,7 @@ public class ReviewController {
     }
 
     @GetMapping
-    @Operation(summary = "Danh sach danh gia da duyet")
+    @Operation(summary = "Danh sách đánh giá đã duyệt")
     public ResponseEntity<PageResponse<ReviewResponse>> list(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "6") int size) {
@@ -62,14 +62,14 @@ public class ReviewController {
     }
 
     @GetMapping("/summary")
-    @Operation(summary = "Diem trung binh")
+    @Operation(summary = "Điểm trung bình")
     public ResponseEntity<Map<String, Object>> summary() {
         Double average = reviewRepository.averageRating();
         return ResponseEntity.ok(Map.of("average", average == null ? 0d : average));
     }
 
     @PostMapping
-    @Operation(summary = "Gui danh gia moi - cho quan tri duyet truoc khi hien thi")
+    @Operation(summary = "Gửi đánh giá mới, chờ quản trị duyệt trước khi hiển thị")
     public ResponseEntity<Void> create(@Valid @RequestBody ReviewRequest request) {
         reviewRepository.save(Review.builder()
                 .customerName(request.customerName().trim())
@@ -83,7 +83,7 @@ public class ReviewController {
 
     @PatchMapping("/{id}/approve")
     @PreAuthorize("hasAnyRole('ADMIN','STAFF')")
-    @Operation(summary = "Duyet danh gia")
+    @Operation(summary = "Duyệt đánh giá")
     public ResponseEntity<Void> approve(@PathVariable Long id) {
         Review review = reviewRepository.findById(id)
                 .orElseThrow(() -> ResourceNotFoundException.of("đánh giá", id));

@@ -17,14 +17,14 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/v1/packages")
 @RequiredArgsConstructor
-@Tag(name = "5. Goi tiec")
+@Tag(name = "5. Gói tiệc")
 public class PackageController {
 
     private final PartyPackageRepository packageRepository;
 
     @GetMapping
     @Transactional(readOnly = true)
-    @Operation(summary = "Danh sach goi tiec dang ban")
+    @Operation(summary = "Danh sách gói tiệc đang bán")
     public ResponseEntity<List<PackageResponse>> list() {
         return ResponseEntity.ok(packageRepository.findByActiveTrueOrderBySortOrderAsc()
                 .stream().map(PackageResponse::from).toList());
@@ -32,7 +32,7 @@ public class PackageController {
 
     @GetMapping("/{code}")
     @Transactional(readOnly = true)
-    @Operation(summary = "Chi tiet mot goi tiec")
+    @Operation(summary = "Chi tiết một gói tiệc")
     public ResponseEntity<PackageResponse> detail(@PathVariable String code) {
         return ResponseEntity.ok(packageRepository.findByCode(code)
                 .map(PackageResponse::from)

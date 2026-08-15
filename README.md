@@ -41,8 +41,8 @@ Phía quản trị:
 - Danh sách đơn, lọc theo trạng thái, khoảng ngày và từ khoá
 - Duyệt, hoàn thành hoặc huỷ đơn
 - Thống kê số đơn theo từng trạng thái
-- Quản lý không gian sự kiện
-- Duyệt đánh giá của khách trước khi hiển thị
+
+Phần quản lý không gian và duyệt đánh giá hiện mới có API, chưa làm giao diện.
 
 ## Yêu cầu
 

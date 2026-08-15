@@ -29,14 +29,14 @@ public class AdminAccountInitializer {
                 return;
             }
             User admin = User.builder()
-                    .fullName("Quan tri he thong")
+                    .fullName("Quản trị hệ thống")
                     .email(email)
                     .passwordHash(passwordEncoder.encode(adminProperties.defaultPassword()))
                     .role(Role.ADMIN)
                     .enabled(true)
                     .build();
             userRepository.save(admin);
-            log.info("Da tao tai khoan quan tri mac dinh: {}", email);
+            log.info("Đã tạo tài khoản quản trị mặc định: {}", email);
         };
     }
 }

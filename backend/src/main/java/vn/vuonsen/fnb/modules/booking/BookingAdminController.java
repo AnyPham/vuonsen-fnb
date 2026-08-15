@@ -28,13 +28,13 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/v1/admin/bookings")
 @RequiredArgsConstructor
-@Tag(name = "10. Quan tri - Don dat tiec")
+@Tag(name = "10. Quản trị - Đơn đặt tiệc")
 public class BookingAdminController {
 
     private final BookingService bookingService;
 
     @GetMapping
-    @Operation(summary = "Danh sach don, loc theo trang thai / khoang ngay / tu khoa")
+    @Operation(summary = "Danh sách đơn, lọc theo trạng thái, khoảng ngày và từ khóa")
     public ResponseEntity<PageResponse<BookingResponse>> list(
             @RequestParam(required = false) BookingStatus status,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate from,
@@ -48,13 +48,13 @@ public class BookingAdminController {
     }
 
     @GetMapping("/{code}")
-    @Operation(summary = "Chi tiet mot don")
+    @Operation(summary = "Chi tiết một đơn")
     public ResponseEntity<BookingResponse> detail(@PathVariable String code) {
         return ResponseEntity.ok(bookingService.getByCode(code));
     }
 
     @PatchMapping("/{id}/status")
-    @Operation(summary = "Duyet / hoan thanh / huy don")
+    @Operation(summary = "Duyệt, hoàn thành hoặc hủy đơn")
     public ResponseEntity<BookingResponse> changeStatus(@PathVariable Long id,
                                                         @Valid @RequestBody StatusUpdateRequest request,
                                                         @AuthenticationPrincipal AppUserDetails principal) {
@@ -63,7 +63,7 @@ public class BookingAdminController {
     }
 
     @GetMapping("/statistics")
-    @Operation(summary = "So don theo tung trang thai - dung cho bang dieu khien")
+    @Operation(summary = "Số đơn theo từng trạng thái")
     public ResponseEntity<Map<String, Long>> statistics() {
         Map<String, Long> stats = new LinkedHashMap<>();
         for (BookingStatus status : BookingStatus.values()) {

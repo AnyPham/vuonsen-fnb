@@ -30,19 +30,19 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/v1/bookings")
 @RequiredArgsConstructor
-@Tag(name = "6. Dat tiec")
+@Tag(name = "6. Đặt tiệc")
 public class BookingController {
 
     private final BookingService bookingService;
 
     @PostMapping("/quote")
-    @Operation(summary = "Bao gia tam tinh (khong tao don)")
+    @Operation(summary = "Báo giá tạm tính, không tạo đơn")
     public ResponseEntity<QuoteResponse> quote(@Valid @RequestBody QuoteRequest request) {
         return ResponseEntity.ok(bookingService.quote(request));
     }
 
     @PostMapping
-    @Operation(summary = "Gui yeu cau dat tiec. Khach chua dang nhap van dat duoc.")
+    @Operation(summary = "Gửi yêu cầu đặt tiệc, khách chưa đăng nhập vẫn đặt được")
     public ResponseEntity<BookingResponse> create(@Valid @RequestBody BookingRequest request,
                                                   @AuthenticationPrincipal AppUserDetails principal) {
         Long userId = principal == null ? null : principal.getUserId();
@@ -50,13 +50,13 @@ public class BookingController {
     }
 
     @GetMapping("/track/{code}")
-    @Operation(summary = "Tra cuu don bang ma don")
+    @Operation(summary = "Tra cứu đơn bằng mã đơn")
     public ResponseEntity<BookingResponse> track(@PathVariable String code) {
         return ResponseEntity.ok(bookingService.getByCode(code));
     }
 
     @GetMapping("/my")
-    @Operation(summary = "Lich su dat tiec cua tai khoan dang dang nhap")
+    @Operation(summary = "Lịch sử đặt tiệc của tài khoản đang đăng nhập")
     public ResponseEntity<PageResponse<BookingResponse>> myBookings(
             @AuthenticationPrincipal AppUserDetails principal,
             @RequestParam(defaultValue = "0") int page,
@@ -66,7 +66,7 @@ public class BookingController {
     }
 
     @GetMapping("/options")
-    @Operation(summary = "Danh muc loai su kien va buoi to chuc cho form dat tiec")
+    @Operation(summary = "Danh mục loại sự kiện và buổi tổ chức cho form đặt tiệc")
     public ResponseEntity<Map<String, List<Map<String, String>>>> options() {
         return ResponseEntity.ok(Map.of(
                 "eventTypes", Arrays.stream(EventType.values())

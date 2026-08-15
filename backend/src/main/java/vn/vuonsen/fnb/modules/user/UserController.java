@@ -22,7 +22,7 @@ import vn.vuonsen.fnb.security.AppUserDetails;
 @RestController
 @RequestMapping("/api/v1/me")
 @RequiredArgsConstructor
-@Tag(name = "2. Ho so ca nhan")
+@Tag(name = "2. Hồ sơ cá nhân")
 public class UserController {
 
     private final UserRepository userRepository;
@@ -35,7 +35,7 @@ public class UserController {
     }
 
     @GetMapping
-    @Operation(summary = "Thong tin tai khoan dang dang nhap")
+    @Operation(summary = "Thông tin tài khoản đang đăng nhập")
     public ResponseEntity<UserResponse> me(@AuthenticationPrincipal AppUserDetails principal) {
         User user = userRepository.findById(principal.getUserId())
                 .orElseThrow(() -> ResourceNotFoundException.of("người dùng", principal.getUserId()));
@@ -44,7 +44,7 @@ public class UserController {
 
     @PutMapping
     @Transactional
-    @Operation(summary = "Cap nhat ho so ca nhan")
+    @Operation(summary = "Cập nhật hồ sơ cá nhân")
     public ResponseEntity<UserResponse> update(@AuthenticationPrincipal AppUserDetails principal,
                                                @Valid @RequestBody UpdateProfileRequest request) {
         User user = userRepository.findById(principal.getUserId())

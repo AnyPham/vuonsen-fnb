@@ -44,11 +44,7 @@ const attach = (builder, thunk, key, onSuccess) => {
 const catalogSlice = createSlice({
   name: 'catalog',
   initialState,
-  reducers: {
-    setActiveCategory: (state, action) => {
-      state.dishes.activeCategory = action.payload;
-    },
-  },
+  reducers: {},
   extraReducers: (builder) => {
     attach(builder, fetchSpaces, 'spaces');
     attach(builder, fetchCategories, 'categories');
@@ -58,8 +54,6 @@ const catalogSlice = createSlice({
     });
   },
 });
-
-export const { setActiveCategory } = catalogSlice.actions;
 
 export const selectSpaces = (state) => state.catalog.spaces;
 export const selectCategories = (state) => state.catalog.categories.items;

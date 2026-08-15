@@ -34,3 +34,6 @@ desktop.ini
 *.log
 npm-debug.log*
 logs/
+
+# --- Ghi chu ca nhan, khong day len git ---
+doc/TODO.md

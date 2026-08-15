@@ -72,7 +72,7 @@ public class JwtService {
                     .parseSignedClaims(token)
                     .getPayload();
         } catch (JwtException | IllegalArgumentException ex) {
-            log.debug("Token khong hop le: {}", ex.getMessage());
+            log.debug("Token không hợp lệ: {}", ex.getMessage());
             return null;
         }
     }

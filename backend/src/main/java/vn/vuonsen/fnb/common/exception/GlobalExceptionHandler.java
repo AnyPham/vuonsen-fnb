@@ -58,7 +58,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleUnexpected(Exception ex, HttpServletRequest request) {
-        log.error("Loi khong mong doi tai {}", request.getRequestURI(), ex);
+        log.error("Lỗi không mong đợi tại {}", request.getRequestURI(), ex);
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body(ErrorResponse.of(500, "Internal Server Error",
                         "Hệ thống đang bận, vui lòng thử lại sau", request.getRequestURI()));

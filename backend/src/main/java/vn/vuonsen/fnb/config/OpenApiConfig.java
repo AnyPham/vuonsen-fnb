@@ -21,8 +21,8 @@ public class OpenApiConfig {
                 .info(new Info()
                         .title("Vuon Sen F&B API")
                         .version("1.0.0")
-                        .description("API nen tang dich vu nha hang & cho thue khong gian su kien F&B")
-                        .contact(new Contact().name("Pham Tran Tuan Anh - 21130004")))
+                        .description("API website dịch vụ nhà hàng và cho thuê không gian sự kiện")
+                        .contact(new Contact().name("Phạm Trần Tuấn Anh - 21130004")))
                 .addSecurityItem(new SecurityRequirement().addList(SCHEME))
                 .components(new Components().addSecuritySchemes(SCHEME,
                         new SecurityScheme()

@@ -21,25 +21,25 @@ import vn.vuonsen.fnb.modules.space.dto.SpaceResponse;
 @RequestMapping("/api/v1/admin/spaces")
 @RequiredArgsConstructor
 @PreAuthorize("hasRole('ADMIN')")
-@Tag(name = "9. Quan tri - Khong gian")
+@Tag(name = "9. Quản trị - Không gian")
 public class SpaceAdminController {
 
     private final SpaceService spaceService;
 
     @PostMapping
-    @Operation(summary = "Them khong gian moi")
+    @Operation(summary = "Thêm không gian mới")
     public ResponseEntity<SpaceResponse> create(@Valid @RequestBody SpaceRequest request) {
         return ResponseEntity.status(HttpStatus.CREATED).body(spaceService.create(request));
     }
 
     @PutMapping("/{id}")
-    @Operation(summary = "Cap nhat khong gian")
+    @Operation(summary = "Cập nhật không gian")
     public ResponseEntity<SpaceResponse> update(@PathVariable Long id, @Valid @RequestBody SpaceRequest request) {
         return ResponseEntity.ok(spaceService.update(id, request));
     }
 
     @DeleteMapping("/{id}")
-    @Operation(summary = "Ngung kinh doanh mot khong gian (xoa mem)")
+    @Operation(summary = "Ngừng kinh doanh một không gian")
     public ResponseEntity<Void> deactivate(@PathVariable Long id) {
         spaceService.deactivate(id);
         return ResponseEntity.noContent().build();

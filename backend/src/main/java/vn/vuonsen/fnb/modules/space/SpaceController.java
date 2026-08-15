@@ -20,13 +20,13 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/v1/spaces")
 @RequiredArgsConstructor
-@Tag(name = "3. Khong gian su kien")
+@Tag(name = "3. Không gian sự kiện")
 public class SpaceController {
 
     private final SpaceService spaceService;
 
     @GetMapping
-    @Operation(summary = "Danh sach khong gian, ho tro loc theo so khach / loai / gia toi da")
+    @Operation(summary = "Danh sách không gian, lọc theo số khách, loại và giá tối đa")
     public ResponseEntity<List<SpaceResponse>> list(
             @RequestParam(required = false) Integer guests,
             @RequestParam(required = false) SpaceType type,
@@ -35,7 +35,7 @@ public class SpaceController {
     }
 
     @GetMapping("/types")
-    @Operation(summary = "Danh sach loai khong gian de dung cho tab/filter")
+    @Operation(summary = "Danh sách loại không gian dùng cho bộ lọc")
     public ResponseEntity<List<Map<String, String>>> types() {
         return ResponseEntity.ok(Arrays.stream(SpaceType.values())
                 .map(t -> Map.of("value", t.name(), "label", t.getLabel()))
@@ -43,7 +43,7 @@ public class SpaceController {
     }
 
     @GetMapping("/{slug}")
-    @Operation(summary = "Chi tiet mot khong gian theo slug")
+    @Operation(summary = "Chi tiết một không gian theo slug")
     public ResponseEntity<SpaceResponse> detail(@PathVariable String slug) {
         return ResponseEntity.ok(spaceService.getBySlug(slug));
     }

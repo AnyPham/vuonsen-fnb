@@ -90,7 +90,7 @@ public class BookingService {
         recordHistory(saved, null, BookingStatus.PENDING, "Khách gửi yêu cầu từ website",
                 user == null ? "guest" : user.getEmail());
 
-        log.info("Da tao don dat tiec {} - {} khach - tong {}", saved.getCode(), saved.getGuestCount(),
+        log.info("Đã tạo đơn đặt tiệc {} - {} khách - tổng {}", saved.getCode(), saved.getGuestCount(),
                 saved.getTotalAmount());
         // TODO: gửi email xác nhận cho khách
         return BookingResponse.from(saved);

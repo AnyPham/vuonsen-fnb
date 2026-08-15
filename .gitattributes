@@ -1,0 +1,31 @@
+# Quy định kiểu ký tự xuống dòng, để code giống nhau trên mọi máy.
+# Repo luôn lưu LF nên build bằng Docker (Linux) không bị lỗi.
+
+# Mặc định: git tự nhận biết file văn bản, lưu và lấy ra đều dùng LF
+* text=auto eol=lf
+
+# Riêng file kịch bản của Windows thì giữ CRLF
+*.bat text eol=crlf
+*.cmd text eol=crlf
+*.ps1 text eol=crlf
+
+# File chạy trong container Linux bắt buộc phải LF, dùng CRLF là chạy lỗi
+*.sh       text eol=lf
+Dockerfile text eol=lf
+*.conf     text eol=lf
+
+# File nhị phân: git không được tự sửa nội dung bên trong
+*.docx  binary
+*.pdf   binary
+*.jar   binary
+*.png   binary
+*.jpg   binary
+*.jpeg  binary
+*.gif   binary
+*.webp  binary
+*.ico   binary
+*.woff  binary
+*.woff2 binary
+
+# File do máy sinh ra, không tính vào thống kê ngôn ngữ của repo
+frontend/package-lock.json linguist-generated=true

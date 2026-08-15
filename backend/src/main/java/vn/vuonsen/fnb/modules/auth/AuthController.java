@@ -20,31 +20,31 @@ import vn.vuonsen.fnb.security.AppUserDetails;
 @RestController
 @RequestMapping("/api/auth")
 @RequiredArgsConstructor
-@Tag(name = "1. Xac thuc", description = "Dang ky, dang nhap, lam moi token")
+@Tag(name = "1. Xác thực", description = "Đăng ký, đăng nhập, làm mới token")
 public class AuthController {
 
     private final AuthService authService;
 
     @PostMapping("/register")
-    @Operation(summary = "Dang ky tai khoan khach hang")
+    @Operation(summary = "Đăng ký tài khoản khách hàng")
     public ResponseEntity<AuthResponse> register(@Valid @RequestBody RegisterRequest request) {
         return ResponseEntity.status(HttpStatus.CREATED).body(authService.register(request));
     }
 
     @PostMapping("/login")
-    @Operation(summary = "Dang nhap, tra ve access token + refresh token")
+    @Operation(summary = "Đăng nhập, trả về access token và refresh token")
     public ResponseEntity<AuthResponse> login(@Valid @RequestBody LoginRequest request) {
         return ResponseEntity.ok(authService.login(request));
     }
 
     @PostMapping("/refresh")
-    @Operation(summary = "Doi refresh token lay access token moi")
+    @Operation(summary = "Đổi refresh token lấy access token mới")
     public ResponseEntity<AuthResponse> refresh(@Valid @RequestBody RefreshRequest request) {
         return ResponseEntity.ok(authService.refresh(request.refreshToken()));
     }
 
     @PostMapping("/logout")
-    @Operation(summary = "Dang xuat - thu hoi toan bo refresh token cua tai khoan")
+    @Operation(summary = "Đăng xuất, thu hồi toàn bộ refresh token của tài khoản")
     public ResponseEntity<Void> logout(@AuthenticationPrincipal AppUserDetails principal) {
         if (principal != null) {
             authService.logout(principal.getUserId());

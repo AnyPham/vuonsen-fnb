@@ -14,7 +14,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/v1/gallery")
 @RequiredArgsConstructor
-@Tag(name = "8. Thu vien anh")
+@Tag(name = "8. Thư viện ảnh")
 public class GalleryController {
 
     public record GalleryResponse(Long id, String url, String caption, String category) {
@@ -26,7 +26,7 @@ public class GalleryController {
     private final GalleryImageRepository repository;
 
     @GetMapping
-    @Operation(summary = "Danh sach anh, loc tuy chon theo chu de")
+    @Operation(summary = "Danh sách ảnh, lọc theo chủ đề")
     public ResponseEntity<List<GalleryResponse>> list(@RequestParam(required = false) String category) {
         List<GalleryImage> images = (category == null || category.isBlank())
                 ? repository.findByActiveTrueOrderBySortOrderAsc()

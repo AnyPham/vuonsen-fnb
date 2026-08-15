@@ -18,14 +18,14 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/v1/menu")
 @RequiredArgsConstructor
-@Tag(name = "4. Thuc don")
+@Tag(name = "4. Thực đơn")
 public class MenuController {
 
     private final DishRepository dishRepository;
     private final DishCategoryRepository categoryRepository;
 
     @GetMapping("/categories")
-    @Operation(summary = "Danh muc mon an (dung lam tab)")
+    @Operation(summary = "Danh mục món ăn, dùng để dựng tab")
     public ResponseEntity<List<CategoryResponse>> categories() {
         return ResponseEntity.ok(categoryRepository.findByActiveTrueOrderBySortOrderAsc()
                 .stream().map(CategoryResponse::from).toList());
@@ -33,7 +33,7 @@ public class MenuController {
 
     @GetMapping("/dishes")
     @Transactional(readOnly = true)
-    @Operation(summary = "Danh sach mon an, loc theo danh muc va tu khoa")
+    @Operation(summary = "Danh sách món ăn, lọc theo danh mục và từ khóa")
     public ResponseEntity<List<DishResponse>> dishes(
             @RequestParam(required = false) String category,
             @RequestParam(required = false) String keyword) {
@@ -43,7 +43,7 @@ public class MenuController {
 
     @GetMapping("/best-sellers")
     @Transactional(readOnly = true)
-    @Operation(summary = "Cac mon duoc goi nhieu nhat")
+    @Operation(summary = "Các món được gọi nhiều nhất")
     public ResponseEntity<List<DishResponse>> bestSellers() {
         return ResponseEntity.ok(dishRepository.findByBestSellerTrueAndAvailableTrueOrderBySortOrderAsc()
                 .stream().map(DishResponse::from).toList());
