@@ -1,219 +1,197 @@
-# Vườn Sen — Nền tảng website dịch vụ F&B
+# Vườn Sen
 
-Khóa luận tốt nghiệp: *"Nghiên cứu và ứng dụng Spring Boot, ReactJS và SQL trong xây dựng nền tảng
-website dịch vụ nhà hàng & cho thuê không gian sự kiện F&B"*
-— Phạm Trần Tuấn Anh (21130004, DH21DTA) · GVHD: TS. Nguyễn Thị Phương Trâm
+Website dịch vụ nhà hàng và cho thuê không gian tổ chức tiệc. Khách hàng xem không gian, thực đơn,
+gói tiệc và đặt tiệc trực tuyến với chi phí được tính tự động. Quản trị viên duyệt và theo dõi đơn.
 
----
+Đồ án tốt nghiệp ngành Công nghệ thông tin, Trường Đại học Nông Lâm TP.HCM.
 
-## 1. Kiến trúc tổng thể
+## Công nghệ sử dụng
 
-```
-Trình duyệt
-    │
-    ▼
-┌──────────────────────┐   REST + JWT   ┌───────────────────────┐   JPA/JDBC   ┌─────────┐
-│  ReactJS + Redux     │ ─────────────► │  Spring Boot 3.3      │ ───────────► │ MySQL 8 │
-│  Vite · React Router │ ◄───────────── │  Security · JPA       │ ◄─────────── │         │
-└──────────────────────┘     JSON       └───────────────────────┘              └─────────┘
-```
+**Backend**
 
-Backend chia theo **module nghiệp vụ** (không chia theo tầng kỹ thuật), mỗi module tự chứa
-entity – repository – service – controller:
+- Java 17, Spring Boot 3.3
+- Spring Security, JWT
+- Spring Data JPA, Flyway
+- MySQL 8 (dùng H2 khi chạy thử)
 
-```
-backend/src/main/java/vn/vuonsen/fnb/
-├── common/          Lớp dùng chung: BaseEntity, xử lý lỗi tập trung, DTO phân trang
-├── config/          SecurityConfig, OpenAPI, tài khoản admin khởi tạo, các lớp @ConfigurationProperties
-├── security/        JwtService, JwtAuthenticationFilter, AppUserDetails
-└── modules/
-    ├── auth/        Đăng ký · đăng nhập · refresh token
-    ├── user/        Hồ sơ người dùng, phân quyền CUSTOMER / STAFF / ADMIN
-    ├── space/       6 không gian sự kiện + bộ lọc theo sức chứa / loại / giá
-    ├── menu/        Danh mục & món ăn (hệ thống tab)
-    ├── partypackage/ Gói tiệc tính theo mâm
-    ├── booking/     ★ Đặt tiệc, PricingService (công thức tính giá), vòng đời đơn
-    ├── review/      Đánh giá khách hàng (duyệt trước khi hiển thị)
-    └── gallery/     Thư viện ảnh
-```
+**Frontend**
 
-Frontend tổ chức theo **feature-based** — chuẩn khuyến nghị của Redux Toolkit:
+- React 18, Vite
+- Redux Toolkit
+- React Router 6
+- Axios
 
-```
-frontend/src/
-├── api/          axiosClient (interceptor tự làm mới token) + endpoints
-├── app/          store.js
-├── features/     authSlice · catalogSlice · bookingSlice
-├── components/   layout (Header/Footer) · common (GoogleMap, StateBlock)
-├── pages/        Từng màn hình, kể cả khu quản trị
-├── routes/       ProtectedRoute (chặn theo quyền)
-└── styles/       global.css — giữ nguyên bảng màu của prototype
-```
+**Khác:** Docker, Swagger UI
 
----
+## Tính năng
 
-## 2. Chạy dự án
+Phía khách hàng:
 
-### Cách A — Chạy nhanh, **không cần cài MySQL** (khuyến nghị khi mới bắt đầu)
+- Đăng ký, đăng nhập bằng JWT
+- Xem 6 không gian sự kiện, lọc theo số khách, loại không gian và giá thuê
+- Xem thực đơn chia tab theo danh mục món
+- Xem các gói tiệc tính theo mâm
+- Thư viện ảnh, bấm vào ảnh để xem phóng to
+- Đặt tiệc qua form 3 bước, chi phí tính tự động theo số khách
+- Tra cứu đơn bằng mã đơn, không cần tài khoản
+- Xem lại lịch sử đơn đã đặt
 
-Backend chạy profile `dev` với H2 in-memory; Flyway tự tạo bảng và nạp dữ liệu mẫu.
+Phía quản trị:
 
-```bash
-cd backend && mvn spring-boot:run
-```
+- Danh sách đơn, lọc theo trạng thái, khoảng ngày và từ khoá
+- Duyệt, hoàn thành hoặc huỷ đơn
+- Thống kê số đơn theo từng trạng thái
+- Quản lý không gian sự kiện
+- Duyệt đánh giá của khách trước khi hiển thị
+
+## Yêu cầu
+
+- JDK 17 trở lên
+- Node.js 18 trở lên
+- Maven 3.9 trở lên
+- MySQL 8 (không bắt buộc, xem cách chạy nhanh bên dưới)
+
+## Cài đặt và chạy
+
+### Cách 1: Chạy nhanh, không cần cài MySQL
+
+Backend dùng H2 chạy trên RAM, Flyway tự tạo bảng và nạp sẵn dữ liệu mẫu.
 
 ```bash
-cd frontend && npm install && npm run dev
+cd backend
+mvn spring-boot:run
 ```
 
-| Địa chỉ | Nội dung |
-|---|---|
-| http://localhost:5173 | Giao diện website |
-| http://localhost:8080/swagger-ui.html | Tài liệu API tương tác |
-| http://localhost:8080/h2-console | Xem CSDL (JDBC URL: `jdbc:h2:mem:vuonsen`, user `sa`, mật khẩu để trống) |
+Mở terminal thứ hai:
+
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+- Giao diện: http://localhost:5173
+- Tài liệu API: http://localhost:8080/swagger-ui.html
+- Xem cơ sở dữ liệu: http://localhost:8080/h2-console
+  (JDBC URL `jdbc:h2:mem:vuonsen`, user `sa`, mật khẩu để trống)
 
 Tài khoản quản trị mặc định: `admin@vuonsen.vn` / `Admin@123`
 
-### Cách B — Chạy với MySQL thật
+### Cách 2: Chạy với MySQL
+
+Tạo database:
 
 ```sql
 CREATE DATABASE vuonsen_fnb CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 ```
 
+Đặt các biến môi trường `DB_URL`, `DB_USER`, `DB_PASSWORD`, sau đó:
+
 ```bash
-cd backend && mvn spring-boot:run -Dspring-boot.run.profiles=prod
+cd backend
+mvn spring-boot:run -Dspring-boot.run.profiles=prod
 ```
 
-Thông tin kết nối lấy từ biến môi trường `DB_URL`, `DB_USER`, `DB_PASSWORD` (xem `application.yml`).
-
-### Cách C — Docker (đủ 3 dịch vụ)
+### Cách 3: Chạy bằng Docker
 
 ```bash
 cp .env.example .env
 ```
 
-Điền `JWT_SECRET` và `ADMIN_PASSWORD` vào `.env`, sau đó:
+Điền `JWT_SECRET` và `ADMIN_PASSWORD` vào file `.env`, rồi chạy:
 
 ```bash
 docker compose up -d --build
 ```
 
-Website tại http://localhost, API tại http://localhost:8080.
+Website chạy tại http://localhost, API tại http://localhost:8080.
 
----
+## Cấu trúc thư mục
 
-## 3. Công thức tính giá tiệc
+```
+backend/
+  src/main/java/vn/vuonsen/fnb/
+    common/       Lớp dùng chung, xử lý lỗi tập trung
+    config/       Cấu hình bảo mật, Swagger, tài khoản admin
+    security/     Xử lý JWT
+    modules/      auth, user, space, menu, partypackage, booking, review, gallery
+  src/main/resources/
+    db/migration/ Script tạo bảng và dữ liệu mẫu
 
-Toàn bộ quy tắc nằm ở một chỗ duy nhất: `PricingService`. Frontend **không** tự tính lại
-mà luôn gọi `POST /api/v1/bookings/quote`, nhờ vậy số tiền trên màn hình và trong đơn
-không bao giờ lệch nhau.
-
-| Thành phần | Cách tính |
-|---|---|
-| Số mâm | `ceil(số khách / 10)` |
-| Tiền ăn | `số mâm × giá gói/mâm` |
-| Phí không gian | `0` nếu ≥ 30 mâm; loại tính theo chòi thì `phí × số chòi` |
-| Giảm giá | `5% × (tiền ăn + phí không gian)` nếu đặt trước ≥ 60 ngày |
-| VAT | `8% × (tiền ăn + phí không gian − giảm giá)` |
-| **Tổng cộng** | `tiền ăn + phí không gian − giảm giá + VAT` |
-
-Các tham số (10 khách/mâm, VAT 8%, mốc 30 mâm, 60 ngày, 5%) đặt trong `application.yml`
-nhóm `app.booking` — đổi chính sách giá không phải sửa mã nguồn.
-
-Chạy kiểm thử công thức:
-
-```bash
-cd backend && mvn test
+frontend/
+  src/
+    api/          Gọi API
+    features/     Redux slice
+    components/   Component dùng chung
+    pages/        Các trang giao diện
+    routes/       Phân quyền truy cập trang
 ```
 
----
+Mỗi module ở backend tự chứa đầy đủ entity, repository, service và controller của nghiệp vụ đó.
 
-## 4. Bảng dữ liệu
+## Cách tính giá tiệc
 
-Flyway quản lý schema (`backend/src/main/resources/db/migration`), Hibernate chỉ ở chế độ
-`validate` — sai lệch giữa entity và bảng sẽ báo lỗi ngay khi khởi động.
+Công thức nằm trong `PricingService`. Frontend gọi API `POST /api/v1/bookings/quote` để lấy kết quả
+chứ không tự tính lại, nhờ vậy số tiền hiển thị và số tiền lưu trong đơn luôn khớp nhau.
 
-| Bảng | Vai trò |
-|---|---|
-| `users`, `refresh_tokens` | Tài khoản, phân quyền, phiên đăng nhập |
-| `spaces`, `space_amenities`, `space_images` | Không gian sự kiện và tiện ích |
-| `dish_categories`, `dishes` | Thực đơn theo danh mục |
-| `party_packages`, `package_features` | Gói tiệc và nội dung từng gói |
-| `bookings`, `booking_status_history` | Đơn đặt tiệc và nhật ký đổi trạng thái |
-| `reviews` | Đánh giá khách hàng |
-| `gallery_images` | Thư viện ảnh |
+```
+số mâm         = làm tròn lên (số khách / 10)
+tiền ăn        = số mâm x giá một mâm của gói tiệc
+phí không gian = 0 nếu đặt từ 30 mâm trở lên
+giảm giá       = 5% nếu đặt trước từ 60 ngày
+VAT            = 8%
+tổng cộng      = tiền ăn + phí không gian - giảm giá + VAT
+```
 
-Bảng `bookings` lưu **bản sao** giá tại thời điểm đặt (`unit_price`, `food_amount`, `vat_amount`…).
-Nhà hàng tăng giá sau này không làm thay đổi số tiền đã báo cho khách.
+Các tham số (10 khách một mâm, VAT 8%, mốc 30 mâm, 60 ngày, 5%) đặt trong `application.yml`
+phần `app.booking`, đổi chính sách giá không cần sửa mã nguồn.
 
-Vòng đời đơn: `PENDING → CONFIRMED → COMPLETED`, có thể `CANCELLED` từ hai trạng thái đầu.
-Bước chuyển không hợp lệ bị `BookingStatus.canTransitionTo()` chặn lại.
-
----
-
-## 5. Bảo mật
-
-- Mật khẩu băm bằng **BCrypt**, không bao giờ lưu dạng rõ.
-- **Access token** (60 phút) dùng gọi API; **refresh token** (14 ngày) lưu trong CSDL nên
-  có thể thu hồi khi đăng xuất — điều mà JWT thuần túy không làm được.
-- Refresh token **xoay vòng**: token cũ bị thu hồi ngay khi dùng, chống tấn công phát lại.
-- API stateless, tắt CSRF, CORS chỉ mở cho origin khai báo trong `app.cors.allowed-origins`.
-- Phân quyền hai lớp: theo đường dẫn ở `SecurityConfig`, theo phương thức bằng `@PreAuthorize`.
-
----
-
-## 6. Danh mục API chính
+## API chính
 
 | Phương thức | Đường dẫn | Quyền |
 |---|---|---|
-| `POST` | `/api/auth/register`, `/api/auth/login`, `/api/auth/refresh` | Công khai |
-| `GET` | `/api/v1/spaces` (lọc `guests`, `type`, `maxPrice`) | Công khai |
-| `GET` | `/api/v1/menu/categories`, `/api/v1/menu/dishes` | Công khai |
-| `GET` | `/api/v1/packages` | Công khai |
-| `POST` | `/api/v1/bookings/quote` | Công khai |
-| `POST` | `/api/v1/bookings` | Công khai (khách vãng lai đặt được) |
-| `GET` | `/api/v1/bookings/track/{code}` | Công khai |
-| `GET` | `/api/v1/bookings/my` | Đã đăng nhập |
-| `GET` | `/api/v1/admin/bookings` | ADMIN / STAFF |
-| `PATCH` | `/api/v1/admin/bookings/{id}/status` | ADMIN / STAFF |
+| POST | `/api/auth/register`, `/api/auth/login` | Công khai |
+| GET | `/api/v1/spaces` | Công khai |
+| GET | `/api/v1/menu/categories`, `/api/v1/menu/dishes` | Công khai |
+| GET | `/api/v1/packages` | Công khai |
+| POST | `/api/v1/bookings/quote` | Công khai |
+| POST | `/api/v1/bookings` | Công khai |
+| GET | `/api/v1/bookings/track/{code}` | Công khai |
+| GET | `/api/v1/bookings/my` | Cần đăng nhập |
+| GET | `/api/v1/admin/bookings` | ADMIN, STAFF |
+| PATCH | `/api/v1/admin/bookings/{id}/status` | ADMIN, STAFF |
 
 Danh sách đầy đủ xem tại Swagger UI.
 
----
+## Cơ sở dữ liệu
 
-## 7. Việc còn lại
+Flyway quản lý toàn bộ script tạo bảng trong `backend/src/main/resources/db/migration`.
+Hibernate chỉ ở chế độ `validate` nên nếu entity lệch với bảng sẽ báo lỗi ngay khi khởi động.
 
-Khung đã dựng xong phần lõi. Các hạng mục nên làm tiếp:
+Các bảng chính: `users`, `refresh_tokens`, `spaces`, `dishes`, `party_packages`, `bookings`,
+`reviews`, `gallery_images`.
 
-- [ ] Tải ảnh thật cho không gian, món ăn, thư viện (hiện dùng khối màu giữ chỗ)
-- [ ] Gửi email xác nhận đơn đặt tiệc (`BookingService.create` đã đánh dấu chỗ cắm)
-- [ ] Màn hình quản trị cho không gian / thực đơn / gói tiệc (API backend đã sẵn sàng)
-- [ ] Tích hợp cổng thanh toán đặt cọc (VNPay hoặc MoMo)
-- [ ] Bổ sung kiểm thử tích hợp cho luồng đặt tiệc bằng MockMvc
-- [ ] Tối ưu SEO: thẻ meta động, sitemap, dữ liệu có cấu trúc `schema.org/Restaurant`
+Bảng `bookings` lưu lại giá tại thời điểm khách đặt, nên sau này nhà hàng tăng giá thì
+số tiền của đơn cũ vẫn giữ nguyên.
 
----
-
-## 8. Lưu ý về môi trường Windows
-
-Thư mục dự án đặt tại `E:\Web-ThietKe-DichVu-FB-TLTN`.
-
-Tên cũ chứa ký tự `&` đã làm hỏng mọi lệnh `npm run`: `cmd.exe` hiểu `&` là ký tự nối lệnh
-nên đường dẫn bị cắt đôi, báo lỗi `'B' is not recognized as an internal or external command`.
-Thư mục đã được đổi sang dạng ASCII, không dấu, không khoảng trắng nên lỗi này không còn.
-
-**Giữ nguyên quy ước đặt tên này** khi tạo thư mục con hoặc di chuyển dự án — tránh ký tự
-`&`, `%`, `^` và dấu tiếng Việt trong đường dẫn để không gặp lại vấn đề tương tự với npm,
-Docker hay các công cụ dòng lệnh khác.
-
-### Mở bằng IntelliJ IDEA
-
-Mở **thư mục gốc** của dự án (không phải riêng `backend/`) để thấy cả hai phần. Khi IntelliJ
-hiện thông báo *"Maven build script found"*, bấm **Load** để nó nhận `backend/pom.xml` và tải
-thư viện. Sau đó chạy `FnbApplication` bằng nút ▶ bên cạnh hàm `main`.
-
-Frontend chạy ở terminal tích hợp (`Alt+F12`):
+## Kiểm thử
 
 ```bash
-cd frontend && npm run dev
+cd backend
+mvn test
 ```
+
+## Hướng phát triển
+
+- Thay ảnh giữ chỗ bằng ảnh thật của nhà hàng
+- Gửi email xác nhận khi khách đặt tiệc
+- Bổ sung trang quản trị cho thực đơn và gói tiệc
+- Tích hợp thanh toán đặt cọc qua VNPay hoặc MoMo
+- Viết thêm kiểm thử tích hợp cho luồng đặt tiệc
+
+## Tác giả
+
+Phạm Trần Tuấn Anh — MSSV 21130004, lớp DH21DTA
+Khoa Công nghệ thông tin, Trường Đại học Nông Lâm TP.HCM
+
+Giảng viên hướng dẫn: TS. Nguyễn Thị Phương Trâm
