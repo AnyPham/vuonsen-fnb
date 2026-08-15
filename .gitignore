@@ -1,0 +1,36 @@
+# --- Bien moi truong / bi mat ---
+.env
+*.env.local
+
+# --- Java / Maven ---
+target/
+*.jar
+*.war
+!.mvn/wrapper/maven-wrapper.jar
+
+# --- Node / Vite ---
+node_modules/
+dist/
+dist-ssr/
+*.local
+.vite/
+
+# --- IDE ---
+.idea/
+.vscode/
+*.iml
+*.ipr
+*.iws
+.settings/
+.classpath
+.project
+
+# --- He dieu hanh ---
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# --- Nhat ky ---
+*.log
+npm-debug.log*
+logs/

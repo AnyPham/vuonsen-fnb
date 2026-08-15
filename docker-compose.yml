@@ -1,0 +1,60 @@
+# Ba dich vu: CSDL MySQL, backend Spring Boot, frontend React phuc vu qua Nginx.
+# Chay toan bo he thong:  docker compose up -d --build
+# Xem log backend:        docker compose logs -f backend
+# Dung va xoa du lieu:    docker compose down -v
+name: vuonsen-fnb
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: vuonsen-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:-root}
+      MYSQL_DATABASE: vuonsen_fnb
+      MYSQL_USER: ${DB_USER:-vuonsen}
+      MYSQL_PASSWORD: ${DB_PASSWORD:-vuonsen123}
+      TZ: Asia/Ho_Chi_Minh
+    command:
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_unicode_ci
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql-data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-p${DB_ROOT_PASSWORD:-root}"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  backend:
+    build: ./backend
+    container_name: vuonsen-backend
+    restart: unless-stopped
+    depends_on:
+      mysql:
+        condition: service_healthy
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+      DB_URL: jdbc:mysql://mysql:3306/vuonsen_fnb?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Ho_Chi_Minh&allowPublicKeyRetrieval=true&useSSL=false
+      DB_USER: ${DB_USER:-vuonsen}
+      DB_PASSWORD: ${DB_PASSWORD:-vuonsen123}
+      JWT_SECRET: ${JWT_SECRET:?Dat JWT_SECRET trong file .env truoc khi chay}
+      ADMIN_EMAIL: ${ADMIN_EMAIL:-admin@vuonsen.vn}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:?Dat ADMIN_PASSWORD trong file .env truoc khi chay}
+      CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost}
+    ports:
+      - "8080:8080"
+
+  frontend:
+    build: ./frontend
+    container_name: vuonsen-frontend
+    restart: unless-stopped
+    depends_on:
+      - backend
+    ports:
+      - "80:80"
+
+volumes:
+  mysql-data:

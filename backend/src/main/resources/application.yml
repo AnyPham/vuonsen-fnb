@@ -1,0 +1,80 @@
+spring:
+  application:
+    name: fnb-backend
+  profiles:
+    active: dev
+
+  datasource:
+    url: ${DB_URL:jdbc:mysql://localhost:3306/vuonsen_fnb?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Ho_Chi_Minh&allowPublicKeyRetrieval=true&useSSL=false}
+    username: ${DB_USER:root}
+    password: ${DB_PASSWORD:root}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  jpa:
+    hibernate:
+      # Flyway lo tạo bảng, Hibernate chỉ kiểm tra chứ không tự sửa
+      ddl-auto: validate
+    open-in-view: false
+    properties:
+      hibernate:
+        format_sql: true
+        jdbc:
+          time_zone: Asia/Ho_Chi_Minh
+
+  flyway:
+    enabled: true
+    baseline-on-migrate: true
+    locations: classpath:db/migration
+
+  jackson:
+    default-property-inclusion: non_null
+    serialization:
+      write-dates-as-timestamps: false
+
+  servlet:
+    multipart:
+      max-file-size: 5MB
+      max-request-size: 20MB
+
+server:
+  port: ${SERVER_PORT:8080}
+  error:
+    include-message: always
+  servlet:
+    context-path: /
+
+# Cấu hình riêng của ứng dụng
+app:
+  jwt:
+    # Khóa bí mật tối thiểu 32 ký tự. Khi chạy thật nhớ đổi qua biến JWT_SECRET.
+    secret: ${JWT_SECRET:vuonsen-fnb-dev-secret-key-doi-lai-khi-len-production-2026}
+    access-token-minutes: 60
+    refresh-token-days: 14
+    issuer: vuonsen-fnb
+
+  cors:
+    allowed-origins: ${CORS_ORIGINS:http://localhost:5173,http://localhost:3000}
+
+  # Các tham số tính giá tiệc, đổi ở đây không cần sửa code
+  booking:
+    guests-per-table: 10          # 1 mam = 10 khach
+    vat-rate: 0.08                # VAT 8%
+    free-space-from-tables: 30    # tu 30 mam tro len: mien phi thue khong gian
+    early-bird-days: 60           # dat truoc >= 60 ngay
+    early-bird-rate: 0.05         # giam them 5%
+    min-guests: 10
+    max-guests: 800
+
+  admin:
+    # Tài khoản admin tạo tự động khi chạy lần đầu
+    default-email: ${ADMIN_EMAIL:admin@vuonsen.vn}
+    default-password: ${ADMIN_PASSWORD:Admin@123}
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+    operationsSorter: method
+
+logging:
+  level:
+    vn.vuonsen.fnb: DEBUG

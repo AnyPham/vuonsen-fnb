@@ -1,0 +1,1308 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vườn Sen — Khu ẩm thực & Tiệc sân vườn | Nhà hàng và cho thuê không gian tiệc</title>
+<meta name="description" content="Vườn Sen — khu ẩm thực sân vườn và dịch vụ cho thuê không gian tiệc tại TP.HCM. Tiệc cưới, tiệc công ty, sinh nhật, họp mặt gia đình. Thực đơn món Việt, báo giá theo mâm, đặt tiệc online.">
+<meta name="keywords" content="nhà hàng sân vườn, cho thuê không gian tiệc, đặt tiệc cưới, tiệc công ty, tiệc sinh nhật, ẩm thực miền quê, nhà hàng tiệc TPHCM">
+<link rel="canonical" href="https://vuonsen.vn/">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Vườn Sen — Khu ẩm thực & Tiệc sân vườn">
+<meta property="og:description" content="Không gian sân vườn ven sông, ẩm thực miền quê và dịch vụ tổ chức tiệc trọn gói từ 20 đến 800 khách.">
+<meta property="og:locale" content="vi_VN">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Be+Vietnam+Pro:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='26' font-size='26'>🌿</text></svg>">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Restaurant",
+  "name": "Vườn Sen — Khu ẩm thực & Tiệc sân vườn",
+  "servesCuisine": "Vietnamese",
+  "priceRange": "$$",
+  "address": {
+    "@type": "PostalAddress",
+    "streetAddress": "1147 Bình Quới, Phường 28, Bình Thạnh",
+    "addressLocality": "TP. Hồ Chí Minh",
+    "addressCountry": "VN"
+  },
+  "telephone": "+84-28-1234-5678",
+  "openingHours": "Mo-Su 09:00-22:00",
+  "amenityFeature": [
+    {"@type": "LocationFeatureSpecification", "name": "Cho thuê không gian tiệc", "value": true},
+    {"@type": "LocationFeatureSpecification", "name": "Bãi đỗ xe", "value": true},
+    {"@type": "LocationFeatureSpecification", "name": "Sân vườn ngoài trời", "value": true}
+  ],
+  "hasMenu": "https://vuonsen.vn/#menu",
+  "acceptsReservations": "https://vuonsen.vn/#dat-tiec"
+}
+</script>
+<style>
+/* ============ 1. DESIGN TOKENS ============ */
+:root{
+  --green-900:#12281C;
+  --green-800:#1B3B29;
+  --green-700:#27533A;
+  --green-400:#6E9C7E;
+  --gold:#C6A052;
+  --gold-light:#E3C88A;
+  --terra:#B4552F;
+  --cream:#FBF7EF;
+  --cream-2:#F3EBDD;
+  --ink:#2A2723;
+  --ink-soft:#5E5951;
+  --line:rgba(42,39,35,.12);
+  --shadow-sm:0 2px 10px rgba(18,40,28,.07);
+  --shadow-md:0 12px 34px rgba(18,40,28,.12);
+  --shadow-lg:0 26px 70px rgba(18,40,28,.2);
+  --serif:"Playfair Display", "Times New Roman", serif;
+  --sans:"Be Vietnam Pro", -apple-system, "Segoe UI", Roboto, sans-serif;
+  --r:14px;
+  --wrap:1200px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;scroll-padding-top:78px}
+body{
+  font-family:var(--sans);
+  color:var(--ink);
+  background:var(--cream);
+  line-height:1.65;
+  -webkit-font-smoothing:antialiased;
+  overflow-x:hidden;
+}
+img{max-width:100%;display:block}
+a{color:inherit;text-decoration:none}
+button,input,select,textarea{font:inherit;color:inherit}
+.wrap{max-width:var(--wrap);margin:0 auto;padding:0 24px}
+h1,h2,h3,.serif{font-family:var(--serif);font-weight:600;line-height:1.18;letter-spacing:-.01em}
+
+/* ============ 2. SHARED BITS ============ */
+.eyebrow{
+  font-size:.74rem;letter-spacing:.22em;text-transform:uppercase;
+  font-weight:600;color:var(--gold);display:flex;align-items:center;gap:12px;
+}
+.eyebrow::before{content:"";width:34px;height:1px;background:var(--gold);opacity:.7}
+.eyebrow.center{justify-content:center}
+.eyebrow.center::after{content:"";width:34px;height:1px;background:var(--gold);opacity:.7}
+.section{padding:96px 0;position:relative}
+.section-head{max-width:660px;margin-bottom:48px}
+.section-head.center{margin-left:auto;margin-right:auto;text-align:center}
+.section-head h2{font-size:clamp(1.9rem,3.6vw,2.9rem);margin:18px 0 14px}
+.section-head p{color:var(--ink-soft);font-size:1.03rem}
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:9px;
+  padding:14px 28px;border-radius:100px;border:1px solid transparent;
+  font-weight:600;font-size:.94rem;cursor:pointer;
+  transition:transform .2s ease, box-shadow .2s ease, background .2s ease, color .2s ease;
+}
+.btn:hover{transform:translateY(-2px)}
+.btn-gold{background:var(--gold);color:var(--green-900);box-shadow:0 8px 22px rgba(198,160,82,.34)}
+.btn-gold:hover{background:var(--gold-light);box-shadow:0 12px 30px rgba(198,160,82,.42)}
+.btn-outline{border-color:rgba(251,247,239,.42);color:var(--cream)}
+.btn-outline:hover{background:rgba(251,247,239,.12)}
+.btn-dark{background:var(--green-800);color:var(--cream)}
+.btn-dark:hover{background:var(--green-700)}
+.btn-ghost{border-color:var(--line);color:var(--ink)}
+.btn-ghost:hover{background:#fff;box-shadow:var(--shadow-sm)}
+
+/* photo placeholders — thay bằng ảnh thật khi có */
+.ph{position:relative;overflow:hidden;background:var(--green-800)}
+.ph::before{
+  content:"";position:absolute;inset:0;
+  background:
+    radial-gradient(120% 90% at 18% 12%, rgba(227,200,138,.5), transparent 55%),
+    radial-gradient(100% 100% at 85% 88%, rgba(110,156,126,.75), transparent 60%),
+    linear-gradient(150deg,var(--green-700),var(--green-900));
+}
+.ph::after{
+  content:"";position:absolute;inset:0;opacity:.16;
+  background-image:
+    repeating-linear-gradient(45deg, rgba(251,247,239,.7) 0 1px, transparent 1px 13px),
+    repeating-linear-gradient(-45deg, rgba(251,247,239,.4) 0 1px, transparent 1px 22px);
+}
+.ph .ph-label{
+  position:absolute;inset:0;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;gap:6px;z-index:2;
+  color:rgba(251,247,239,.9);text-align:center;padding:16px;
+}
+.ph .ph-label span:first-child{font-size:1.6rem}
+.ph .ph-label span:last-child{font-size:.72rem;letter-spacing:.16em;text-transform:uppercase;opacity:.75}
+.ph.v2::before{background:radial-gradient(110% 90% at 80% 10%, rgba(198,160,82,.55), transparent 55%),linear-gradient(210deg,var(--terra),var(--green-800))}
+.ph.v3::before{background:radial-gradient(100% 100% at 20% 90%, rgba(227,200,138,.6), transparent 60%),linear-gradient(120deg,var(--green-900),var(--green-700))}
+.ph.v4::before{background:radial-gradient(120% 100% at 50% 0%, rgba(110,156,126,.8), transparent 60%),linear-gradient(160deg,var(--green-800),#0C1D14)}
+
+/* reveal on scroll */
+.reveal{opacity:0;transform:translateY(26px);transition:opacity .7s ease, transform .7s ease}
+.reveal.in{opacity:1;transform:none}
+
+/* ============ 3. HEADER ============ */
+.topbar{
+  background:var(--green-900);color:rgba(251,247,239,.78);
+  font-size:.8rem;padding:9px 0;
+}
+.topbar .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
+.topbar strong{color:var(--gold-light);font-weight:600}
+header.nav{
+  position:sticky;top:0;z-index:60;
+  background:rgba(251,247,239,.86);backdrop-filter:blur(14px);
+  border-bottom:1px solid var(--line);transition:box-shadow .3s ease;
+}
+header.nav.stuck{box-shadow:var(--shadow-sm)}
+.nav-inner{display:flex;align-items:center;justify-content:space-between;gap:20px;height:74px}
+.logo{display:flex;align-items:center;gap:11px;font-family:var(--serif);font-size:1.3rem;font-weight:700;color:var(--green-900)}
+.logo .mark{
+  width:38px;height:38px;border-radius:11px;flex:none;
+  background:linear-gradient(140deg,var(--green-700),var(--green-900));
+  color:var(--gold-light);display:grid;place-items:center;font-size:1.05rem;
+}
+.logo small{display:block;font-family:var(--sans);font-size:.6rem;letter-spacing:.2em;
+  text-transform:uppercase;color:var(--ink-soft);font-weight:500}
+.menu{display:flex;align-items:center;gap:4px}
+.menu a{
+  padding:9px 14px;border-radius:100px;font-size:.9rem;font-weight:500;
+  color:var(--ink);transition:background .2s ease,color .2s ease;
+}
+.menu a:hover{background:var(--cream-2);color:var(--green-800)}
+.nav-cta{display:flex;align-items:center;gap:10px}
+.burger{display:none;width:44px;height:44px;border:1px solid var(--line);background:#fff;border-radius:12px;cursor:pointer}
+.burger span{display:block;width:18px;height:2px;background:var(--ink);margin:4px auto;border-radius:2px;transition:.25s}
+.burger.on span:nth-child(1){transform:translateY(6px) rotate(45deg)}
+.burger.on span:nth-child(2){opacity:0}
+.burger.on span:nth-child(3){transform:translateY(-6px) rotate(-45deg)}
+
+/* ============ 4. HERO ============ */
+.hero{position:relative;min-height:640px;display:flex;align-items:center;color:var(--cream);overflow:hidden}
+.hero .bg{position:absolute;inset:0;z-index:0}
+.hero .bg::before{
+  content:"";position:absolute;inset:0;
+  background:
+    radial-gradient(90% 70% at 78% 22%, rgba(198,160,82,.32), transparent 58%),
+    radial-gradient(80% 80% at 12% 88%, rgba(110,156,126,.42), transparent 60%),
+    linear-gradient(155deg,#0D1F15 0%, var(--green-800) 48%, #0A1A11 100%);
+}
+.hero .bg::after{
+  content:"";position:absolute;inset:0;opacity:.10;
+  background-image:repeating-linear-gradient(60deg, rgba(251,247,239,.6) 0 1px, transparent 1px 26px);
+}
+.hero .wrap{position:relative;z-index:2;padding-top:110px;padding-bottom:110px}
+.hero-grid{display:grid;grid-template-columns:1.15fr .85fr;gap:56px;align-items:center}
+.hero h1{font-size:clamp(2.4rem,5.4vw,4.15rem);margin:22px 0 20px}
+.hero h1 em{font-style:normal;color:var(--gold-light)}
+.hero p.lead{font-size:1.1rem;color:rgba(251,247,239,.82);max-width:520px;font-weight:300}
+.hero-actions{display:flex;gap:14px;flex-wrap:wrap;margin-top:34px}
+.hero-stats{display:flex;gap:36px;margin-top:52px;flex-wrap:wrap}
+.hero-stats div strong{display:block;font-family:var(--serif);font-size:2rem;color:var(--gold-light)}
+.hero-stats div span{font-size:.82rem;color:rgba(251,247,239,.65)}
+.quickcard{
+  background:rgba(251,247,239,.07);border:1px solid rgba(251,247,239,.16);
+  border-radius:20px;padding:26px;backdrop-filter:blur(10px);box-shadow:var(--shadow-lg);
+}
+.quickcard h3{font-size:1.22rem;margin-bottom:4px}
+.quickcard > p{font-size:.85rem;color:rgba(251,247,239,.6);margin-bottom:18px}
+.qfield{margin-bottom:13px}
+.qfield label{display:block;font-size:.74rem;letter-spacing:.1em;text-transform:uppercase;
+  color:rgba(251,247,239,.6);margin-bottom:6px;font-weight:600}
+.qfield input,.qfield select{
+  width:100%;padding:11px 13px;border-radius:10px;
+  border:1px solid rgba(251,247,239,.2);background:rgba(13,31,21,.55);
+  color:var(--cream);font-size:.92rem;
+}
+.qfield select option{background:var(--green-900)}
+.qfield input:focus,.qfield select:focus{outline:2px solid var(--gold);outline-offset:1px}
+.quickcard .btn{width:100%;margin-top:6px}
+.quickcard .note{font-size:.74rem;color:rgba(251,247,239,.5);text-align:center;margin-top:11px}
+
+/* ============ 5. USP STRIP ============ */
+.usp{background:var(--green-900);color:var(--cream);padding:0}
+.usp-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:rgba(251,247,239,.11)}
+.usp-item{background:var(--green-900);padding:34px 26px}
+.usp-item .ico{font-size:1.5rem;margin-bottom:10px}
+.usp-item h4{font-size:1rem;font-weight:600;margin-bottom:5px}
+.usp-item p{font-size:.86rem;color:rgba(251,247,239,.62);font-weight:300}
+
+/* ============ 6. STORY ============ */
+.story-grid{display:grid;grid-template-columns:1fr 1fr;gap:64px;align-items:center}
+.story-media{position:relative}
+.story-media .ph:first-child{aspect-ratio:4/5;border-radius:var(--r);box-shadow:var(--shadow-md)}
+.story-media .ph:last-child{
+  position:absolute;right:-26px;bottom:-32px;width:52%;aspect-ratio:1;
+  border-radius:var(--r);border:8px solid var(--cream);box-shadow:var(--shadow-md);
+}
+.story-text h2{font-size:clamp(1.9rem,3.4vw,2.7rem);margin:18px 0 18px}
+.story-text p{color:var(--ink-soft);margin-bottom:16px}
+.story-list{list-style:none;margin-top:26px;display:grid;gap:12px}
+.story-list li{display:flex;gap:12px;align-items:flex-start;font-size:.95rem}
+.story-list li::before{content:"✦";color:var(--gold);flex:none;margin-top:2px}
+
+/* ============ 7. SPACES ============ */
+.spaces{background:var(--cream-2)}
+.space-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:26px}
+.space-card{
+  background:#fff;border-radius:var(--r);overflow:hidden;
+  box-shadow:var(--shadow-sm);transition:transform .3s ease, box-shadow .3s ease;
+  display:flex;flex-direction:column;
+}
+.space-card:hover{transform:translateY(-6px);box-shadow:var(--shadow-md)}
+.space-card .ph{aspect-ratio:3/2}
+.space-tag{
+  position:absolute;top:14px;left:14px;z-index:3;background:rgba(18,40,28,.8);
+  color:var(--gold-light);padding:5px 12px;border-radius:100px;
+  font-size:.7rem;letter-spacing:.12em;text-transform:uppercase;font-weight:600;
+}
+.space-body{padding:24px;display:flex;flex-direction:column;flex:1}
+.space-body h3{font-size:1.28rem;margin-bottom:7px}
+.space-body p{font-size:.9rem;color:var(--ink-soft);margin-bottom:16px;flex:1}
+.space-meta{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:18px}
+.chip{
+  background:var(--cream-2);border-radius:100px;padding:5px 12px;
+  font-size:.78rem;color:var(--green-800);font-weight:500;
+}
+.space-foot{display:flex;align-items:center;justify-content:space-between;
+  border-top:1px solid var(--line);padding-top:16px}
+.price{font-family:var(--serif);font-size:1.15rem;color:var(--green-800)}
+.price small{font-family:var(--sans);font-size:.74rem;color:var(--ink-soft);font-weight:400}
+.space-foot a{font-size:.86rem;font-weight:600;color:var(--terra)}
+.space-foot a:hover{text-decoration:underline}
+
+/* ============ 8. MENU ============ */
+.tabs{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-bottom:40px}
+.tab{
+  padding:10px 22px;border-radius:100px;border:1px solid var(--line);
+  background:transparent;cursor:pointer;font-size:.9rem;font-weight:500;
+  transition:.2s;
+}
+.tab:hover{border-color:var(--gold)}
+.tab.active{background:var(--green-800);color:var(--cream);border-color:var(--green-800)}
+.menu-panel{display:none;grid-template-columns:1fr 1fr;gap:14px 48px}
+.menu-panel.active{display:grid;animation:fade .45s ease}
+@keyframes fade{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+.dish{display:flex;gap:14px;align-items:baseline;padding:14px 0;border-bottom:1px dashed var(--line)}
+.dish .d-name{font-weight:600;font-size:1rem}
+.dish .d-desc{font-size:.85rem;color:var(--ink-soft);font-weight:300}
+.dish .dots{flex:1;border-bottom:1px dotted rgba(42,39,35,.28);transform:translateY(-4px)}
+.dish .d-price{font-family:var(--serif);color:var(--green-800);white-space:nowrap}
+.badge-hot{background:var(--terra);color:#fff;font-size:.62rem;padding:2px 7px;
+  border-radius:100px;letter-spacing:.08em;text-transform:uppercase;margin-left:7px;vertical-align:middle}
+
+/* ============ 9. PACKAGES ============ */
+.packages{background:var(--green-900);color:var(--cream)}
+.packages .section-head p{color:rgba(251,247,239,.66)}
+.pkg-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;align-items:stretch}
+.pkg{
+  background:rgba(251,247,239,.055);border:1px solid rgba(251,247,239,.14);
+  border-radius:18px;padding:32px 28px;display:flex;flex-direction:column;
+  transition:transform .3s ease,border-color .3s ease;
+}
+.pkg:hover{transform:translateY(-6px);border-color:rgba(198,160,82,.55)}
+.pkg.featured{background:linear-gradient(165deg,rgba(198,160,82,.19),rgba(251,247,239,.05));
+  border-color:var(--gold);box-shadow:var(--shadow-lg)}
+.pkg .ribbon{
+  align-self:flex-start;background:var(--gold);color:var(--green-900);
+  font-size:.68rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;
+  padding:5px 12px;border-radius:100px;margin-bottom:14px;
+}
+.pkg h3{font-size:1.5rem;margin-bottom:6px}
+.pkg .sub{font-size:.85rem;color:rgba(251,247,239,.6);margin-bottom:20px}
+.pkg .amt{font-family:var(--serif);font-size:2.4rem;color:var(--gold-light);line-height:1}
+.pkg .amt span{font-family:var(--sans);font-size:.82rem;color:rgba(251,247,239,.6);font-weight:400}
+.pkg ul{list-style:none;margin:22px 0 26px;display:grid;gap:10px;flex:1}
+.pkg li{font-size:.9rem;color:rgba(251,247,239,.82);display:flex;gap:10px;font-weight:300}
+.pkg li::before{content:"✓";color:var(--gold);font-weight:700;flex:none}
+.pkg .btn{width:100%}
+.pkg-note{text-align:center;margin-top:30px;font-size:.85rem;color:rgba(251,247,239,.55)}
+
+/* ============ 10. GALLERY ============ */
+.gal-grid{display:grid;grid-template-columns:repeat(4,1fr);grid-auto-rows:190px;gap:14px}
+.gal-item{border-radius:12px;overflow:hidden;cursor:pointer;position:relative;
+  transition:transform .3s ease;box-shadow:var(--shadow-sm)}
+.gal-item:hover{transform:scale(1.02)}
+.gal-item .ph{position:absolute;inset:0}
+.gal-item::after{
+  content:"⤢";position:absolute;inset:0;display:grid;place-items:center;z-index:4;
+  background:rgba(18,40,28,.55);color:var(--cream);font-size:1.5rem;
+  opacity:0;transition:opacity .3s ease;
+}
+.gal-item:hover::after{opacity:1}
+.gal-item.tall{grid-row:span 2}
+.gal-item.wide{grid-column:span 2}
+.lightbox{
+  position:fixed;inset:0;z-index:120;background:rgba(10,26,17,.94);
+  display:none;align-items:center;justify-content:center;padding:40px;
+}
+.lightbox.on{display:flex;animation:fade .3s ease}
+.lightbox .frame{width:min(880px,90vw);aspect-ratio:16/10;border-radius:16px;overflow:hidden;position:relative}
+.lightbox .cap{position:absolute;left:0;right:0;bottom:0;z-index:5;padding:22px;
+  background:linear-gradient(transparent,rgba(10,26,17,.9));color:var(--cream);font-size:.95rem}
+.lb-close{position:absolute;top:26px;right:30px;font-size:2rem;color:var(--cream);
+  background:none;border:none;cursor:pointer;line-height:1}
+.lb-nav{position:absolute;top:50%;transform:translateY(-50%);font-size:2rem;color:var(--cream);
+  background:rgba(251,247,239,.12);border:none;cursor:pointer;width:52px;height:52px;border-radius:50%}
+.lb-prev{left:24px} .lb-next{right:24px}
+
+/* ============ 11. BOOKING ============ */
+.booking{background:var(--cream-2)}
+.book-grid{display:grid;grid-template-columns:1.35fr .65fr;gap:34px;align-items:start}
+.book-card{background:#fff;border-radius:20px;padding:38px;box-shadow:var(--shadow-md)}
+.steps{display:flex;gap:8px;margin-bottom:30px}
+.step{flex:1;text-align:center;font-size:.78rem;color:var(--ink-soft);position:relative;padding-top:32px}
+.step::before{
+  content:attr(data-n);position:absolute;top:0;left:50%;transform:translateX(-50%);
+  width:26px;height:26px;border-radius:50%;background:var(--cream-2);color:var(--ink-soft);
+  display:grid;place-items:center;font-weight:700;font-size:.78rem;transition:.3s;
+}
+.step.on::before{background:var(--green-800);color:var(--cream)}
+.step.done::before{content:"✓";background:var(--gold);color:var(--green-900)}
+.step.on{color:var(--green-800);font-weight:600}
+.fpanel{display:none}
+.fpanel.on{display:block;animation:fade .35s ease}
+.frow{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px}
+.fgroup{display:flex;flex-direction:column;gap:6px}
+.fgroup.full{grid-column:1/-1}
+.fgroup label{font-size:.82rem;font-weight:600;color:var(--green-800)}
+.fgroup input,.fgroup select,.fgroup textarea{
+  padding:12px 14px;border:1px solid var(--line);border-radius:10px;
+  background:var(--cream);font-size:.94rem;transition:.2s;
+}
+.fgroup input:focus,.fgroup select:focus,.fgroup textarea:focus{
+  outline:none;border-color:var(--gold);background:#fff;box-shadow:0 0 0 3px rgba(198,160,82,.16)}
+.fgroup textarea{resize:vertical;min-height:92px}
+.fgroup .err{font-size:.76rem;color:var(--terra);display:none}
+.fgroup.invalid input,.fgroup.invalid select{border-color:var(--terra)}
+.fgroup.invalid .err{display:block}
+.picks{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.pick{
+  border:1px solid var(--line);border-radius:12px;padding:16px;cursor:pointer;
+  text-align:center;transition:.2s;background:var(--cream);
+}
+.pick:hover{border-color:var(--gold)}
+.pick.sel{border-color:var(--green-800);background:#fff;box-shadow:0 0 0 2px var(--green-800)}
+.pick .t{font-weight:600;font-size:.92rem;display:block}
+.pick .s{font-size:.76rem;color:var(--ink-soft)}
+.fnav{display:flex;justify-content:space-between;gap:12px;margin-top:26px}
+.estimate{
+  background:var(--green-900);color:var(--cream);border-radius:20px;padding:30px;
+  position:sticky;top:100px;box-shadow:var(--shadow-md);
+}
+.estimate h3{font-size:1.2rem;margin-bottom:4px}
+.estimate > p{font-size:.82rem;color:rgba(251,247,239,.55);margin-bottom:22px}
+.est-row{display:flex;justify-content:space-between;gap:12px;font-size:.88rem;
+  padding:11px 0;border-bottom:1px solid rgba(251,247,239,.11)}
+.est-row span:first-child{color:rgba(251,247,239,.62)}
+.est-row span:last-child{font-weight:600;text-align:right}
+.est-total{display:flex;justify-content:space-between;align-items:baseline;margin-top:20px;
+  padding-top:18px;border-top:1px solid rgba(198,160,82,.45)}
+.est-total .lbl{font-size:.8rem;letter-spacing:.14em;text-transform:uppercase;color:rgba(251,247,239,.6)}
+.est-total .val{font-family:var(--serif);font-size:1.85rem;color:var(--gold-light)}
+.estimate .hint{font-size:.75rem;color:rgba(251,247,239,.5);margin-top:14px;line-height:1.55}
+.success{
+  display:none;text-align:center;padding:26px 10px;
+}
+.success.on{display:block;animation:fade .4s ease}
+.success .tick{width:66px;height:66px;border-radius:50%;background:var(--green-800);color:var(--gold-light);
+  display:grid;place-items:center;font-size:1.9rem;margin:0 auto 18px}
+.success h3{font-size:1.5rem;margin-bottom:8px}
+.success p{color:var(--ink-soft);font-size:.94rem}
+.summary{background:var(--cream);border-radius:14px;padding:20px;margin:22px auto 0;
+  max-width:430px;text-align:left;font-size:.9rem}
+.summary div{display:flex;justify-content:space-between;gap:14px;padding:6px 0}
+.summary div span:first-child{color:var(--ink-soft)}
+.summary div span:last-child{font-weight:600}
+
+/* ============ 12. BLOG ============ */
+.blog-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:26px}
+.post{background:#fff;border-radius:var(--r);overflow:hidden;box-shadow:var(--shadow-sm);
+  transition:transform .3s ease,box-shadow .3s ease;display:flex;flex-direction:column}
+.post:hover{transform:translateY(-6px);box-shadow:var(--shadow-md)}
+.post .ph{aspect-ratio:16/10}
+.post-body{padding:22px;display:flex;flex-direction:column;flex:1}
+.post-meta{font-size:.75rem;letter-spacing:.1em;text-transform:uppercase;color:var(--gold);
+  font-weight:600;margin-bottom:9px}
+.post-body h3{font-size:1.12rem;line-height:1.4;margin-bottom:9px}
+.post-body p{font-size:.88rem;color:var(--ink-soft);flex:1;margin-bottom:15px}
+.post-body a{font-size:.85rem;font-weight:600;color:var(--terra)}
+.post-body a:hover{text-decoration:underline}
+
+/* ============ 13. TESTIMONIAL ============ */
+.quotes{background:var(--cream-2)}
+.q-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px}
+.q-card{background:#fff;border-radius:var(--r);padding:30px;box-shadow:var(--shadow-sm)}
+.q-card .stars{color:var(--gold);letter-spacing:2px;margin-bottom:12px}
+.q-card p{font-size:.95rem;color:var(--ink-soft);font-style:italic;margin-bottom:18px}
+.q-who{display:flex;align-items:center;gap:12px}
+.q-av{width:42px;height:42px;border-radius:50%;background:linear-gradient(140deg,var(--green-700),var(--green-900));
+  color:var(--gold-light);display:grid;place-items:center;font-weight:700;flex:none}
+.q-who strong{display:block;font-size:.92rem}
+.q-who span{font-size:.78rem;color:var(--ink-soft)}
+
+/* ============ 14. CTA + FOOTER ============ */
+.cta{background:linear-gradient(150deg,var(--green-800),var(--green-900));color:var(--cream);text-align:center}
+.cta h2{font-size:clamp(1.9rem,3.6vw,2.8rem);margin:18px auto 16px;max-width:640px}
+.cta p{color:rgba(251,247,239,.7);max-width:520px;margin:0 auto 30px}
+.cta .btns{display:flex;gap:14px;justify-content:center;flex-wrap:wrap}
+footer{background:var(--green-900);color:rgba(251,247,239,.68);padding:64px 0 28px;
+  border-top:1px solid rgba(251,247,239,.1)}
+.f-grid{display:grid;grid-template-columns:1.5fr 1fr 1fr 1.3fr;gap:36px;margin-bottom:44px}
+footer h4{color:var(--cream);font-size:.8rem;letter-spacing:.16em;text-transform:uppercase;
+  margin-bottom:16px;font-family:var(--sans);font-weight:600}
+footer ul{list-style:none;display:grid;gap:9px;font-size:.9rem}
+footer a:hover{color:var(--gold-light)}
+footer .logo{color:var(--cream);margin-bottom:14px}
+footer .about{font-size:.9rem;font-weight:300;max-width:290px}
+.f-bottom{border-top:1px solid rgba(251,247,239,.1);padding-top:22px;font-size:.82rem;
+  display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
+.socials{display:flex;gap:10px;margin-top:16px}
+.socials a{width:36px;height:36px;border-radius:50%;border:1px solid rgba(251,247,239,.2);
+  display:grid;place-items:center;transition:.2s}
+.socials a:hover{background:var(--gold);color:var(--green-900);border-color:var(--gold)}
+
+/* floating call button */
+.fab{position:fixed;right:22px;bottom:22px;z-index:70;display:flex;flex-direction:column;gap:10px}
+.fab a{width:52px;height:52px;border-radius:50%;display:grid;place-items:center;font-size:1.25rem;
+  box-shadow:var(--shadow-md);background:var(--green-800);color:var(--cream);transition:transform .2s}
+.fab a.gold{background:var(--gold);color:var(--green-900)}
+.fab a:hover{transform:scale(1.08)}
+
+/* ============ 15. RESPONSIVE ============ */
+@media(max-width:1024px){
+  .hero-grid,.story-grid,.book-grid{grid-template-columns:1fr}
+  .story-media{max-width:460px}
+  .space-grid,.pkg-grid,.blog-grid,.q-grid{grid-template-columns:1fr 1fr}
+  .usp-grid{grid-template-columns:1fr 1fr}
+  .gal-grid{grid-template-columns:repeat(2,1fr)}
+  .f-grid{grid-template-columns:1fr 1fr}
+  .estimate{position:static}
+}
+@media(max-width:760px){
+  .section{padding:64px 0}
+  .menu{
+    position:fixed;top:74px;left:0;right:0;background:var(--cream);
+    flex-direction:column;align-items:stretch;padding:14px;gap:2px;
+    border-bottom:1px solid var(--line);box-shadow:var(--shadow-md);
+    display:none;
+  }
+  .menu.open{display:flex}
+  .burger{display:block}
+  .nav-cta .btn{display:none}
+  .space-grid,.pkg-grid,.blog-grid,.q-grid,.menu-panel.active,.frow,.picks{grid-template-columns:1fr}
+  .gal-grid{grid-template-columns:1fr;grid-auto-rows:210px}
+  .gal-item.wide,.gal-item.tall{grid-column:auto;grid-row:auto}
+  .book-card{padding:24px}
+  .story-media .ph:last-child{display:none}
+  .hero{min-height:auto}
+  .step{font-size:0}
+  .step::before{font-size:.78rem}
+  .f-grid{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<!-- ============ TOPBAR ============ -->
+<div class="topbar">
+  <div class="wrap">
+    <div>📍 1147 Bình Quới, P.28, Bình Thạnh, TP.HCM &nbsp;·&nbsp; Mở cửa 9:00 – 22:00 mỗi ngày</div>
+    <div>Đặt tiệc: <strong>1900 6789</strong> &nbsp;·&nbsp; datban@vuonsen.vn</div>
+  </div>
+</div>
+
+<!-- ============ NAV ============ -->
+<header class="nav" id="nav">
+  <div class="wrap nav-inner">
+    <a href="#top" class="logo">
+      <span class="mark">🌿</span>
+      <span>Vườn Sen<small>Ẩm thực &amp; Sự kiện</small></span>
+    </a>
+    <nav class="menu" id="navmenu">
+      <a href="#gioi-thieu">Giới thiệu</a>
+      <a href="#khong-gian">Không gian tiệc</a>
+      <a href="#menu">Thực đơn</a>
+      <a href="#goi-tiec">Gói tiệc</a>
+      <a href="#thu-vien">Thư viện ảnh</a>
+      <a href="#blog">Cẩm nang</a>
+      <a href="#lien-he">Liên hệ</a>
+    </nav>
+    <div class="nav-cta">
+      <a href="#dat-tiec" class="btn btn-dark">Đặt bàn / Đặt tiệc</a>
+      <button class="burger" id="burger" aria-label="Mở menu"><span></span><span></span><span></span></button>
+    </div>
+  </div>
+</header>
+
+<!-- ============ HERO ============ -->
+<section class="hero" id="top">
+  <div class="bg"></div>
+  <div class="wrap">
+    <div class="hero-grid">
+      <div>
+        <div class="eyebrow">Khu ẩm thực &amp; tiệc sân vườn ven sông</div>
+        <h1>Nơi bữa ăn trở thành <em>kỷ niệm</em> của cả gia đình</h1>
+        <p class="lead">Không gian sân vườn 8.000m² giữa lòng thành phố — ẩm thực miền quê Nam Bộ, sảnh tiệc riêng tư và dịch vụ tổ chức trọn gói từ 20 đến 800 khách.</p>
+        <div class="hero-actions">
+          <a href="#dat-tiec" class="btn btn-gold">Đặt tiệc ngay →</a>
+          <a href="#khong-gian" class="btn btn-outline">Xem không gian</a>
+        </div>
+        <div class="hero-stats">
+          <div><strong>8.000</strong><span>m² sân vườn ven sông</span></div>
+          <div><strong>6</strong><span>khu vực tiệc riêng biệt</span></div>
+          <div><strong>1.200+</strong><span>sự kiện đã tổ chức</span></div>
+        </div>
+      </div>
+      <div class="quickcard">
+        <h3>Kiểm tra ngày trống</h3>
+        <p>Phản hồi trong 30 phút giờ hành chính</p>
+        <div class="qfield">
+          <label for="q-date">Ngày tổ chức</label>
+          <input type="date" id="q-date">
+        </div>
+        <div class="qfield">
+          <label for="q-guests">Số khách dự kiến</label>
+          <input type="number" id="q-guests" min="10" placeholder="Ví dụ: 120">
+        </div>
+        <div class="qfield">
+          <label for="q-type">Loại tiệc</label>
+          <select id="q-type">
+            <option value="cuoi">Tiệc cưới</option>
+            <option value="cty">Tiệc công ty / hội nghị</option>
+            <option value="sinhnhat">Sinh nhật / thôi nôi</option>
+            <option value="giadinh">Họp mặt gia đình</option>
+            <option value="khac">Nhu cầu khác</option>
+          </select>
+        </div>
+        <button class="btn btn-gold" id="q-submit">Nhận báo giá miễn phí</button>
+        <p class="note">Không mất phí · Không ràng buộc</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ USP ============ -->
+<section class="usp">
+  <div class="usp-grid">
+    <div class="usp-item"><div class="ico">🍲</div><h4>Bếp mở, món quê</h4><p>Hơn 120 món Nam Bộ nấu tại chỗ, nguyên liệu nhập mỗi sáng.</p></div>
+    <div class="usp-item"><div class="ico">🏡</div><h4>6 khu vực tiệc</h4><p>Từ nhà rường 20 khách đến sảnh sự kiện 800 khách.</p></div>
+    <div class="usp-item"><div class="ico">🎉</div><h4>Trọn gói sự kiện</h4><p>Trang trí, MC, âm thanh ánh sáng, chụp ảnh — một đầu mối.</p></div>
+    <div class="usp-item"><div class="ico">🅿️</div><h4>300 chỗ đậu xe</h4><p>Bãi xe rộng, có xe điện đưa khách vào tận sảnh.</p></div>
+  </div>
+</section>
+
+<!-- ============ STORY ============ -->
+<section class="section" id="gioi-thieu">
+  <div class="wrap story-grid">
+    <div class="story-media reveal">
+      <div class="ph"><div class="ph-label"><span>🌾</span><span>Ảnh toàn cảnh khu vườn</span></div></div>
+      <div class="ph v2"><div class="ph-label"><span>👨‍🍳</span><span>Bếp mở</span></div></div>
+    </div>
+    <div class="story-text reveal">
+      <div class="eyebrow">Câu chuyện Vườn Sen</div>
+      <h2>Giữ lại một khoảng quê giữa lòng thành phố</h2>
+      <p>Vườn Sen bắt đầu từ một mảnh vườn ven sông Sài Gòn với vài mái lá và bếp củi. Chúng tôi tin rằng một bữa tiệc đáng nhớ không nằm ở đèn màu hay sân khấu lớn, mà ở cảm giác được ngồi cùng nhau dưới tán cây, ăn món ăn nấu bằng tay.</p>
+      <p>Hôm nay, Vườn Sen vừa là nhà hàng phục vụ hằng ngày, vừa là nơi các gia đình và doanh nghiệp gửi gắm những dịp quan trọng nhất của mình.</p>
+      <ul class="story-list">
+        <li>Đầu bếp trưởng 22 năm kinh nghiệm ẩm thực miền Tây</li>
+        <li>Nguyên liệu tươi từ vùng trồng Củ Chi và chợ đầu mối mỗi sáng</li>
+        <li>Đội ngũ 40 nhân sự phục vụ, có điều phối viên riêng cho từng tiệc</li>
+        <li>Chứng nhận An toàn vệ sinh thực phẩm — kiểm định định kỳ 6 tháng</li>
+      </ul>
+      <div class="hero-actions">
+        <a href="#thu-vien" class="btn btn-ghost">Xem thư viện ảnh</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ SPACES ============ -->
+<section class="section spaces" id="khong-gian">
+  <div class="wrap">
+    <div class="section-head center reveal">
+      <div class="eyebrow center">Cho thuê không gian</div>
+      <h2>Sáu không gian, sáu cách kể chuyện</h2>
+      <p>Mỗi khu vực có lối vào riêng, khu tiếp khách và bếp phụ riêng — tiệc của bạn không bị ảnh hưởng bởi khách khác.</p>
+    </div>
+    <div class="space-grid">
+
+      <article class="space-card reveal">
+        <div class="ph"><span class="space-tag">Ngoài trời</span><div class="ph-label"><span>🌊</span><span>Sảnh Ven Sông</span></div></div>
+        <div class="space-body">
+          <h3>Sảnh Ven Sông</h3>
+          <p>Sân cỏ nhìn thẳng ra sông, phù hợp tiệc cưới ngoài trời và gala tối. Có mái che di động phòng mưa.</p>
+          <div class="space-meta"><span class="chip">300–800 khách</span><span class="chip">Sân khấu 8m</span><span class="chip">Có mái che</span></div>
+          <div class="space-foot">
+            <div class="price">15.000.000đ <small>/ buổi</small></div>
+            <a href="#dat-tiec">Đặt giữ chỗ →</a>
+          </div>
+        </div>
+      </article>
+
+      <article class="space-card reveal">
+        <div class="ph v2"><span class="space-tag">Trong nhà</span><div class="ph-label"><span>🏛️</span><span>Sảnh Sen Vàng</span></div></div>
+        <div class="space-body">
+          <h3>Sảnh Sen Vàng</h3>
+          <p>Sảnh máy lạnh trần cao 7m, hệ thống LED và âm thanh line-array. Lựa chọn an toàn cho mọi thời tiết.</p>
+          <div class="space-meta"><span class="chip">200–500 khách</span><span class="chip">Máy lạnh</span><span class="chip">LED 6x3m</span></div>
+          <div class="space-foot">
+            <div class="price">12.000.000đ <small>/ buổi</small></div>
+            <a href="#dat-tiec">Đặt giữ chỗ →</a>
+          </div>
+        </div>
+      </article>
+
+      <article class="space-card reveal">
+        <div class="ph v3"><span class="space-tag">Riêng tư</span><div class="ph-label"><span>🪷</span><span>Nhà Rường</span></div></div>
+        <div class="space-body">
+          <h3>Nhà Rường Gỗ</h3>
+          <p>Nhà gỗ ba gian truyền thống, ấm cúng cho họp mặt gia đình, giỗ chạp, mừng thọ hoặc tiệc thân mật.</p>
+          <div class="space-meta"><span class="chip">20–60 khách</span><span class="chip">Phòng kín</span><span class="chip">Karaoke</span></div>
+          <div class="space-foot">
+            <div class="price">3.000.000đ <small>/ buổi</small></div>
+            <a href="#dat-tiec">Đặt giữ chỗ →</a>
+          </div>
+        </div>
+      </article>
+
+      <article class="space-card reveal">
+        <div class="ph v4"><span class="space-tag">Hội nghị</span><div class="ph-label"><span>💼</span><span>Phòng Hội Nghị</span></div></div>
+        <div class="space-body">
+          <h3>Phòng Hội Nghị Lúa</h3>
+          <p>Bố trí lớp học hoặc chữ U, máy chiếu 4K, wifi riêng 200Mbps. Có gói teabreak giữa giờ.</p>
+          <div class="space-meta"><span class="chip">40–150 khách</span><span class="chip">Máy chiếu 4K</span><span class="chip">Teabreak</span></div>
+          <div class="space-foot">
+            <div class="price">6.000.000đ <small>/ buổi</small></div>
+            <a href="#dat-tiec">Đặt giữ chỗ →</a>
+          </div>
+        </div>
+      </article>
+
+      <article class="space-card reveal">
+        <div class="ph v2"><span class="space-tag">Chòi lá</span><div class="ph-label"><span>🛖</span><span>Chòi Sen</span></div></div>
+        <div class="space-body">
+          <h3>Cụm Chòi Sen</h3>
+          <p>12 chòi lá trên mặt nước, mỗi chòi 8–12 khách. Đặt lẻ hằng ngày hoặc bao trọn cụm cho nhóm lớn.</p>
+          <div class="space-meta"><span class="chip">8–12 khách/chòi</span><span class="chip">Trên mặt nước</span><span class="chip">Đặt lẻ</span></div>
+          <div class="space-foot">
+            <div class="price">500.000đ <small>/ chòi</small></div>
+            <a href="#dat-tiec">Đặt giữ chỗ →</a>
+          </div>
+        </div>
+      </article>
+
+      <article class="space-card reveal">
+        <div class="ph v3"><span class="space-tag">Sự kiện nhỏ</span><div class="ph-label"><span>🌸</span><span>Vườn Cau</span></div></div>
+        <div class="space-body">
+          <h3>Vườn Cau</h3>
+          <p>Bãi cỏ dưới hàng cau, đẹp nhất lúc 16–18h. Lý tưởng cho lễ đính hôn, tiệc trà và chụp ảnh cưới.</p>
+          <div class="space-meta"><span class="chip">60–150 khách</span><span class="chip">Tiệc đứng</span><span class="chip">Góc chụp đẹp</span></div>
+          <div class="space-foot">
+            <div class="price">7.000.000đ <small>/ buổi</small></div>
+            <a href="#dat-tiec">Đặt giữ chỗ →</a>
+          </div>
+        </div>
+      </article>
+
+    </div>
+  </div>
+</section>
+
+<!-- ============ MENU ============ -->
+<section class="section" id="menu">
+  <div class="wrap">
+    <div class="section-head center reveal">
+      <div class="eyebrow center">Thực đơn</div>
+      <h2>Món quê nấu bằng tay, dọn nóng tại bàn</h2>
+      <p>Thực đơn thay đổi theo mùa. Giá dưới đây áp dụng cho phần ăn tại nhà hàng; tiệc theo mâm xem ở phần Gói tiệc.</p>
+    </div>
+
+    <div class="tabs" id="tabs">
+      <button class="tab active" data-t="khaivi">Khai vị</button>
+      <button class="tab" data-t="chinh">Món chính</button>
+      <button class="tab" data-t="lau">Lẩu &amp; nướng</button>
+      <button class="tab" data-t="trangmieng">Tráng miệng</button>
+      <button class="tab" data-t="douong">Đồ uống</button>
+    </div>
+
+    <div class="menu-panel active" data-p="khaivi">
+      <div class="dish"><div><div class="d-name">Gỏi củ hũ dừa tôm thịt <span class="badge-hot">Best</span></div><div class="d-desc">Củ hũ dừa Bến Tre, tôm sú, bánh phồng tôm</div></div><div class="dots"></div><div class="d-price">185.000đ</div></div>
+      <div class="dish"><div><div class="d-name">Chả giò rế hải sản</div><div class="d-desc">Cuốn tay, chiên giòn, rau sống vườn nhà</div></div><div class="dots"></div><div class="d-price">145.000đ</div></div>
+      <div class="dish"><div><div class="d-name">Bánh xèo miền Tây</div><div class="d-desc">Đổ tại bàn, 12 loại rau rừng</div></div><div class="dots"></div><div class="d-price">120.000đ</div></div>
+      <div class="dish"><div><div class="d-name">Bò lá lốt nướng than</div><div class="d-desc">Bò tơ Củ Chi, mắm nêm pha nhà</div></div><div class="dots"></div><div class="d-price">165.000đ</div></div>
+      <div class="dish"><div><div class="d-name">Súp cua trứng bắc thảo</div><div class="d-desc">Nấu từ nước hầm gà 6 tiếng</div></div><div class="dots"></div><div class="d-price">95.000đ</div></div>
+      <div class="dish"><div><div class="d-name">Nham bắp cải tôm khô</div><div class="d-desc">Món dân dã, chua ngọt nhẹ</div></div><div class="dots"></div><div class="d-price">110.000đ</div></div>
+    </div>
+
+    <div class="menu-panel" data-p="chinh">
+      <div class="dish"><div><div class="d-name">Cá lóc nướng trui cuốn bánh tráng <span class="badge-hot">Best</span></div><div class="d-desc">Cá lóc đồng 1,2kg, nướng rơm tại bàn</div></div><div class="dots"></div><div class="d-price">395.000đ</div></div>
+      <div class="dish"><div><div class="d-name">Gà ta hấp lá chanh</div><div class="d-desc">Gà thả vườn nguyên con, muối tiêu chanh</div></div><div class="dots"></div><div class="d-price">450.000đ</div></div>
+      <div class="dish"><div><div class="d-name">Tôm càng nướng muối ớt</div><div class="d-desc">Tôm càng xanh size 4 con/kg</div></div><div class="dots"></div><div class="d-price">620.000đ</div></div>
+      <div class="dish"><div><div class="d-name">Sườn non kho tộ</div><div class="d-desc">Kho nước dừa xiêm, ăn kèm cơm cháy</div></div><div class="dots"></div><div class="d-price">265.000đ</div></div>
+      <div class="dish"><div><div class="d-name">Cơm cháy chà bông kho quẹt</div><div class="d-desc">Rau luộc theo mùa</div></div><div class="dots"></div><div class="d-price">135.000đ</div></div>
+      <div class="dish"><div><div class="d-name">Cá kèo kho rau răm</div><div class="d-desc">Cá kèo tươi, kho tiêu xanh</div></div><div class="dots"></div><div class="d-price">225.000đ</div></div>
+    </div>
+
+    <div class="menu-panel" data-p="lau">
+      <div class="dish"><div><div class="d-name">Lẩu mắm miền Tây <span class="badge-hot">Best</span></div><div class="d-desc">Mắm cá linh, 15 loại rau đồng</div></div><div class="dots"></div><div class="d-price">495.000đ</div></div>
+      <div class="dish"><div><div class="d-name">Lẩu cá kèo lá giang</div><div class="d-desc">Chua thanh, ăn kèm bún tươi</div></div><div class="dots"></div><div class="d-price">425.000đ</div></div>
+      <div class="dish"><div><div class="d-name">Lẩu gà lá é</div><div class="d-desc">Gà ta, măng tươi, lá é Phú Yên</div></div><div class="dots"></div><div class="d-price">455.000đ</div></div>
+      <div class="dish"><div><div class="d-name">Combo nướng than hoa</div><div class="d-desc">Bò, heo, hải sản — 6 món, cho 4 người</div></div><div class="dots"></div><div class="d-price">690.000đ</div></div>
+      <div class="dish"><div><div class="d-name">Heo quay giòn bì</div><div class="d-desc">Nguyên con quay lu, đặt trước 24h</div></div><div class="dots"></div><div class="d-price">Theo cân</div></div>
+      <div class="dish"><div><div class="d-name">Dê nướng ngũ vị</div><div class="d-desc">Ăn kèm bánh mì và chao</div></div><div class="dots"></div><div class="d-price">385.000đ</div></div>
+    </div>
+
+    <div class="menu-panel" data-p="trangmieng">
+      <div class="dish"><div><div class="d-name">Chè bưởi Cần Thơ</div><div class="d-desc">Nấu mỗi ngày, không phẩm màu</div></div><div class="dots"></div><div class="d-price">45.000đ</div></div>
+      <div class="dish"><div><div class="d-name">Rau câu dừa lá dứa</div><div class="d-desc">Đổ trong trái dừa tươi</div></div><div class="dots"></div><div class="d-price">55.000đ</div></div>
+      <div class="dish"><div><div class="d-name">Bánh da lợn hấp lá dứa</div><div class="d-desc">Làm theo công thức gia truyền</div></div><div class="dots"></div><div class="d-price">40.000đ</div></div>
+      <div class="dish"><div><div class="d-name">Trái cây theo mùa</div><div class="d-desc">Đĩa lớn cho bàn 10 khách</div></div><div class="dots"></div><div class="d-price">150.000đ</div></div>
+    </div>
+
+    <div class="menu-panel" data-p="douong">
+      <div class="dish"><div><div class="d-name">Nước sâm lá dứa nhà nấu</div><div class="d-desc">Bình 1,5 lít</div></div><div class="dots"></div><div class="d-price">85.000đ</div></div>
+      <div class="dish"><div><div class="d-name">Dừa tươi Bến Tre</div><div class="d-desc">Ướp lạnh, phục vụ nguyên trái</div></div><div class="dots"></div><div class="d-price">45.000đ</div></div>
+      <div class="dish"><div><div class="d-name">Rượu nếp than ủ 12 tháng</div><div class="d-desc">Chai 500ml</div></div><div class="dots"></div><div class="d-price">220.000đ</div></div>
+      <div class="dish"><div><div class="d-name">Bia &amp; nước ngọt</div><div class="d-desc">Đủ nhãn phổ biến, tính theo lon dùng thật</div></div><div class="dots"></div><div class="d-price">25.000đ</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ PACKAGES ============ -->
+<section class="section packages" id="goi-tiec">
+  <div class="wrap">
+    <div class="section-head center reveal">
+      <div class="eyebrow center">Bảng giá combo</div>
+      <h2>Gói tiệc tính theo mâm 10 khách</h2>
+      <p>Giá đã gồm phục vụ, khăn bàn, nước sâm và trà đá. Chưa gồm phí thuê không gian và VAT.</p>
+    </div>
+    <div class="pkg-grid">
+
+      <div class="pkg reveal">
+        <h3>Gói Đồng Quê</h3>
+        <div class="sub">Họp mặt gia đình, tiệc thân mật</div>
+        <div class="amt">2.900.000<span> đ/mâm</span></div>
+        <ul>
+          <li>Thực đơn 6 món + tráng miệng</li>
+          <li>Nước sâm &amp; trà đá không giới hạn</li>
+          <li>Trang trí bàn cơ bản, hoa tươi</li>
+          <li>Nhân viên phục vụ 1 người/2 bàn</li>
+          <li>Sử dụng không gian 3 tiếng</li>
+        </ul>
+        <a href="#dat-tiec" class="btn btn-outline">Chọn gói này</a>
+      </div>
+
+      <div class="pkg featured reveal">
+        <div class="ribbon">Được chọn nhiều nhất</div>
+        <h3>Gói Sen Vàng</h3>
+        <div class="sub">Tiệc cưới, sinh nhật, tất niên</div>
+        <div class="amt">4.500.000<span> đ/mâm</span></div>
+        <ul>
+          <li>Thực đơn 8 món có hải sản</li>
+          <li>Cổng hoa, backdrop &amp; bàn gallery</li>
+          <li>MC dẫn chương trình 2 tiếng</li>
+          <li>Âm thanh, ánh sáng sân khấu</li>
+          <li>Bánh kem &amp; tháp ly champagne</li>
+          <li>Sử dụng không gian 5 tiếng</li>
+        </ul>
+        <a href="#dat-tiec" class="btn btn-gold">Chọn gói này</a>
+      </div>
+
+      <div class="pkg reveal">
+        <h3>Gói Thượng Uyển</h3>
+        <div class="sub">Tiệc cưới cao cấp, gala doanh nghiệp</div>
+        <div class="amt">6.800.000<span> đ/mâm</span></div>
+        <ul>
+          <li>Thực đơn 10 món chọn theo yêu cầu</li>
+          <li>Trang trí concept riêng, hoa nhập</li>
+          <li>MC + ban nhạc acoustic 3 người</li>
+          <li>Quay phim &amp; chụp ảnh phóng sự</li>
+          <li>Xe điện đón khách, lễ tân riêng</li>
+          <li>Sử dụng không gian trọn ngày</li>
+        </ul>
+        <a href="#dat-tiec" class="btn btn-outline">Chọn gói này</a>
+      </div>
+
+    </div>
+    <p class="pkg-note">Tiệc từ 30 mâm trở lên được miễn phí thuê không gian · Đặt trước 60 ngày giảm thêm 5%</p>
+  </div>
+</section>
+
+<!-- ============ GALLERY ============ -->
+<section class="section" id="thu-vien">
+  <div class="wrap">
+    <div class="section-head center reveal">
+      <div class="eyebrow center">Thư viện ảnh</div>
+      <h2>Những buổi tiệc đã diễn ra tại Vườn Sen</h2>
+      <p>Nhấn vào ảnh để xem lớn. Khi có ảnh thật, chỉ cần thay phần nền của từng ô.</p>
+    </div>
+    <div class="gal-grid" id="gallery">
+      <div class="gal-item wide" data-cap="Tiệc cưới ngoài trời tại Sảnh Ven Sông — 420 khách"><div class="ph"><div class="ph-label"><span>💒</span><span>Tiệc cưới ven sông</span></div></div></div>
+      <div class="gal-item tall" data-cap="Nhà Rường Gỗ — họp mặt gia đình 40 khách"><div class="ph v3"><div class="ph-label"><span>🪷</span><span>Nhà rường</span></div></div></div>
+      <div class="gal-item" data-cap="Bàn tiệc set-up gói Sen Vàng"><div class="ph v2"><div class="ph-label"><span>🍽️</span><span>Set-up bàn tiệc</span></div></div></div>
+      <div class="gal-item" data-cap="Cá lóc nướng trui — món đặc trưng của Vườn Sen"><div class="ph v4"><div class="ph-label"><span>🐟</span><span>Món đặc trưng</span></div></div></div>
+      <div class="gal-item" data-cap="Cụm Chòi Sen trên mặt nước lúc hoàng hôn"><div class="ph"><div class="ph-label"><span>🛖</span><span>Chòi sen</span></div></div></div>
+      <div class="gal-item wide" data-cap="Year End Party doanh nghiệp — 600 khách tại Sảnh Sen Vàng"><div class="ph v2"><div class="ph-label"><span>🎊</span><span>Tiệc công ty</span></div></div></div>
+      <div class="gal-item" data-cap="Vườn Cau — lễ đính hôn buổi chiều"><div class="ph v3"><div class="ph-label"><span>🌸</span><span>Vườn cau</span></div></div></div>
+      <div class="gal-item" data-cap="Khu bếp mở, khách có thể xem đầu bếp chế biến"><div class="ph v4"><div class="ph-label"><span>🔥</span><span>Bếp mở</span></div></div></div>
+    </div>
+  </div>
+</section>
+
+<div class="lightbox" id="lightbox">
+  <button class="lb-close" id="lbClose" aria-label="Đóng">×</button>
+  <button class="lb-nav lb-prev" id="lbPrev" aria-label="Trước">‹</button>
+  <div class="frame"><div class="ph" id="lbImg"><div class="ph-label"><span>🖼️</span><span>Ảnh minh hoạ</span></div></div><div class="cap" id="lbCap"></div></div>
+  <button class="lb-nav lb-next" id="lbNext" aria-label="Sau">›</button>
+</div>
+
+<!-- ============ BOOKING ============ -->
+<section class="section booking" id="dat-tiec">
+  <div class="wrap">
+    <div class="section-head center reveal">
+      <div class="eyebrow center">Đặt bàn / Đặt tiệc</div>
+      <h2>Gửi yêu cầu, nhận báo giá trong 30 phút</h2>
+      <p>Điền 3 bước dưới đây. Chi phí hiển thị bên cạnh là ước tính tự động để bạn hình dung ngân sách.</p>
+    </div>
+
+    <div class="book-grid">
+      <div class="book-card reveal">
+        <div class="steps">
+          <div class="step on" data-n="1">Nhu cầu</div>
+          <div class="step" data-n="2">Không gian &amp; gói</div>
+          <div class="step" data-n="3">Thông tin liên hệ</div>
+        </div>
+
+        <form id="bookForm" novalidate>
+          <!-- STEP 1 -->
+          <div class="fpanel on" data-s="1">
+            <div class="frow">
+              <div class="fgroup">
+                <label for="b-type">Loại hình *</label>
+                <select id="b-type">
+                  <option value="">— Chọn loại hình —</option>
+                  <option value="Đặt bàn ăn thường">Đặt bàn ăn thường</option>
+                  <option value="Tiệc cưới">Tiệc cưới</option>
+                  <option value="Tiệc công ty / hội nghị">Tiệc công ty / hội nghị</option>
+                  <option value="Sinh nhật / thôi nôi">Sinh nhật / thôi nôi</option>
+                  <option value="Họp mặt gia đình / giỗ">Họp mặt gia đình / giỗ</option>
+                </select>
+                <div class="err">Vui lòng chọn loại hình.</div>
+              </div>
+              <div class="fgroup">
+                <label for="b-guests">Số khách dự kiến *</label>
+                <input type="number" id="b-guests" min="10" max="800" placeholder="Ví dụ: 150">
+                <div class="err">Nhập số khách từ 10 đến 800.</div>
+              </div>
+              <div class="fgroup">
+                <label for="b-date">Ngày tổ chức *</label>
+                <input type="date" id="b-date">
+                <div class="err">Vui lòng chọn ngày (từ hôm nay trở đi).</div>
+              </div>
+              <div class="fgroup">
+                <label for="b-time">Buổi</label>
+                <select id="b-time">
+                  <option>Trưa (10:00 – 14:00)</option>
+                  <option>Chiều (14:00 – 17:00)</option>
+                  <option>Tối (17:30 – 22:00)</option>
+                </select>
+              </div>
+            </div>
+            <div class="fnav"><span></span><button type="button" class="btn btn-dark next">Tiếp tục →</button></div>
+          </div>
+
+          <!-- STEP 2 -->
+          <div class="fpanel" data-s="2">
+            <div class="fgroup full" style="margin-bottom:18px">
+              <label>Chọn không gian *</label>
+              <div class="picks" id="pickSpace">
+                <div class="pick" data-v="Sảnh Ven Sông" data-fee="15000000"><span class="t">Sảnh Ven Sông</span><span class="s">300–800 khách</span></div>
+                <div class="pick" data-v="Sảnh Sen Vàng" data-fee="12000000"><span class="t">Sảnh Sen Vàng</span><span class="s">200–500 khách</span></div>
+                <div class="pick" data-v="Vườn Cau" data-fee="7000000"><span class="t">Vườn Cau</span><span class="s">60–150 khách</span></div>
+                <div class="pick" data-v="Phòng Hội Nghị Lúa" data-fee="6000000"><span class="t">Phòng Hội Nghị</span><span class="s">40–150 khách</span></div>
+                <div class="pick" data-v="Nhà Rường Gỗ" data-fee="3000000"><span class="t">Nhà Rường Gỗ</span><span class="s">20–60 khách</span></div>
+                <div class="pick" data-v="Cụm Chòi Sen" data-fee="0"><span class="t">Cụm Chòi Sen</span><span class="s">Tính theo chòi</span></div>
+              </div>
+              <div class="err">Vui lòng chọn một không gian.</div>
+            </div>
+            <div class="fgroup full">
+              <label>Chọn gói tiệc *</label>
+              <div class="picks" id="pickPkg">
+                <div class="pick" data-v="Gói Đồng Quê" data-price="2900000"><span class="t">Đồng Quê</span><span class="s">2,9 tr/mâm</span></div>
+                <div class="pick sel" data-v="Gói Sen Vàng" data-price="4500000"><span class="t">Sen Vàng</span><span class="s">4,5 tr/mâm</span></div>
+                <div class="pick" data-v="Gói Thượng Uyển" data-price="6800000"><span class="t">Thượng Uyển</span><span class="s">6,8 tr/mâm</span></div>
+              </div>
+              <div class="err">Vui lòng chọn một gói.</div>
+            </div>
+            <div class="fnav"><button type="button" class="btn btn-ghost prev">← Quay lại</button><button type="button" class="btn btn-dark next">Tiếp tục →</button></div>
+          </div>
+
+          <!-- STEP 3 -->
+          <div class="fpanel" data-s="3">
+            <div class="frow">
+              <div class="fgroup">
+                <label for="b-name">Họ và tên *</label>
+                <input type="text" id="b-name" placeholder="Nguyễn Văn A">
+                <div class="err">Vui lòng nhập họ tên.</div>
+              </div>
+              <div class="fgroup">
+                <label for="b-phone">Số điện thoại *</label>
+                <input type="tel" id="b-phone" placeholder="09xx xxx xxx">
+                <div class="err">Số điện thoại không hợp lệ (9–11 chữ số).</div>
+              </div>
+              <div class="fgroup full">
+                <label for="b-email">Email</label>
+                <input type="email" id="b-email" placeholder="ban@email.com">
+              </div>
+              <div class="fgroup full">
+                <label for="b-note">Yêu cầu thêm</label>
+                <textarea id="b-note" placeholder="Ví dụ: cần 2 bàn chay, có 3 khách dị ứng hải sản, muốn dựng sân khấu bên trái..."></textarea>
+              </div>
+            </div>
+            <div class="fnav"><button type="button" class="btn btn-ghost prev">← Quay lại</button><button type="submit" class="btn btn-gold">Gửi yêu cầu đặt tiệc</button></div>
+          </div>
+        </form>
+
+        <div class="success" id="success">
+          <div class="tick">✓</div>
+          <h3>Đã nhận yêu cầu của bạn!</h3>
+          <p>Bộ phận kinh doanh sẽ gọi lại trong vòng 30 phút giờ hành chính để xác nhận ngày trống và gửi báo giá chi tiết.</p>
+          <div class="summary" id="summary"></div>
+          <button class="btn btn-ghost" id="again" style="margin-top:20px">Gửi yêu cầu khác</button>
+        </div>
+      </div>
+
+      <aside class="estimate reveal">
+        <h3>Chi phí ước tính</h3>
+        <p>Cập nhật tự động theo lựa chọn của bạn</p>
+        <div class="est-row"><span>Số mâm (10 khách/mâm)</span><span id="e-tables">—</span></div>
+        <div class="est-row"><span>Gói tiệc</span><span id="e-pkg">Gói Sen Vàng</span></div>
+        <div class="est-row"><span>Tiền ăn</span><span id="e-food">—</span></div>
+        <div class="est-row"><span>Thuê không gian</span><span id="e-fee">—</span></div>
+        <div class="est-row"><span>VAT 8%</span><span id="e-vat">—</span></div>
+        <div class="est-total"><span class="lbl">Tạm tính</span><span class="val" id="e-total">—</span></div>
+        <p class="hint">Từ 30 mâm trở lên được miễn phí thuê không gian. Con số trên chỉ mang tính tham khảo, báo giá chính thức sẽ do nhân viên gửi sau khi xác nhận.</p>
+      </aside>
+    </div>
+  </div>
+</section>
+
+<!-- ============ TESTIMONIALS ============ -->
+<section class="section quotes">
+  <div class="wrap">
+    <div class="section-head center reveal">
+      <div class="eyebrow center">Khách hàng nói gì</div>
+      <h2>Hơn 1.200 buổi tiệc, và vẫn đang đếm</h2>
+    </div>
+    <div class="q-grid">
+      <div class="q-card reveal">
+        <div class="stars">★★★★★</div>
+        <p>"Tiệc cưới nhà mình 45 bàn ở Sảnh Ven Sông. Trời mưa lúc 5h chiều mà đội ngũ dựng mái che xong trong 20 phút, khách không ai ướt. Món ăn ra nóng đều."</p>
+        <div class="q-who"><div class="q-av">TH</div><div><strong>Chị Thu Hà</strong><span>Tiệc cưới · Tháng 3/2026</span></div></div>
+      </div>
+      <div class="q-card reveal">
+        <div class="stars">★★★★★</div>
+        <p>"Công ty tổ chức Year End Party 600 người. Có điều phối viên riêng lo từ âm thanh tới xe đưa đón, mình gần như không phải làm gì trong ngày sự kiện."</p>
+        <div class="q-who"><div class="q-av">MQ</div><div><strong>Anh Minh Quân</strong><span>HR Manager · Tháng 1/2026</span></div></div>
+      </div>
+      <div class="q-card reveal">
+        <div class="stars">★★★★★</div>
+        <p>"Nhà rường gỗ rất hợp để làm giỗ. Ba mẹ mình thích không gian yên tĩnh, có sân riêng cho tụi nhỏ chạy chơi. Giá cũng dễ chịu hơn nhà hàng trong trung tâm."</p>
+        <div class="q-who"><div class="q-av">NL</div><div><strong>Chị Ngọc Lan</strong><span>Họp mặt gia đình · Tháng 5/2026</span></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ BLOG ============ -->
+<section class="section" id="blog">
+  <div class="wrap">
+    <div class="section-head center reveal">
+      <div class="eyebrow center">Cẩm nang tổ chức tiệc</div>
+      <h2>Kinh nghiệm từ hơn một nghìn buổi tiệc</h2>
+      <p>Chuyên mục này cũng là cách khách tìm thấy Vườn Sen qua Google — mỗi bài nhắm một nhóm từ khoá khách thật sự tìm kiếm.</p>
+    </div>
+    <div class="blog-grid">
+      <article class="post reveal">
+        <div class="ph"><div class="ph-label"><span>📋</span><span>Ảnh bài viết</span></div></div>
+        <div class="post-body">
+          <div class="post-meta">Cưới hỏi · 8 phút đọc</div>
+          <h3>Checklist đặt tiệc cưới: 12 việc cần làm trước 90 ngày</h3>
+          <p>Từ chốt số bàn dự phòng đến việc hỏi nhà hàng về phí mở rượu — danh sách chúng tôi đưa cho mọi cô dâu chú rể.</p>
+          <a href="#">Đọc bài →</a>
+        </div>
+      </article>
+      <article class="post reveal">
+        <div class="ph v2"><div class="ph-label"><span>💰</span><span>Ảnh bài viết</span></div></div>
+        <div class="post-body">
+          <div class="post-meta">Ngân sách · 6 phút đọc</div>
+          <h3>Chi phí đặt tiệc 100 khách ở TP.HCM năm 2026 hết bao nhiêu?</h3>
+          <p>Bóc tách từng khoản: tiền ăn, thuê sảnh, trang trí, phát sinh — kèm ba mức ngân sách tham khảo.</p>
+          <a href="#">Đọc bài →</a>
+        </div>
+      </article>
+      <article class="post reveal">
+        <div class="ph v3"><div class="ph-label"><span>🍽️</span><span>Ảnh bài viết</span></div></div>
+        <div class="post-body">
+          <div class="post-meta">Thực đơn · 5 phút đọc</div>
+          <h3>Cách chọn thực đơn tiệc khi khách có cả người lớn tuổi và trẻ nhỏ</h3>
+          <p>Nguyên tắc 3-2-1 của bếp trưởng Vườn Sen để không bàn nào bị bỏ món.</p>
+          <a href="#">Đọc bài →</a>
+        </div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- ============ CTA ============ -->
+<section class="section cta">
+  <div class="wrap">
+    <div class="eyebrow center">Còn ngày trống tháng này</div>
+    <h2>Đến xem không gian trước khi quyết định</h2>
+    <p>Đặt lịch tham quan miễn phí — chúng tôi sẽ dẫn bạn đi hết 6 khu vực và tư vấn phương án phù hợp ngân sách.</p>
+    <div class="btns">
+      <a href="#dat-tiec" class="btn btn-gold">Đặt lịch tham quan</a>
+      <a href="tel:19006789" class="btn btn-outline">📞 1900 6789</a>
+    </div>
+  </div>
+</section>
+
+<!-- ============ FOOTER ============ -->
+<footer id="lien-he">
+  <div class="wrap">
+    <div class="f-grid">
+      <div>
+        <div class="logo"><span class="mark">🌿</span><span>Vườn Sen<small>Ẩm thực &amp; Sự kiện</small></span></div>
+        <p class="about">Khu ẩm thực sân vườn và dịch vụ cho thuê không gian tiệc bên sông Sài Gòn. Phục vụ từ 20 đến 800 khách.</p>
+        <div class="socials">
+          <a href="#" aria-label="Facebook">f</a>
+          <a href="#" aria-label="Instagram">◎</a>
+          <a href="#" aria-label="TikTok">♪</a>
+          <a href="#" aria-label="YouTube">▶</a>
+        </div>
+      </div>
+      <div>
+        <h4>Dịch vụ</h4>
+        <ul>
+          <li><a href="#khong-gian">Cho thuê không gian tiệc</a></li>
+          <li><a href="#goi-tiec">Tiệc cưới trọn gói</a></li>
+          <li><a href="#goi-tiec">Tiệc công ty &amp; hội nghị</a></li>
+          <li><a href="#menu">Nhà hàng hằng ngày</a></li>
+          <li><a href="#dat-tiec">Catering tận nơi</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Khám phá</h4>
+        <ul>
+          <li><a href="#gioi-thieu">Về Vườn Sen</a></li>
+          <li><a href="#thu-vien">Thư viện ảnh</a></li>
+          <li><a href="#blog">Cẩm nang tổ chức tiệc</a></li>
+          <li><a href="#dat-tiec">Đặt lịch tham quan</a></li>
+          <li><a href="#">Tuyển dụng</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Liên hệ</h4>
+        <ul>
+          <li>📍 1147 Bình Quới, P.28, Q. Bình Thạnh, TP.HCM</li>
+          <li>📞 <a href="tel:19006789">1900 6789</a> — Đặt tiệc</li>
+          <li>✉️ <a href="mailto:datban@vuonsen.vn">datban@vuonsen.vn</a></li>
+          <li>🕘 9:00 – 22:00 tất cả các ngày</li>
+          <li>🅿️ 300 chỗ đậu xe ô tô &amp; xe máy</li>
+        </ul>
+      </div>
+    </div>
+    <div class="f-bottom">
+      <div>© 2026 Vườn Sen. Trang demo — nội dung và hình ảnh mang tính minh hoạ.</div>
+      <div>Chính sách bảo mật · Điều khoản sử dụng</div>
+    </div>
+  </div>
+</footer>
+
+<div class="fab">
+  <a href="tel:19006789" class="gold" aria-label="Gọi ngay">📞</a>
+  <a href="#dat-tiec" aria-label="Đặt tiệc">📅</a>
+</div>
+
+<script>
+(function(){
+  "use strict";
+  var $ = function(s,c){return (c||document).querySelector(s)};
+  var $$ = function(s,c){return Array.prototype.slice.call((c||document).querySelectorAll(s))};
+  var fmt = function(n){return new Intl.NumberFormat('vi-VN').format(Math.round(n)) + 'đ'};
+
+  /* ---- nav ---- */
+  var nav = $('#nav'), navmenu = $('#navmenu'), burger = $('#burger');
+  window.addEventListener('scroll', function(){
+    nav.classList.toggle('stuck', window.scrollY > 8);
+  });
+  burger.addEventListener('click', function(){
+    navmenu.classList.toggle('open');
+    burger.classList.toggle('on');
+  });
+  $$('#navmenu a').forEach(function(a){
+    a.addEventListener('click', function(){ navmenu.classList.remove('open'); burger.classList.remove('on'); });
+  });
+
+  /* ---- reveal ---- */
+  if ('IntersectionObserver' in window){
+    var io = new IntersectionObserver(function(es){
+      es.forEach(function(e){ if(e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target); } });
+    }, {threshold:.12});
+    $$('.reveal').forEach(function(el){ io.observe(el); });
+  } else { $$('.reveal').forEach(function(el){ el.classList.add('in'); }); }
+
+  /* ---- menu tabs ---- */
+  $$('.tab').forEach(function(t){
+    t.addEventListener('click', function(){
+      $$('.tab').forEach(function(x){x.classList.remove('active')});
+      t.classList.add('active');
+      $$('.menu-panel').forEach(function(p){
+        p.classList.toggle('active', p.getAttribute('data-p') === t.getAttribute('data-t'));
+      });
+    });
+  });
+
+  /* ---- gallery lightbox ---- */
+  var items = $$('#gallery .gal-item'), lb = $('#lightbox'), lbImg = $('#lbImg'), lbCap = $('#lbCap'), idx = 0;
+  function openLB(i){
+    idx = (i + items.length) % items.length;
+    var src = $('.ph', items[idx]);
+    lbImg.className = src.className;
+    lbImg.innerHTML = src.innerHTML;
+    lbCap.textContent = items[idx].getAttribute('data-cap') || '';
+    lb.classList.add('on');
+    document.body.style.overflow = 'hidden';
+  }
+  function closeLB(){ lb.classList.remove('on'); document.body.style.overflow = ''; }
+  items.forEach(function(it,i){ it.addEventListener('click', function(){ openLB(i); }); });
+  $('#lbClose').addEventListener('click', closeLB);
+  $('#lbPrev').addEventListener('click', function(e){ e.stopPropagation(); openLB(idx-1); });
+  $('#lbNext').addEventListener('click', function(e){ e.stopPropagation(); openLB(idx+1); });
+  lb.addEventListener('click', function(e){ if(e.target === lb) closeLB(); });
+  document.addEventListener('keydown', function(e){
+    if(!lb.classList.contains('on')) return;
+    if(e.key === 'Escape') closeLB();
+    if(e.key === 'ArrowLeft') openLB(idx-1);
+    if(e.key === 'ArrowRight') openLB(idx+1);
+  });
+
+  /* ---- pickers ---- */
+  function bindPicks(id){
+    $$('#'+id+' .pick').forEach(function(p){
+      p.addEventListener('click', function(){
+        $$('#'+id+' .pick').forEach(function(x){x.classList.remove('sel')});
+        p.classList.add('sel');
+        p.closest('.fgroup').classList.remove('invalid');
+        estimate();
+      });
+    });
+  }
+  bindPicks('pickSpace'); bindPicks('pickPkg');
+
+  /* ---- estimate ---- */
+  function estimate(){
+    var guests = parseInt($('#b-guests').value, 10) || 0;
+    var tables = guests > 0 ? Math.ceil(guests/10) : 0;
+    var pkgEl = $('#pickPkg .pick.sel');
+    var spEl  = $('#pickSpace .pick.sel');
+    var unit  = pkgEl ? parseInt(pkgEl.getAttribute('data-price'),10) : 0;
+    var fee   = spEl ? parseInt(spEl.getAttribute('data-fee'),10) : 0;
+    if (tables >= 30) fee = 0;                 // miễn phí không gian từ 30 mâm
+    var food  = tables * unit;
+    var vat   = (food + fee) * 0.08;
+    $('#e-tables').textContent = tables ? tables + ' mâm' : '—';
+    $('#e-pkg').textContent    = pkgEl ? pkgEl.querySelector('.t').textContent : '—';
+    $('#e-food').textContent   = food ? fmt(food) : '—';
+    $('#e-fee').textContent    = spEl ? (fee === 0 ? 'Miễn phí' : fmt(fee)) : '—';
+    $('#e-vat').textContent    = (food+fee) ? fmt(vat) : '—';
+    $('#e-total').textContent  = (food+fee) ? fmt(food + fee + vat) : '—';
+  }
+  $('#b-guests').addEventListener('input', estimate);
+
+  /* ---- multi-step form ---- */
+  var cur = 1;
+  function show(n){
+    cur = n;
+    $$('.fpanel').forEach(function(p){ p.classList.toggle('on', +p.getAttribute('data-s') === n); });
+    $$('.step').forEach(function(s,i){
+      s.classList.toggle('on', i+1 === n);
+      s.classList.toggle('done', i+1 < n);
+    });
+    $('.book-card').scrollIntoView({behavior:'smooth', block:'start'});
+  }
+  function invalid(el, bad){
+    el.closest('.fgroup').classList.toggle('invalid', bad);
+    return !bad;
+  }
+  function validate(step){
+    var ok = true;
+    if(step === 1){
+      ok &= invalid($('#b-type'), !$('#b-type').value);
+      var g = parseInt($('#b-guests').value,10);
+      ok &= invalid($('#b-guests'), !(g >= 10 && g <= 800));
+      var d = $('#b-date').value;
+      var today = new Date(); today.setHours(0,0,0,0);
+      ok &= invalid($('#b-date'), !d || new Date(d) < today);
+    }
+    if(step === 2){
+      var s1 = !!$('#pickSpace .pick.sel'), s2 = !!$('#pickPkg .pick.sel');
+      $('#pickSpace').closest('.fgroup').classList.toggle('invalid', !s1);
+      $('#pickPkg').closest('.fgroup').classList.toggle('invalid', !s2);
+      ok = ok && s1 && s2;
+    }
+    if(step === 3){
+      ok &= invalid($('#b-name'), $('#b-name').value.trim().length < 2);
+      ok &= invalid($('#b-phone'), !/^[0-9\s.+()-]{9,15}$/.test($('#b-phone').value.trim()));
+    }
+    return !!ok;
+  }
+  $$('.next').forEach(function(b){ b.addEventListener('click', function(){ if(validate(cur)) show(cur+1); }); });
+  $$('.prev').forEach(function(b){ b.addEventListener('click', function(){ show(cur-1); }); });
+
+  $('#bookForm').addEventListener('submit', function(e){
+    e.preventDefault();
+    if(!validate(3)) return;
+    estimate();
+    var rows = [
+      ['Loại hình', $('#b-type').value],
+      ['Ngày &amp; buổi', $('#b-date').value + ' · ' + $('#b-time').value],
+      ['Số khách', $('#b-guests').value + ' khách (' + $('#e-tables').textContent + ')'],
+      ['Không gian', $('#pickSpace .pick.sel').getAttribute('data-v')],
+      ['Gói tiệc', $('#pickPkg .pick.sel').getAttribute('data-v')],
+      ['Người liên hệ', $('#b-name').value + ' · ' + $('#b-phone').value],
+      ['Tạm tính', $('#e-total').textContent]
+    ];
+    $('#summary').innerHTML = rows.map(function(r){
+      return '<div><span>'+r[0]+'</span><span>'+String(r[1]).replace(/</g,'&lt;')+'</span></div>';
+    }).join('');
+    $('#bookForm').style.display = 'none';
+    $('.steps').style.display = 'none';
+    $('#success').classList.add('on');
+    /* Khi kết nối backend: gửi dữ liệu ở đây (fetch POST /api/bookings) */
+  });
+
+  $('#again').addEventListener('click', function(){
+    $('#bookForm').reset();
+    $('#bookForm').style.display = '';
+    $('.steps').style.display = '';
+    $('#success').classList.remove('on');
+    show(1); estimate();
+  });
+
+  /* ---- hero quick form -> booking ---- */
+  $('#q-submit').addEventListener('click', function(){
+    var map = {cuoi:'Tiệc cưới', cty:'Tiệc công ty / hội nghị', sinhnhat:'Sinh nhật / thôi nôi', giadinh:'Họp mặt gia đình / giỗ', khac:''};
+    if($('#q-date').value) $('#b-date').value = $('#q-date').value;
+    if($('#q-guests').value) $('#b-guests').value = $('#q-guests').value;
+    var v = map[$('#q-type').value];
+    if(v) $('#b-type').value = v;
+    estimate();
+    document.getElementById('dat-tiec').scrollIntoView({behavior:'smooth'});
+  });
+
+  /* ---- date mins ---- */
+  var t = new Date().toISOString().split('T')[0];
+  $('#q-date').min = t; $('#b-date').min = t;
+
+  estimate();
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,105 @@
+package vn.vuonsen.fnb.modules.booking;
+
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import vn.vuonsen.fnb.config.props.BookingProperties;
+import vn.vuonsen.fnb.modules.partypackage.PartyPackage;
+import vn.vuonsen.fnb.modules.space.Space;
+
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
+import java.util.List;
+
+// Tính giá tiệc:
+// tổng = tiền ăn + phí không gian - giảm giá + VAT
+@Service
+@RequiredArgsConstructor
+public class PricingService {
+
+    // Tiền Việt không có số lẻ nên làm tròn về đồng
+    private static final int MONEY_SCALE = 0;
+    private static final RoundingMode ROUNDING = RoundingMode.HALF_UP;
+
+    private final BookingProperties properties;
+
+    // Kết quả báo giá gửi về cho giao diện
+    public record Quote(
+            int guestCount,
+            int tableCount,
+            BigDecimal unitPrice,
+            BigDecimal foodAmount,
+            BigDecimal spaceFee,
+            BigDecimal discountAmount,
+            BigDecimal vatRate,
+            BigDecimal vatAmount,
+            BigDecimal totalAmount,
+            List<String> appliedRules
+    ) {
+    }
+
+    public Quote calculate(Space space, PartyPackage partyPackage, int guestCount, LocalDate eventDate) {
+        List<String> rules = new ArrayList<>();
+
+        int tableCount = tableCountFor(guestCount);
+        BigDecimal unitPrice = partyPackage.getPricePerTable();
+        BigDecimal foodAmount = money(unitPrice.multiply(BigDecimal.valueOf(tableCount)));
+
+        BigDecimal spaceFee = spaceFeeFor(space, guestCount, tableCount, rules);
+        BigDecimal subtotal = foodAmount.add(spaceFee);
+
+        BigDecimal discount = earlyBirdDiscountFor(subtotal, eventDate, rules);
+        BigDecimal taxable = subtotal.subtract(discount);
+
+        BigDecimal vatRate = properties.vatRate();
+        BigDecimal vatAmount = money(taxable.multiply(vatRate));
+        BigDecimal total = taxable.add(vatAmount);
+
+        return new Quote(guestCount, tableCount, unitPrice, foodAmount, spaceFee,
+                discount, vatRate, vatAmount, money(total), rules);
+    }
+
+    // 1 mâm 10 khách, dư mấy khách cũng tính thêm 1 mâm
+    public int tableCountFor(int guestCount) {
+        if (guestCount <= 0) {
+            return 0;
+        }
+        return (int) Math.ceil((double) guestCount / properties.guestsPerTable());
+    }
+
+    private BigDecimal spaceFeeFor(Space space, int guestCount, int tableCount, List<String> rules) {
+        if (tableCount >= properties.freeSpaceFromTables()) {
+            rules.add("Miễn phí thuê không gian (tiệc từ %d mâm)".formatted(properties.freeSpaceFromTables()));
+            return money(BigDecimal.ZERO);
+        }
+
+        // Cụm Chòi Sen tính tiền theo số chòi thuê
+        if ("HUT".equals(space.getFeeUnit()) && space.getUnitCapacity() != null && space.getUnitCapacity() > 0) {
+            int units = (int) Math.ceil((double) guestCount / space.getUnitCapacity());
+            rules.add("Thuê %d chòi cho %d khách".formatted(units, guestCount));
+            return money(space.getRentalFee().multiply(BigDecimal.valueOf(units)));
+        }
+
+        return money(space.getRentalFee());
+    }
+
+    private BigDecimal earlyBirdDiscountFor(BigDecimal subtotal, LocalDate eventDate, List<String> rules) {
+        if (eventDate == null) {
+            return money(BigDecimal.ZERO);
+        }
+        long daysAhead = ChronoUnit.DAYS.between(LocalDate.now(), eventDate);
+        if (daysAhead < properties.earlyBirdDays()) {
+            return money(BigDecimal.ZERO);
+        }
+        rules.add("Giảm %s%% do đặt trước %d ngày"
+                .formatted(properties.earlyBirdRate().multiply(BigDecimal.valueOf(100)).stripTrailingZeros().toPlainString(),
+                        properties.earlyBirdDays()));
+        return money(subtotal.multiply(properties.earlyBirdRate()));
+    }
+
+    private BigDecimal money(BigDecimal value) {
+        return value.setScale(MONEY_SCALE, ROUNDING);
+    }
+}

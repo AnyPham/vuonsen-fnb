@@ -1,0 +1,21 @@
+# Cấu hình khi chạy thật với MySQL.
+# Mật khẩu và khóa bí mật đọc từ biến môi trường, không ghi vào file này.
+spring:
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: false
+
+  h2:
+    console:
+      enabled: false
+
+logging:
+  level:
+    vn.vuonsen.fnb: INFO
+    org.hibernate.SQL: WARN
+
+server:
+  error:
+    include-message: never      # khong lo chi tiet loi ra ngoai
+    include-stacktrace: never
