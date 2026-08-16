@@ -11,6 +11,9 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
 
     Page<Review> findByApprovedOrderByCreatedAtDesc(boolean approved, Pageable pageable);
 
+    // Mỗi đơn chỉ được đánh giá một lần
+    boolean existsByBookingId(Long bookingId);
+
     @Query("SELECT AVG(r.rating) FROM Review r WHERE r.approved = true")
     Double averageRating();
 }

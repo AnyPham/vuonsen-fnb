@@ -22,6 +22,8 @@ import vn.vuonsen.fnb.modules.user.UserRepository;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
+import java.util.List;
 
 // Xử lý đặt tiệc: báo giá, tạo đơn, tra cứu, đổi trạng thái
 @Slf4j
@@ -55,7 +57,9 @@ public class BookingService {
         PartyPackage pkg = findPackage(request.packageId());
 
         validateGuestCount(request.guestCount(), space);
-        validateSlotAvailable(space, request.eventDate(), request.timeSlot());
+        validateLeadTime(request.eventDate(), request.guestCount());
+        validatePackageFitsSlot(pkg, request.timeSlot());
+        validateSlotAvailable(space, pkg, request.eventDate(), request.timeSlot());
 
         PricingService.Quote quote =
                 pricingService.calculate(space, pkg, request.guestCount(), request.eventDate());
@@ -129,13 +133,56 @@ public class BookingService {
         }
         // Trước khi xác nhận phải kiểm tra buổi đó còn trống
         if (target.occupiesSlot()) {
-            validateSlotAvailable(booking.getSpace(), booking.getEventDate(), booking.getTimeSlot());
+            validateSlotAvailable(booking.getSpace(), booking.getPartyPackage(),
+                    booking.getEventDate(), booking.getTimeSlot());
+        }
+        if (target == BookingStatus.CANCELLED) {
+            note = withRefundPolicy(booking, note);
         }
 
         booking.setStatus(target);
         Booking saved = bookingRepository.save(booking);
         recordHistory(saved, current, target, note, actor);
+
+        // Xác nhận một đơn thì các đơn khác cùng chỗ cùng buổi không còn cơ hội, hủy luôn
+        // để nhân viên không phải nhớ và khách không bị treo chờ vô hạn.
+        if (target.occupiesSlot()) {
+            cancelCompetingRequests(saved, actor);
+        }
         return BookingResponse.from(saved);
+    }
+
+    private void cancelCompetingRequests(Booking confirmed, String actor) {
+        List<Booking> waiting = bookingRepository.findBySpaceIdAndEventDateAndTimeSlotAndStatus(
+                confirmed.getSpace().getId(), confirmed.getEventDate(),
+                confirmed.getTimeSlot(), BookingStatus.PENDING);
+
+        for (Booking other : waiting) {
+            if (other.getId().equals(confirmed.getId())) {
+                continue;
+            }
+            other.setStatus(BookingStatus.CANCELLED);
+            bookingRepository.save(other);
+            recordHistory(other, BookingStatus.PENDING, BookingStatus.CANCELLED,
+                    "Buổi này đã nhận đơn %s".formatted(confirmed.getCode()), actor);
+            log.info("Đã hủy đơn {} do trùng lịch với đơn {}", other.getCode(), confirmed.getCode());
+        }
+    }
+
+    // Ghi rõ mức hoàn cọc theo thời điểm hủy để hai bên khỏi tranh cãi về sau
+    private String withRefundPolicy(Booking booking, String note) {
+        long daysLeft = ChronoUnit.DAYS.between(LocalDate.now(), booking.getEventDate());
+        String policy;
+        if (daysLeft >= 30) {
+            policy = "Hủy trước %d ngày, hoàn 100%% tiền cọc".formatted(daysLeft);
+        } else if (daysLeft >= 15) {
+            policy = "Hủy trước %d ngày, hoàn 50%% tiền cọc".formatted(daysLeft);
+        } else if (daysLeft >= 0) {
+            policy = "Hủy trước %d ngày, không hoàn tiền cọc".formatted(daysLeft);
+        } else {
+            policy = "Hủy sau ngày tổ chức";
+        }
+        return (note == null || note.isBlank()) ? policy : note + " - " + policy;
     }
 
     private Space findSpace(Long spaceId) {
@@ -159,21 +206,79 @@ public class BookingService {
         }
     }
 
-    private void validateSlotAvailable(Space space, LocalDate date, TimeSlot slot) {
-        boolean taken = bookingRepository.existsBySpaceIdAndEventDateAndTimeSlotAndStatus(
-                space.getId(), date, slot, BookingStatus.CONFIRMED);
-        if (taken) {
-            throw new BusinessException("%s đã có tiệc vào %s %s, vui lòng chọn buổi hoặc ngày khác"
-                    .formatted(space.getName(), slot.getLabel(), date));
+    // Khách phải báo trước để nhà hàng kịp chuẩn bị nguyên liệu, nhân sự và trang trí.
+    // Tiệc càng lớn càng cần nhiều thời gian.
+    private void validateLeadTime(LocalDate eventDate, int guestCount) {
+        long daysAhead = ChronoUnit.DAYS.between(LocalDate.now(), eventDate);
+        int tableCount = pricingService.tableCountFor(guestCount);
+
+        int required = tableCount >= properties.largePartyTables()
+                ? properties.largePartyMinDays()
+                : properties.minDaysAhead();
+
+        if (daysAhead < required) {
+            throw new BusinessException(
+                    "Tiệc %d mâm cần đặt trước ít nhất %d ngày, ngày bạn chọn chỉ còn %d ngày"
+                            .formatted(tableCount, required, Math.max(daysAhead, 0)));
         }
     }
 
-    // Sinh mã đơn dạng VS-20260815-0001
+    // Gói tiệc dài hơn thời lượng của buổi thì không phục vụ được
+    private void validatePackageFitsSlot(PartyPackage pkg, TimeSlot slot) {
+        Integer hours = pkg.getHoursIncluded();
+        if (hours == null || isFullDay(pkg)) {
+            return;
+        }
+        if (hours > slot.getDurationHours()) {
+            throw new BusinessException(
+                    "%s cần %d tiếng, %s chỉ có %d tiếng. Vui lòng chọn buổi khác."
+                            .formatted(pkg.getName(), hours, slot.getLabel(), slot.getDurationHours()));
+        }
+    }
+
+    // Gói thuê trọn ngày chiếm cả ngày, không thể xếp thêm tiệc nào khác vào cùng không gian
+    private boolean isFullDay(PartyPackage pkg) {
+        Integer hours = pkg.getHoursIncluded();
+        return hours != null && hours >= properties.fullDayPackageHours();
+    }
+
+    private void validateSlotAvailable(Space space, PartyPackage pkg, LocalDate date, TimeSlot slot) {
+        List<Booking> confirmed = bookingRepository.findBySpaceIdAndEventDateAndStatus(
+                space.getId(), date, BookingStatus.CONFIRMED);
+
+        for (Booking other : confirmed) {
+            if (isFullDay(other.getPartyPackage())) {
+                throw new BusinessException("%s đã cho thuê trọn ngày %s theo đơn %s"
+                        .formatted(space.getName(), date, other.getCode()));
+            }
+            if (isFullDay(pkg)) {
+                throw new BusinessException("%s đã có tiệc ngày %s nên không thể thuê trọn ngày"
+                        .formatted(space.getName(), date));
+            }
+            if (other.getTimeSlot() == slot) {
+                throw new BusinessException("%s đã có tiệc vào %s ngày %s, vui lòng chọn buổi hoặc ngày khác"
+                        .formatted(space.getName(), slot.getLabel(), date));
+            }
+        }
+    }
+
+    // Sinh mã đơn dạng VS-20260815-0001.
+    // Hai khách bấm gửi cùng lúc có thể ra cùng một số nên phải dò tới khi gặp mã chưa dùng.
     private String nextBookingCode() {
         LocalDate today = LocalDate.now();
-        long todayCount = bookingRepository.countCreatedBetween(
-                today.atStartOfDay(), today.plusDays(1).atStartOfDay());
-        return "VS-%s-%04d".formatted(today.format(CODE_DATE), todayCount + 1);
+        long sequence = bookingRepository.countCreatedBetween(
+                today.atStartOfDay(), today.plusDays(1).atStartOfDay()) + 1;
+
+        String code = formatCode(today, sequence);
+        while (bookingRepository.existsByCode(code)) {
+            sequence++;
+            code = formatCode(today, sequence);
+        }
+        return code;
+    }
+
+    private String formatCode(LocalDate date, long sequence) {
+        return "VS-%s-%04d".formatted(date.format(CODE_DATE), sequence);
     }
 
     private void recordHistory(Booking booking, BookingStatus from, BookingStatus to,

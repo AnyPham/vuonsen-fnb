@@ -137,14 +137,20 @@ chứ không tự tính lại, nhờ vậy số tiền hiển thị và số ti�
 ```
 số mâm         = làm tròn lên (số khách / 10)
 tiền ăn        = số mâm x giá một mâm của gói tiệc
-phí không gian = 0 nếu đặt từ 30 mâm trở lên
+mức tối thiểu  = phí thuê không gian x 10
+phí không gian = 0 nếu tiền ăn đạt mức tối thiểu,
+                 chưa đạt thì trả theo tỉ lệ còn thiếu
 giảm giá       = 5% nếu đặt trước từ 60 ngày
 VAT            = 8%
 tổng cộng      = tiền ăn + phí không gian - giảm giá + VAT
+tiền cọc       = 30% tổng cộng
 ```
 
-Các tham số (10 khách một mâm, VAT 8%, mốc 30 mâm, 60 ngày, 5%) đặt trong `application.yml`
-phần `app.booking`, đổi chính sách giá không cần sửa mã nguồn.
+Phí thuê giảm dần theo tiền ăn thay vì miễn phí đột ngột, để khách đặt đông hơn không bao giờ
+trả ít tiền hơn khách đặt ít.
+
+Các tham số đặt trong `application.yml` phần `app.booking`, đổi chính sách giá không cần sửa
+mã nguồn.
 
 ## API chính
 

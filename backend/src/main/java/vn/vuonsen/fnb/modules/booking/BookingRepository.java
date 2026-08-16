@@ -8,6 +8,7 @@ import org.springframework.data.repository.query.Param;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 public interface BookingRepository extends JpaRepository<Booking, Long> {
@@ -16,8 +17,14 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
 
     Page<Booking> findByUserIdOrderByCreatedAtDesc(Long userId, Pageable pageable);
 
-    // Kiểm tra không gian đã có tiệc trong buổi đó chưa
-    boolean existsBySpaceIdAndEventDateAndTimeSlotAndStatus(
+    boolean existsByCode(String code);
+
+    // Các tiệc đã xác nhận của một không gian trong một ngày, dùng để kiểm tra trùng lịch
+    List<Booking> findBySpaceIdAndEventDateAndStatus(
+            Long spaceId, LocalDate eventDate, BookingStatus status);
+
+    // Các đơn còn chờ duyệt của cùng không gian, cùng ngày, cùng buổi
+    List<Booking> findBySpaceIdAndEventDateAndTimeSlotAndStatus(
             Long spaceId, LocalDate eventDate, TimeSlot timeSlot, BookingStatus status);
 
     // Đếm số đơn trong ngày để đánh số thứ tự cho mã đơn

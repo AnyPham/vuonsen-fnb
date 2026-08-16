@@ -22,7 +22,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import vn.vuonsen.fnb.common.dto.PageResponse;
+import vn.vuonsen.fnb.common.exception.BusinessException;
 import vn.vuonsen.fnb.common.exception.ResourceNotFoundException;
+import vn.vuonsen.fnb.modules.booking.Booking;
+import vn.vuonsen.fnb.modules.booking.BookingRepository;
+import vn.vuonsen.fnb.modules.booking.BookingStatus;
 
 import java.time.LocalDateTime;
 import java.util.Map;
@@ -34,13 +38,14 @@ import java.util.Map;
 public class ReviewController {
 
     private final ReviewRepository reviewRepository;
+    private final BookingRepository bookingRepository;
 
     public record ReviewRequest(
+            @NotBlank(message = "Vui lòng nhập mã đơn đã tổ chức") String bookingCode,
             @NotBlank(message = "Vui lòng nhập tên") @Size(max = 120) String customerName,
             @NotNull @Min(value = 1, message = "Điểm từ 1 đến 5")
             @Max(value = 5, message = "Điểm từ 1 đến 5") Integer rating,
-            @NotBlank(message = "Vui lòng nhập nội dung") @Size(max = 1000) String content,
-            String eventType
+            @NotBlank(message = "Vui lòng nhập nội dung") @Size(max = 1000) String content
     ) {
     }
 
@@ -69,13 +74,26 @@ public class ReviewController {
     }
 
     @PostMapping
-    @Operation(summary = "Gửi đánh giá mới, chờ quản trị duyệt trước khi hiển thị")
+    @Operation(summary = "Gửi đánh giá cho một tiệc đã tổ chức, chờ quản trị duyệt")
     public ResponseEntity<Void> create(@Valid @RequestBody ReviewRequest request) {
+        // Chỉ khách đã thật sự tổ chức tiệc mới được đánh giá
+        Booking booking = bookingRepository.findByCode(request.bookingCode().trim())
+                .orElseThrow(() -> ResourceNotFoundException.of("đơn đặt tiệc", request.bookingCode()));
+
+        if (booking.getStatus() != BookingStatus.COMPLETED) {
+            throw new BusinessException("Chỉ đánh giá được sau khi tiệc đã hoàn thành");
+        }
+        if (reviewRepository.existsByBookingId(booking.getId())) {
+            throw new BusinessException("Đơn này đã được đánh giá rồi");
+        }
+
         reviewRepository.save(Review.builder()
+                .booking(booking)
+                .user(booking.getUser())
                 .customerName(request.customerName().trim())
                 .rating(request.rating())
                 .content(request.content().trim())
-                .eventType(request.eventType())
+                .eventType(booking.getEventType().name())
                 .approved(false)
                 .build());
         return ResponseEntity.status(HttpStatus.CREATED).build();

@@ -68,7 +68,7 @@ export default function PackagesPage() {
         </div>
 
         <p className="muted center" style={{ marginTop: 28, fontSize: '0.9rem' }}>
-          Tiệc từ 30 mâm trở lên được miễn phí thuê không gian · Đặt trước 60 ngày giảm thêm 5%
+          Tiền ăn đạt mức tối thiểu của từng không gian thì miễn phí tiền thuê · Đặt trước 60 ngày giảm thêm 5%
         </p>
       </div>
     </section>

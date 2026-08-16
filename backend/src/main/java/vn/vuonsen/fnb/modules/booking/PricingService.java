@@ -36,6 +36,7 @@ public class PricingService {
             BigDecimal vatRate,
             BigDecimal vatAmount,
             BigDecimal totalAmount,
+            BigDecimal depositAmount,
             List<String> appliedRules
     ) {
     }
@@ -47,7 +48,7 @@ public class PricingService {
         BigDecimal unitPrice = partyPackage.getPricePerTable();
         BigDecimal foodAmount = money(unitPrice.multiply(BigDecimal.valueOf(tableCount)));
 
-        BigDecimal spaceFee = spaceFeeFor(space, guestCount, tableCount, rules);
+        BigDecimal spaceFee = spaceFeeFor(space, guestCount, foodAmount, rules);
         BigDecimal subtotal = foodAmount.add(spaceFee);
 
         BigDecimal discount = earlyBirdDiscountFor(subtotal, eventDate, rules);
@@ -55,10 +56,11 @@ public class PricingService {
 
         BigDecimal vatRate = properties.vatRate();
         BigDecimal vatAmount = money(taxable.multiply(vatRate));
-        BigDecimal total = taxable.add(vatAmount);
+        BigDecimal total = money(taxable.add(vatAmount));
+        BigDecimal deposit = money(total.multiply(properties.depositRate()));
 
         return new Quote(guestCount, tableCount, unitPrice, foodAmount, spaceFee,
-                discount, vatRate, vatAmount, money(total), rules);
+                discount, vatRate, vatAmount, total, deposit, rules);
     }
 
     // 1 mâm 10 khách, dư mấy khách cũng tính thêm 1 mâm
@@ -69,20 +71,44 @@ public class PricingService {
         return (int) Math.ceil((double) guestCount / properties.guestsPerTable());
     }
 
-    private BigDecimal spaceFeeFor(Space space, int guestCount, int tableCount, List<String> rules) {
-        if (tableCount >= properties.freeSpaceFromTables()) {
-            rules.add("Miễn phí thuê không gian (tiệc từ %d mâm)".formatted(properties.freeSpaceFromTables()));
-            return money(BigDecimal.ZERO);
-        }
+    /*
+     * Phí thuê không gian giảm dần theo tiền ăn.
+     *
+     * Mỗi không gian có một mức doanh thu tối thiểu = phí thuê x hệ số. Tiền ăn đạt mức đó
+     * thì miễn phí thuê, chưa đạt thì trả phần còn thiếu theo tỉ lệ. Cách này giống mức
+     * "minimum spend" các trung tâm tiệc đang dùng, và tránh được lỗi cũ: khách đặt 300
+     * khách trả ít tiền hơn khách đặt 290 khách.
+     */
+    private BigDecimal spaceFeeFor(Space space, int guestCount, BigDecimal foodAmount, List<String> rules) {
+        BigDecimal rentalFee = space.getRentalFee();
 
-        // Cụm Chòi Sen tính tiền theo số chòi thuê
+        // Không gian tính theo chòi thì thuê bao nhiêu chòi trả bấy nhiêu, không có miễn giảm
         if ("HUT".equals(space.getFeeUnit()) && space.getUnitCapacity() != null && space.getUnitCapacity() > 0) {
             int units = (int) Math.ceil((double) guestCount / space.getUnitCapacity());
             rules.add("Thuê %d chòi cho %d khách".formatted(units, guestCount));
-            return money(space.getRentalFee().multiply(BigDecimal.valueOf(units)));
+            return money(rentalFee.multiply(BigDecimal.valueOf(units)));
         }
 
-        return money(space.getRentalFee());
+        BigDecimal minimumSpend = rentalFee.multiply(BigDecimal.valueOf(properties.minimumSpendMultiplier()));
+        if (minimumSpend.signum() <= 0) {
+            return money(rentalFee);
+        }
+
+        if (foodAmount.compareTo(minimumSpend) >= 0) {
+            rules.add("Miễn phí thuê không gian do tiền ăn đạt %s".formatted(readable(minimumSpend)));
+            return money(BigDecimal.ZERO);
+        }
+
+        // Còn thiếu bao nhiêu phần trăm doanh thu tối thiểu thì trả bấy nhiêu phần trăm phí thuê
+        BigDecimal remainingRatio = BigDecimal.ONE.subtract(
+                foodAmount.divide(minimumSpend, 4, ROUNDING));
+        BigDecimal fee = money(rentalFee.multiply(remainingRatio));
+
+        if (fee.compareTo(money(rentalFee)) < 0) {
+            rules.add("Giảm phí thuê không gian, thêm %s tiền ăn nữa là được miễn phí"
+                    .formatted(readable(minimumSpend.subtract(foodAmount))));
+        }
+        return fee;
     }
 
     private BigDecimal earlyBirdDiscountFor(BigDecimal subtotal, LocalDate eventDate, List<String> rules) {
@@ -101,5 +127,11 @@ public class PricingService {
 
     private BigDecimal money(BigDecimal value) {
         return value.setScale(MONEY_SCALE, ROUNDING);
+    }
+
+    // Đổi 150000000 thành "150 triệu" cho dễ đọc trong câu thông báo
+    private String readable(BigDecimal amount) {
+        BigDecimal million = amount.divide(BigDecimal.valueOf(1_000_000), 1, ROUNDING);
+        return million.stripTrailingZeros().toPlainString() + " triệu";
     }
 }

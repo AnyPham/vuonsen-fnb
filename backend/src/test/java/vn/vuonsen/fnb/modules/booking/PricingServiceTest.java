@@ -18,6 +18,7 @@ class PricingServiceTest {
 
     private PricingService pricingService;
     private Space sanhVenSong;
+    private Space sanhSenVang;
     private Space cumChoiSen;
     private PartyPackage senVang;
 
@@ -26,16 +27,25 @@ class PricingServiceTest {
         BookingProperties properties = new BookingProperties(
                 10,                          // 10 khách / mâm
                 new BigDecimal("0.08"),      // VAT 8%
-                30,                          // miễn phí không gian từ 30 mâm
+                10,                          // tiền ăn đạt phí thuê x 10 thì miễn phí thuê
                 60,                          // đặt trước 60 ngày
                 new BigDecimal("0.05"),      // giảm 5%
-                10, 800);
+                new BigDecimal("0.3"),       // cọc 30%
+                10, 800,
+                3, 20, 14,                   // báo trước 3 ngày, tiệc lớn 20 mâm báo trước 14 ngày
+                8);                          // gói từ 8 tiếng là thuê trọn ngày
         pricingService = new PricingService(properties);
 
         sanhVenSong = Space.builder()
                 .name("Sảnh Ven Sông").spaceType(SpaceType.OUTDOOR)
                 .capacityMin(300).capacityMax(800)
                 .rentalFee(new BigDecimal("15000000")).feeUnit("SESSION")
+                .build();
+
+        sanhSenVang = Space.builder()
+                .name("Sảnh Sen Vàng").spaceType(SpaceType.INDOOR)
+                .capacityMin(200).capacityMax(500)
+                .rentalFee(new BigDecimal("12000000")).feeUnit("SESSION")
                 .build();
 
         cumChoiSen = Space.builder()
@@ -59,40 +69,62 @@ class PricingServiceTest {
     }
 
     @Test
-    @DisplayName("Dưới 30 mâm vẫn tính phí thuê không gian")
-    void chargesSpaceFeeBelowThreshold() {
-        // 200 khách = 20 mâm, ngày tổ chức gần nên không được giảm sớm
-        var quote = pricingService.calculate(sanhVenSong, senVang, 200, LocalDate.now().plusDays(10));
+    @DisplayName("Tiền ăn chưa đạt mức tối thiểu thì phí thuê giảm theo tỉ lệ")
+    void spaceFeeReducesGradually() {
+        // 200 khách = 20 mâm = 90 triệu tiền ăn, mức tối thiểu của sảnh là 120 triệu
+        var quote = pricingService.calculate(sanhSenVang, senVang, 200, LocalDate.now().plusDays(10));
 
         assertThat(quote.tableCount()).isEqualTo(20);
-        assertThat(quote.foodAmount()).isEqualByComparingTo("90000000");   // 20 x 4.500.000
-        assertThat(quote.spaceFee()).isEqualByComparingTo("15000000");
-        assertThat(quote.discountAmount()).isEqualByComparingTo("0");
-        assertThat(quote.vatAmount()).isEqualByComparingTo("8400000");     // 8% x 105.000.000
-        assertThat(quote.totalAmount()).isEqualByComparingTo("113400000");
+        assertThat(quote.foodAmount()).isEqualByComparingTo("90000000");
+        // còn thiếu 25% doanh thu nên trả 25% phí thuê
+        assertThat(quote.spaceFee()).isEqualByComparingTo("3000000");
     }
 
     @Test
-    @DisplayName("Từ 30 mâm trở lên được miễn phí thuê không gian")
-    void freeSpaceFromThirtyTables() {
-        var quote = pricingService.calculate(sanhVenSong, senVang, 300, LocalDate.now().plusDays(10));
+    @DisplayName("Tiền ăn đạt mức tối thiểu thì miễn phí thuê không gian")
+    void freeSpaceWhenMinimumSpendReached() {
+        // 270 khách = 27 mâm = 121,5 triệu, vượt mức 120 triệu
+        var quote = pricingService.calculate(sanhSenVang, senVang, 270, LocalDate.now().plusDays(10));
 
-        assertThat(quote.tableCount()).isEqualTo(30);
         assertThat(quote.spaceFee()).isEqualByComparingTo("0");
         assertThat(quote.appliedRules()).anyMatch(r -> r.contains("Miễn phí thuê không gian"));
     }
 
     @Test
+    @DisplayName("Sảnh lớn vẫn thu được phí thuê khi khách đặt ở mức tối thiểu")
+    void largeHallStillChargesRentAtMinimumCapacity() {
+        // Lỗi cũ: sảnh này nhận tối thiểu 300 khách nên luôn đạt 30 mâm và luôn được miễn phí
+        var quote = pricingService.calculate(sanhVenSong, senVang, 300, LocalDate.now().plusDays(10));
+
+        assertThat(quote.foodAmount()).isEqualByComparingTo("135000000");
+        assertThat(quote.spaceFee()).isGreaterThan(BigDecimal.ZERO);
+    }
+
+    @Test
+    @DisplayName("Thêm khách thì tổng tiền không bao giờ giảm")
+    void totalNeverDropsWhenGuestsIncrease() {
+        LocalDate date = LocalDate.now().plusDays(10);
+        BigDecimal previous = BigDecimal.ZERO;
+
+        for (int guests = 200; guests <= 500; guests += 10) {
+            BigDecimal total = pricingService.calculate(sanhSenVang, senVang, guests, date).totalAmount();
+            assertThat(total)
+                    .as("tổng tiền tại %d khách", guests)
+                    .isGreaterThanOrEqualTo(previous);
+            previous = total;
+        }
+    }
+
+    @Test
     @DisplayName("Đặt trước 60 ngày được giảm thêm 5% trước khi tính VAT")
     void appliesEarlyBirdDiscount() {
-        var quote = pricingService.calculate(sanhVenSong, senVang, 200, LocalDate.now().plusDays(90));
+        var near = pricingService.calculate(sanhSenVang, senVang, 200, LocalDate.now().plusDays(10));
+        var early = pricingService.calculate(sanhSenVang, senVang, 200, LocalDate.now().plusDays(90));
 
-        // (90.000.000 + 15.000.000) x 5% = 5.250.000
-        assertThat(quote.discountAmount()).isEqualByComparingTo("5250000");
-        // VAT tính trên 99.750.000
-        assertThat(quote.vatAmount()).isEqualByComparingTo("7980000");
-        assertThat(quote.totalAmount()).isEqualByComparingTo("107730000");
-        assertThat(quote.appliedRules()).anyMatch(r -> r.contains("đặt trước"));
+        BigDecimal subtotal = near.foodAmount().add(near.spaceFee());
+        assertThat(early.discountAmount()).isEqualByComparingTo(subtotal.multiply(new BigDecimal("0.05")));
+        assertThat(early.totalAmount()).isLessThan(near.totalAmount());
+        assertThat(early.appliedRules()).anyMatch(r -> r.contains("đặt trước"));
     }
 
     @Test
@@ -102,6 +134,16 @@ class PricingServiceTest {
 
         assertThat(quote.spaceFee()).isEqualByComparingTo("1500000");   // 3 chòi x 500.000
         assertThat(quote.appliedRules()).anyMatch(r -> r.contains("3 chòi"));
+    }
+
+    @Test
+    @DisplayName("Tiền cọc bằng 30% tổng hóa đơn")
+    void depositIsThirtyPercent() {
+        var quote = pricingService.calculate(sanhSenVang, senVang, 200, LocalDate.now().plusDays(10));
+
+        assertThat(quote.depositAmount())
+                .isEqualByComparingTo(quote.totalAmount().multiply(new BigDecimal("0.3"))
+                        .setScale(0, java.math.RoundingMode.HALF_UP));
     }
 
     @Test

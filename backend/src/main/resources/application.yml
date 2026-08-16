@@ -57,13 +57,24 @@ app:
 
   # Các tham số tính giá tiệc, đổi ở đây không cần sửa code
   booking:
-    guests-per-table: 10          # 1 mam = 10 khach
-    vat-rate: 0.08                # VAT 8%
-    free-space-from-tables: 30    # tu 30 mam tro len: mien phi thue khong gian
-    early-bird-days: 60           # dat truoc >= 60 ngay
-    early-bird-rate: 0.05         # giam them 5%
+    guests-per-table: 10          # 1 mâm = 10 khách
+    vat-rate: 0.08                # VAT 8%, kiểm tra lại thuế suất hiện hành trước khi chạy thật
+
+    # Tiền ăn đạt mức (phí thuê x 10) thì được miễn phí thuê không gian.
+    # Chưa đạt thì giảm theo tỉ lệ, tránh cảnh đông khách hơn mà trả ít tiền hơn.
+    minimum-spend-multiplier: 10
+
+    early-bird-days: 60           # đặt trước từ 60 ngày
+    early-bird-rate: 0.05         # giảm thêm 5%
+    deposit-rate: 0.3             # đặt cọc 30% để giữ ngày
+
     min-guests: 10
     max-guests: 800
+
+    min-days-ahead: 3             # tiệc thường phải báo trước 3 ngày
+    large-party-tables: 20        # từ 20 mâm trở lên coi là tiệc lớn
+    large-party-min-days: 14      # tiệc lớn phải báo trước 14 ngày
+    full-day-package-hours: 8     # gói từ 8 tiếng trở lên tính là thuê trọn ngày
 
   admin:
     # Tài khoản admin tạo tự động khi chạy lần đầu

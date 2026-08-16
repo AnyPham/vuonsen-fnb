@@ -16,11 +16,13 @@ public record QuoteResponse(
         BigDecimal vatRate,
         BigDecimal vatAmount,
         BigDecimal totalAmount,
+        BigDecimal depositAmount,
         List<String> appliedRules
 ) {
     public static QuoteResponse from(PricingService.Quote q) {
         return new QuoteResponse(
                 q.guestCount(), q.tableCount(), q.unitPrice(), q.foodAmount(), q.spaceFee(),
-                q.discountAmount(), q.vatRate(), q.vatAmount(), q.totalAmount(), q.appliedRules());
+                q.discountAmount(), q.vatRate(), q.vatAmount(), q.totalAmount(),
+                q.depositAmount(), q.appliedRules());
     }
 }

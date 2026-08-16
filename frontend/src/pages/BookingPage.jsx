@@ -379,6 +379,11 @@ function EstimatePanel({ quote, loading }) {
             <span className="val">{formatCurrency(quote.totalAmount)}</span>
           </div>
 
+          <div className="est-row" style={{ borderBottom: 'none' }}>
+            <span>Đặt cọc giữ ngày</span>
+            <span>{formatCurrency(quote.depositAmount)}</span>
+          </div>
+
           {quote.appliedRules?.length > 0 && (
             <ul className="est-rules">
               {quote.appliedRules.map((rule) => (
