@@ -21,9 +21,3 @@ export const formatDateTime = (value) => {
   return new Date(value).toLocaleString('vi-VN');
 };
 
-// Ngày sớm nhất được đặt tiệc là ngày mai
-export const tomorrowISO = () => {
-  const d = new Date();
-  d.setDate(d.getDate() + 1);
-  return d.toISOString().split('T')[0];
-};
