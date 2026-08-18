@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import vn.vuonsen.fnb.common.dto.PageResponse;
+import vn.vuonsen.fnb.config.props.BookingProperties;
 import vn.vuonsen.fnb.modules.booking.dto.BookingRequest;
 import vn.vuonsen.fnb.modules.booking.dto.BookingResponse;
 import vn.vuonsen.fnb.modules.booking.dto.QuoteRequest;
@@ -34,6 +35,7 @@ import java.util.Map;
 public class BookingController {
 
     private final BookingService bookingService;
+    private final BookingProperties properties;
 
     @PostMapping("/quote")
     @Operation(summary = "Báo giá tạm tính, không tạo đơn")
@@ -66,12 +68,25 @@ public class BookingController {
     }
 
     @GetMapping("/options")
-    @Operation(summary = "Danh mục loại sự kiện và buổi tổ chức cho form đặt tiệc")
-    public ResponseEntity<Map<String, List<Map<String, String>>>> options() {
+    @Operation(summary = "Danh mục và quy định để giao diện dựng form đặt tiệc")
+    public ResponseEntity<Map<String, Object>> options() {
         return ResponseEntity.ok(Map.of(
                 "eventTypes", Arrays.stream(EventType.values())
                         .map(e -> Map.of("value", e.name(), "label", e.getLabel())).toList(),
                 "timeSlots", Arrays.stream(TimeSlot.values())
-                        .map(t -> Map.of("value", t.name(), "label", t.getLabel())).toList()));
+                        .map(t -> Map.of(
+                                "value", t.name(),
+                                "label", t.getLabel(),
+                                "durationHours", t.getDurationHours())).toList(),
+                // Gửi kèm quy định để giao diện chặn sớm, khỏi để khách điền hết
+                // ba bước rồi mới báo lỗi ở bước cuối
+                "rules", Map.of(
+                        "minGuests", properties.minGuests(),
+                        "maxGuests", properties.maxGuests(),
+                        "minDaysAhead", properties.minDaysAhead(),
+                        "largePartyTables", properties.largePartyTables(),
+                        "largePartyMinDays", properties.largePartyMinDays(),
+                        "guestsPerTable", properties.guestsPerTable(),
+                        "fullDayPackageHours", properties.fullDayPackageHours())));
     }
 }

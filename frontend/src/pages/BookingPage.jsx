@@ -11,20 +11,50 @@ import {
   updateForm,
 } from '@/features/booking/bookingSlice';
 import { fetchPackages, fetchSpaces, selectPackages, selectSpaces } from '@/features/catalog/catalogSlice';
-import { formatCurrency, tomorrowISO } from '@/utils/format';
+import { formatCurrency } from '@/utils/format';
 import { ErrorBlock } from '@/components/common/StateBlock';
 
 const STEP_LABELS = ['1. Sự kiện & số khách', '2. Không gian & gói tiệc', '3. Thông tin liên hệ'];
 
+// Số ngày phải báo trước, lấy quy định từ backend chứ không tự đặt ra ở đây
+function leadTimeDays(rules, guestCount) {
+  if (!rules) return 1;
+  const tables = Math.ceil((Number(guestCount) || 0) / (rules.guestsPerTable || 10));
+  return tables >= rules.largePartyTables ? rules.largePartyMinDays : rules.minDaysAhead;
+}
+
+function earliestDate(days) {
+  const d = new Date();
+  d.setDate(d.getDate() + days);
+  return d.toISOString().split('T')[0];
+}
+
+// Gói tiệc dài hơn thời lượng buổi thì không phục vụ được. Gói thuê trọn ngày là ngoại lệ.
+function packageFitsSlot(pkg, slotHours, fullDayHours) {
+  if (!pkg.hoursIncluded || !slotHours) return true;
+  if (fullDayHours && pkg.hoursIncluded >= fullDayHours) return true;
+  return pkg.hoursIncluded <= slotHours;
+}
+
 // Kiểm tra từng bước ngay trên trình duyệt để báo lỗi sớm
-function validateStep(step, form) {
+function validateStep(step, form, rules) {
   const errors = {};
   if (step === 1) {
     if (!form.eventType) errors.eventType = 'Vui lòng chọn loại hình sự kiện';
-    if (!form.eventDate) errors.eventDate = 'Vui lòng chọn ngày tổ chức';
-    else if (form.eventDate < tomorrowISO()) errors.eventDate = 'Ngày tổ chức phải sau hôm nay';
+    if (!form.eventDate) {
+      errors.eventDate = 'Vui lòng chọn ngày tổ chức';
+    } else {
+      const days = leadTimeDays(rules, form.guestCount);
+      if (form.eventDate < earliestDate(days)) {
+        errors.eventDate = `Tiệc quy mô này cần đặt trước ít nhất ${days} ngày`;
+      }
+    }
     const guests = Number(form.guestCount);
-    if (!guests || guests < 10 || guests > 800) errors.guestCount = 'Số khách từ 10 đến 800';
+    const min = rules?.minGuests ?? 10;
+    const max = rules?.maxGuests ?? 800;
+    if (!guests || guests < min || guests > max) {
+      errors.guestCount = `Số khách từ ${min} đến ${max}`;
+    }
   }
   if (step === 2) {
     if (!form.spaceId) errors.spaceId = 'Vui lòng chọn một không gian';
@@ -62,7 +92,9 @@ export default function BookingPage() {
     return () => clearTimeout(timer);
   }, [dispatch, form.spaceId, form.packageId, form.guestCount, form.eventDate]);
 
-  const clientErrors = validateStep(step, form);
+  const rules = options.rules;
+  const slotHours = options.timeSlots?.find((s) => s.value === form.timeSlot)?.durationHours;
+  const clientErrors = validateStep(step, form, rules);
   const set = (patch) => dispatch(updateForm(patch));
 
   const next = () => {
@@ -116,7 +148,7 @@ export default function BookingPage() {
 
               <form onSubmit={handleSubmit} noValidate>
                 {step === 1 && (
-                  <StepEvent form={form} set={set} options={options} errors={clientErrors} />
+                  <StepEvent form={form} set={set} options={options} errors={clientErrors} rules={rules} />
                 )}
                 {step === 2 && (
                   <StepChoices
@@ -125,6 +157,8 @@ export default function BookingPage() {
                     spaces={spaces.items}
                     packages={packages.items}
                     errors={clientErrors}
+                    slotHours={slotHours}
+                    fullDayHours={rules?.fullDayPackageHours}
                   />
                 )}
                 {step === 3 && (
@@ -162,7 +196,7 @@ export default function BookingPage() {
 }
 
 // Bước 1: chọn loại sự kiện, ngày và số khách
-function StepEvent({ form, set, options, errors }) {
+function StepEvent({ form, set, options, errors, rules }) {
   return (
     <>
       <div className="fgroup">
@@ -188,7 +222,7 @@ function StepEvent({ form, set, options, errors }) {
           <input
             id="eventDate"
             type="date"
-            min={tomorrowISO()}
+            min={earliestDate(leadTimeDays(rules, form.guestCount))}
             value={form.eventDate}
             onChange={(e) => set({ eventDate: e.target.value })}
           />
@@ -225,7 +259,7 @@ function StepEvent({ form, set, options, errors }) {
 }
 
 // Bước 2: chọn không gian và gói tiệc
-function StepChoices({ form, set, spaces, packages, errors }) {
+function StepChoices({ form, set, spaces, packages, errors, slotHours, fullDayHours }) {
   const guests = Number(form.guestCount) || 0;
 
   return (
@@ -259,17 +293,23 @@ function StepChoices({ form, set, spaces, packages, errors }) {
       <div className="fgroup">
         <label>Chọn gói tiệc *</label>
         <div className="picks">
-          {packages.map((pkg) => (
-            <button
-              key={pkg.id}
-              type="button"
-              className={`pick ${form.packageId === pkg.id ? 'sel' : ''}`}
-              onClick={() => set({ packageId: pkg.id })}
-            >
-              <span className="t">{pkg.name}</span>
-              <span className="s">{formatCurrency(pkg.pricePerTable)} / mâm</span>
-            </button>
-          ))}
+          {packages.map((pkg) => {
+            const fits = packageFitsSlot(pkg, slotHours, fullDayHours);
+            return (
+              <button
+                key={pkg.id}
+                type="button"
+                className={`pick ${form.packageId === pkg.id ? 'sel' : ''}`}
+                onClick={() => set({ packageId: pkg.id })}
+                disabled={!fits}
+                title={fits ? '' : `Gói này cần ${pkg.hoursIncluded} tiếng, buổi đã chọn không đủ giờ`}
+                style={fits ? undefined : { opacity: 0.45, cursor: 'not-allowed' }}
+              >
+                <span className="t">{pkg.name}</span>
+                <span className="s">{formatCurrency(pkg.pricePerTable)} / mâm</span>
+              </button>
+            );
+          })}
         </div>
         {errors.packageId && <div className="err">{errors.packageId}</div>}
       </div>
