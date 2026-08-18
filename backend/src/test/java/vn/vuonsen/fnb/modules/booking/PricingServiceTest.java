@@ -147,6 +147,27 @@ class PricingServiceTest {
     }
 
     @Test
+    @DisplayName("Khách ít hơn mức tối thiểu vẫn nhận, tính tiền theo số mâm tối thiểu")
+    void chargesMinimumTablesWhenGuestsAreFewer() {
+        // Sảnh Ven Sông nhận tối thiểu 300 khách tức 30 mâm
+        var quote = pricingService.calculate(sanhVenSong, senVang, 250, LocalDate.now().plusDays(10));
+
+        assertThat(pricingService.tableCountFor(250)).isEqualTo(25);
+        assertThat(quote.tableCount()).isEqualTo(30);
+        assertThat(quote.foodAmount()).isEqualByComparingTo("135000000");  // 30 x 4.500.000
+        assertThat(quote.appliedRules()).anyMatch(r -> r.contains("tối thiểu 30 mâm"));
+    }
+
+    @Test
+    @DisplayName("Khách đủ mức tối thiểu thì tính đúng số mâm thật")
+    void billsActualTablesWhenAboveMinimum() {
+        var quote = pricingService.calculate(sanhVenSong, senVang, 420, LocalDate.now().plusDays(10));
+
+        assertThat(quote.tableCount()).isEqualTo(42);
+        assertThat(quote.appliedRules()).noneMatch(r -> r.contains("tối thiểu"));
+    }
+
+    @Test
     @DisplayName("Tổng tiền = tiền ăn + phí không gian - giảm giá + VAT")
     void totalIsConsistent() {
         var quote = pricingService.calculate(sanhVenSong, senVang, 350, LocalDate.now().plusDays(70));

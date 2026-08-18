@@ -91,9 +91,4 @@ public class Space extends BaseEntity {
     @Column(name = "amenity", length = 120)
     @Builder.Default
     private List<String> amenities = new ArrayList<>();
-
-    // Kiểm tra số khách có vừa sức chứa không
-    public boolean fitsGuests(int guests) {
-        return guests >= capacityMin && guests <= capacityMax;
-    }
 }

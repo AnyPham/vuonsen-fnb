@@ -20,7 +20,7 @@ public interface SpaceRepository extends JpaRepository<Space, Long> {
     @Query("""
             SELECT s FROM Space s
             WHERE s.active = true
-              AND (:guests   IS NULL OR (:guests BETWEEN s.capacityMin AND s.capacityMax))
+              AND (:guests   IS NULL OR :guests <= s.capacityMax)
               AND (:type     IS NULL OR s.spaceType = :type)
               AND (:maxPrice IS NULL OR s.rentalFee <= :maxPrice)
             ORDER BY s.sortOrder ASC

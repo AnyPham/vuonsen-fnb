@@ -268,7 +268,10 @@ function StepChoices({ form, set, spaces, packages, errors, slotHours, fullDayHo
         <label>Chọn không gian *</label>
         <div className="picks">
           {spaces.map((space) => {
-            const fits = guests === 0 || (guests >= space.capacityMin && guests <= space.capacityMax);
+            // Chỉ chặn khi vượt sức chứa. Khách ít hơn mức tối thiểu vẫn đặt được,
+            // mức tính tiền do backend quyết định và ghi rõ trong bảng tạm tính.
+            const fits = guests === 0 || guests <= space.capacityMax;
+            const belowMinimum = guests > 0 && guests < space.capacityMin;
             return (
               <button
                 key={space.id}
@@ -276,12 +279,13 @@ function StepChoices({ form, set, spaces, packages, errors, slotHours, fullDayHo
                 className={`pick ${form.spaceId === space.id ? 'sel' : ''}`}
                 onClick={() => set({ spaceId: space.id })}
                 disabled={!fits}
-                title={fits ? '' : `Không gian này phục vụ ${space.capacityMin}–${space.capacityMax} khách`}
+                title={fits ? '' : `Không gian này chứa tối đa ${space.capacityMax} khách`}
                 style={fits ? undefined : { opacity: 0.45, cursor: 'not-allowed' }}
               >
                 <span className="t">{space.name}</span>
                 <span className="s">
                   {space.capacityMin}–{space.capacityMax} khách · {formatCurrency(space.rentalFee)}
+                  {belowMinimum && ' · tính theo mức tối thiểu của sảnh'}
                 </span>
               </button>
             );

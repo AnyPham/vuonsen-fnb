@@ -44,7 +44,8 @@ public class PricingService {
     public Quote calculate(Space space, PartyPackage partyPackage, int guestCount, LocalDate eventDate) {
         List<String> rules = new ArrayList<>();
 
-        int tableCount = tableCountFor(guestCount);
+        int guestTables = tableCountFor(guestCount);
+        int tableCount = billedTablesFor(space, guestTables, rules);
         BigDecimal unitPrice = partyPackage.getPricePerTable();
         BigDecimal foodAmount = money(unitPrice.multiply(BigDecimal.valueOf(tableCount)));
 
@@ -61,6 +62,25 @@ public class PricingService {
 
         return new Quote(guestCount, tableCount, unitPrice, foodAmount, spaceFee,
                 discount, vatRate, vatAmount, total, deposit, rules);
+    }
+
+    /*
+     * Mỗi không gian nhận đặt tối thiểu một số mâm, suy ra từ sức chứa tối thiểu.
+     * Khách mời ít hơn vẫn tính tiền theo mức tối thiểu, giống cách các trung tâm
+     * tiệc cưới làm, thay vì từ chối nhận tiệc.
+     */
+    public int minimumTablesFor(Space space) {
+        return (int) Math.ceil((double) space.getCapacityMin() / properties.guestsPerTable());
+    }
+
+    private int billedTablesFor(Space space, int guestTables, List<String> rules) {
+        int minimum = minimumTablesFor(space);
+        if (guestTables >= minimum) {
+            return guestTables;
+        }
+        rules.add("%s nhận tối thiểu %d mâm, tiệc %d mâm của bạn vẫn tính theo %d mâm"
+                .formatted(space.getName(), minimum, guestTables, minimum));
+        return minimum;
     }
 
     // 1 mâm 10 khách, dư mấy khách cũng tính thêm 1 mâm
