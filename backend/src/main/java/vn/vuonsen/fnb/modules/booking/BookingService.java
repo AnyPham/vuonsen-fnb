@@ -200,9 +200,11 @@ public class BookingService {
             throw new BusinessException("Số khách phải trong khoảng %d - %d"
                     .formatted(properties.minGuests(), properties.maxGuests()));
         }
-        if (!space.fitsGuests(guestCount)) {
-            throw new BusinessException("%s chỉ phục vụ %d - %d khách, không phù hợp với %d khách"
-                    .formatted(space.getName(), space.getCapacityMin(), space.getCapacityMax(), guestCount));
+        // Chỉ chặn khi vượt sức chứa. Khách ít hơn mức tối thiểu vẫn nhận, tính tiền
+        // theo số mâm tối thiểu của không gian đó.
+        if (guestCount > space.getCapacityMax()) {
+            throw new BusinessException("%s chỉ chứa tối đa %d khách, không phục vụ được %d khách"
+                    .formatted(space.getName(), space.getCapacityMax(), guestCount));
         }
     }
 
