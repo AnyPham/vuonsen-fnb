@@ -73,7 +73,7 @@ app:
 
     min-days-ahead: 3             # tiệc thường phải báo trước 3 ngày
     large-party-tables: 20        # từ 20 mâm trở lên coi là tiệc lớn
-    large-party-min-days: 14      # tiệc lớn phải báo trước 14 ngày
+    large-party-min-days: 7      # tiệc lớn phải báo trước 7 ngày
     full-day-package-hours: 8     # gói từ 8 tiếng trở lên tính là thuê trọn ngày
 
   admin:
