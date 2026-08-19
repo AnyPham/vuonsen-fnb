@@ -29,7 +29,7 @@ export default function Footer() {
         </div>
 
         <div className="footer-bottom">
-          © {new Date().getFullYear()} Vườn Sen · Khóa luận tốt nghiệp — Phạm Trần Tuấn Anh (21130004)
+          © {new Date().getFullYear()} Vườn Sen · Tiểu luận tốt nghiệp — Phạm Trần Tuấn Anh (21130004)
         </div>
       </div>
     </footer>
