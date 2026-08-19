@@ -33,7 +33,20 @@ export const restoreSession = createAsyncThunk('auth/restore', async (_, { rejec
   }
 });
 
+// Cập nhật hồ sơ rồi lưu lại vào Redux để tên trên thanh menu đổi theo ngay
+export const updateProfile = createAsyncThunk(
+  'auth/updateProfile',
+  async (body, { rejectWithValue }) => {
+    try {
+      return await authApi.updateProfile(body);
+    } catch (error) {
+      return rejectWithValue({ message: error.message, fieldErrors: error.fieldErrors });
+    }
+  },
+);
+
 export const logout = createAsyncThunk('auth/logout', async () => {
+
   try {
     await authApi.logout();
   } finally {
@@ -63,6 +76,9 @@ const authSlice = createSlice({
       .addCase(restoreSession.rejected, (state) => {
         state.user = null;
         state.initialized = true;
+      })
+      .addCase(updateProfile.fulfilled, (state, action) => {
+        state.user = action.payload;
       })
       .addCase(logout.fulfilled, (state) => {
         state.user = null;

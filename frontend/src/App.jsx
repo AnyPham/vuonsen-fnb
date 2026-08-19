@@ -15,6 +15,7 @@ import TrackBookingPage from '@/pages/TrackBookingPage';
 import LoginPage from '@/pages/LoginPage';
 import RegisterPage from '@/pages/RegisterPage';
 import MyBookingsPage from '@/pages/MyBookingsPage';
+import ProfilePage from '@/pages/ProfilePage';
 import AdminBookingsPage from '@/pages/admin/AdminBookingsPage';
 import NotFoundPage from '@/pages/NotFoundPage';
 
@@ -39,6 +40,14 @@ export default function App() {
         <Route path="/dang-nhap" element={<LoginPage />} />
         <Route path="/dang-ky" element={<RegisterPage />} />
 
+        <Route
+          path="/ho-so"
+          element={
+            <ProtectedRoute>
+              <ProfilePage />
+            </ProtectedRoute>
+          }
+        />
         <Route
           path="/don-cua-toi"
           element={
