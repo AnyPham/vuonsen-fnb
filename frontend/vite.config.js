@@ -10,6 +10,8 @@ export default defineConfig({
   },
   server: {
     port: 5173,
+    // Cổng 5173 bận thì báo lỗi và dừng, không tự nhảy sang cổng khác
+    strictPort: true,
     // Tự mở trình duyệt khi chạy npm run dev
     open: true,
     // Chuyển tiếp request /api sang Spring Boot để khỏi vướng CORS
