@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
 import {
@@ -97,14 +97,25 @@ export default function BookingPage() {
   const clientErrors = validateStep(step, form, rules);
   const set = (patch) => dispatch(updateForm(patch));
 
+  // Chỉ báo lỗi sau khi khách bấm Tiếp tục, tránh vừa mở form đã thấy chữ đỏ
+  const [showErrors, setShowErrors] = useState(false);
+  const errors = showErrors ? clientErrors : {};
+
   const next = () => {
-    if (Object.keys(clientErrors).length === 0) dispatch(goToStep(step + 1));
-    else set({}); // render lại để hiện lỗi
+    if (Object.keys(clientErrors).length === 0) {
+      setShowErrors(false);
+      dispatch(goToStep(step + 1));
+    } else {
+      setShowErrors(true);
+    }
   };
 
   const handleSubmit = (event) => {
     event.preventDefault();
-    if (Object.keys(clientErrors).length > 0) return;
+    if (Object.keys(clientErrors).length > 0) {
+      setShowErrors(true);
+      return;
+    }
     dispatch(
       submitBooking({
         ...form,
@@ -148,7 +159,7 @@ export default function BookingPage() {
 
               <form onSubmit={handleSubmit} noValidate>
                 {step === 1 && (
-                  <StepEvent form={form} set={set} options={options} errors={clientErrors} rules={rules} />
+                  <StepEvent form={form} set={set} options={options} errors={errors} rules={rules} />
                 )}
                 {step === 2 && (
                   <StepChoices
@@ -156,13 +167,13 @@ export default function BookingPage() {
                     set={set}
                     spaces={spaces.items}
                     packages={packages.items}
-                    errors={clientErrors}
+                    errors={errors}
                     slotHours={slotHours}
                     fullDayHours={rules?.fullDayPackageHours}
                   />
                 )}
                 {step === 3 && (
-                  <StepContact form={form} set={set} errors={{ ...clientErrors, ...fieldErrors }} />
+                  <StepContact form={form} set={set} errors={{ ...errors, ...fieldErrors }} />
                 )}
 
                 <div className="fnav">
