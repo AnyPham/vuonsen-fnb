@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import {
   fetchCategories,
@@ -6,6 +6,7 @@ import {
   selectCategories,
   selectDishes,
 } from '@/features/catalog/catalogSlice';
+import { menuApi } from '@/api/endpoints';
 import { formatCurrency } from '@/utils/format';
 import { Empty, Loading } from '@/components/common/StateBlock';
 
@@ -15,9 +16,13 @@ export default function MenuPage() {
   const categories = useSelector(selectCategories);
   const { items, status, activeCategory } = useSelector(selectDishes);
 
+  // Món bán chạy lấy riêng, không qua Redux vì chỉ trang này dùng
+  const [bestSellers, setBestSellers] = useState([]);
+
   useEffect(() => {
     dispatch(fetchCategories());
     dispatch(fetchDishes({}));
+    menuApi.bestSellers().then(setBestSellers).catch(() => setBestSellers([]));
   }, [dispatch]);
 
   return (
@@ -31,6 +36,31 @@ export default function MenuPage() {
             xem ở phần Gói tiệc.
           </p>
         </div>
+
+        {bestSellers.length > 0 && (
+          <div style={{ marginBottom: 40 }}>
+            <div className="eyebrow center">Được gọi nhiều nhất</div>
+            <div className="grid grid-3">
+              {bestSellers.map((dish) => (
+                <div key={dish.id} className="card">
+                  <div className="ph v3">
+                    <span>🍲</span>
+                    <span>{dish.categoryName}</span>
+                  </div>
+                  <div className="card-body">
+                    <strong>{dish.name}</strong>
+                    <p className="muted" style={{ fontSize: '0.88rem', margin: '8px 0 12px' }}>
+                      {dish.description}
+                    </p>
+                    <strong style={{ color: 'var(--green-800)' }}>
+                      {dish.price ? formatCurrency(dish.price) : dish.priceNote}
+                    </strong>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
 
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10, justifyContent: 'center', marginBottom: 34 }}>
           <button
