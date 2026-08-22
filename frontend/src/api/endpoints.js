@@ -47,4 +47,7 @@ export const adminApi = {
   bookings: (params) => axiosClient.get('/api/v1/admin/bookings', { params }),
   statistics: () => axiosClient.get('/api/v1/admin/bookings/statistics'),
   changeStatus: (id, body) => axiosClient.patch(`/api/v1/admin/bookings/${id}/status`, body),
+  reviews: (params) => axiosClient.get('/api/v1/admin/reviews', { params }),
+  approveReview: (id) => axiosClient.patch(`/api/v1/admin/reviews/${id}/approve`),
+  rejectReview: (id) => axiosClient.delete(`/api/v1/admin/reviews/${id}`),
 };
