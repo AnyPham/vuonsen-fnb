@@ -7,6 +7,7 @@ import ProtectedRoute from '@/routes/ProtectedRoute';
 
 import HomePage from '@/pages/HomePage';
 import SpacesPage from '@/pages/SpacesPage';
+import SpaceDetailPage from '@/pages/SpaceDetailPage';
 import MenuPage from '@/pages/MenuPage';
 import PackagesPage from '@/pages/PackagesPage';
 import GalleryPage from '@/pages/GalleryPage';
@@ -31,6 +32,7 @@ export default function App() {
       <Route element={<Layout />}>
         <Route path="/" element={<HomePage />} />
         <Route path="/khong-gian" element={<SpacesPage />} />
+        <Route path="/khong-gian/:slug" element={<SpaceDetailPage />} />
         <Route path="/thuc-don" element={<MenuPage />} />
         <Route path="/goi-tiec" element={<PackagesPage />} />
         <Route path="/thu-vien" element={<GalleryPage />} />
