@@ -18,6 +18,8 @@ import RegisterPage from '@/pages/RegisterPage';
 import MyBookingsPage from '@/pages/MyBookingsPage';
 import ProfilePage from '@/pages/ProfilePage';
 import AdminBookingsPage from '@/pages/admin/AdminBookingsPage';
+import AdminReviewsPage from '@/pages/admin/AdminReviewsPage';
+import ReviewsPage from '@/pages/ReviewsPage';
 import NotFoundPage from '@/pages/NotFoundPage';
 
 export default function App() {
@@ -37,6 +39,7 @@ export default function App() {
         <Route path="/thuc-don" element={<MenuPage />} />
         <Route path="/goi-tiec" element={<PackagesPage />} />
         <Route path="/thu-vien" element={<GalleryPage />} />
+        <Route path="/danh-gia" element={<ReviewsPage />} />
         <Route path="/dat-tiec" element={<BookingPage />} />
         <Route path="/tra-cuu" element={<TrackBookingPage />} />
         <Route path="/dang-nhap" element={<LoginPage />} />
@@ -63,6 +66,14 @@ export default function App() {
           element={
             <ProtectedRoute roles={['ADMIN', 'STAFF']}>
               <AdminBookingsPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/quan-tri/danh-gia"
+          element={
+            <ProtectedRoute roles={['ADMIN', 'STAFF']}>
+              <AdminReviewsPage />
             </ProtectedRoute>
           }
         />

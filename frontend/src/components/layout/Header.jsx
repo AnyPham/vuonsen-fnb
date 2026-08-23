@@ -8,6 +8,7 @@ const NAV_ITEMS = [
   { to: '/thuc-don', label: 'Thực đơn' },
   { to: '/goi-tiec', label: 'Gói tiệc' },
   { to: '/thu-vien', label: 'Thư viện' },
+  { to: '/danh-gia', label: 'Đánh giá' },
   { to: '/tra-cuu', label: 'Tra cứu đơn' },
 ];
 
@@ -49,9 +50,14 @@ export default function Header() {
                 Đơn của tôi
               </NavLink>
               {isAdmin && (
-                <NavLink to="/quan-tri/don-dat-tiec" onClick={close}>
-                  Quản trị
-                </NavLink>
+                <>
+                  <NavLink to="/quan-tri/don-dat-tiec" onClick={close}>
+                    Quản trị đơn
+                  </NavLink>
+                  <NavLink to="/quan-tri/danh-gia" onClick={close}>
+                    Duyệt đánh giá
+                  </NavLink>
+                </>
               )}
               <button type="button" className="btn btn-ghost btn-sm" onClick={handleLogout}>
                 Đăng xuất ({user.fullName})
