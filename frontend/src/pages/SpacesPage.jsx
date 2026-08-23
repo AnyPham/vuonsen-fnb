@@ -89,7 +89,9 @@ export default function SpacesPage() {
                 <span>{space.typeLabel}</span>
               </div>
               <div className="card-body">
-                <h3>{space.name}</h3>
+                <h3>
+                  <Link to={`/khong-gian/${space.slug}`}>{space.name}</Link>
+                </h3>
                 <p className="muted" style={{ fontSize: '0.92rem', margin: '8px 0 14px' }}>
                   {space.shortDesc}
                 </p>
@@ -115,8 +117,8 @@ export default function SpacesPage() {
                       / {space.feeUnit === 'HUT' ? 'chòi' : 'buổi'}
                     </small>
                   </strong>
-                  <Link to="/dat-tiec" className="btn btn-outline btn-sm">
-                    Đặt giữ chỗ →
+                  <Link to={`/khong-gian/${space.slug}`} className="btn btn-outline btn-sm">
+                    Xem chi tiết →
                   </Link>
                 </div>
               </div>
