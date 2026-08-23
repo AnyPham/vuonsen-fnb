@@ -25,6 +25,10 @@ export const packageApi = {
   list: () => axiosClient.get('/api/v1/packages'),
 };
 
+export const recommendationApi = {
+  suggest: (body) => axiosClient.post('/api/v1/recommendations', body),
+};
+
 export const bookingApi = {
   options: () => axiosClient.get('/api/v1/bookings/options'),
   quote: (body) => axiosClient.post('/api/v1/bookings/quote', body),
