@@ -42,6 +42,9 @@ export default function Header() {
 
           {user ? (
             <>
+              <NavLink to="/ho-so" onClick={close}>
+                Hồ sơ
+              </NavLink>
               <NavLink to="/don-cua-toi" onClick={close}>
                 Đơn của tôi
               </NavLink>

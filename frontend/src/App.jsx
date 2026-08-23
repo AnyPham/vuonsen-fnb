@@ -7,6 +7,7 @@ import ProtectedRoute from '@/routes/ProtectedRoute';
 
 import HomePage from '@/pages/HomePage';
 import SpacesPage from '@/pages/SpacesPage';
+import SpaceDetailPage from '@/pages/SpaceDetailPage';
 import MenuPage from '@/pages/MenuPage';
 import PackagesPage from '@/pages/PackagesPage';
 import GalleryPage from '@/pages/GalleryPage';
@@ -15,6 +16,7 @@ import TrackBookingPage from '@/pages/TrackBookingPage';
 import LoginPage from '@/pages/LoginPage';
 import RegisterPage from '@/pages/RegisterPage';
 import MyBookingsPage from '@/pages/MyBookingsPage';
+import ProfilePage from '@/pages/ProfilePage';
 import AdminBookingsPage from '@/pages/admin/AdminBookingsPage';
 import NotFoundPage from '@/pages/NotFoundPage';
 
@@ -31,6 +33,7 @@ export default function App() {
       <Route element={<Layout />}>
         <Route path="/" element={<HomePage />} />
         <Route path="/khong-gian" element={<SpacesPage />} />
+        <Route path="/khong-gian/:slug" element={<SpaceDetailPage />} />
         <Route path="/thuc-don" element={<MenuPage />} />
         <Route path="/goi-tiec" element={<PackagesPage />} />
         <Route path="/thu-vien" element={<GalleryPage />} />
@@ -39,6 +42,14 @@ export default function App() {
         <Route path="/dang-nhap" element={<LoginPage />} />
         <Route path="/dang-ky" element={<RegisterPage />} />
 
+        <Route
+          path="/ho-so"
+          element={
+            <ProtectedRoute>
+              <ProfilePage />
+            </ProtectedRoute>
+          }
+        />
         <Route
           path="/don-cua-toi"
           element={

@@ -53,7 +53,8 @@ public class SecurityConfig {
 
                         // khách chưa đăng nhập vẫn đặt tiệc được
                         .requestMatchers(HttpMethod.POST, "/api/v1/bookings", "/api/v1/bookings/quote").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/v1/bookings/track/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/v1/bookings/options",
+                                "/api/v1/bookings/track/**").permitAll()
 
                         // Khu vực quản trị
                         .requestMatchers("/api/v1/admin/**")

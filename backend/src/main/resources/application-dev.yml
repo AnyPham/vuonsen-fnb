@@ -16,7 +16,6 @@ spring:
     hibernate:
       # validate: entity lệch với bảng thì báo lỗi ngay lúc khởi động
       ddl-auto: validate
-    database-platform: org.hibernate.dialect.H2Dialect
     show-sql: true
 
   flyway:
