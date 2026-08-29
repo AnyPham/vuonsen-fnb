@@ -57,6 +57,12 @@ export const adminApi = {
   updateDish: (id, body) => axiosClient.put(`/api/v1/admin/dishes/${id}`, body),
   stopDish: (id) => axiosClient.delete(`/api/v1/admin/dishes/${id}`),
 
+  // Quản trị không gian
+  spaces: () => axiosClient.get('/api/v1/admin/spaces'),
+  createSpace: (body) => axiosClient.post('/api/v1/admin/spaces', body),
+  updateSpace: (id, body) => axiosClient.put(`/api/v1/admin/spaces/${id}`, body),
+  stopSpace: (id) => axiosClient.delete(`/api/v1/admin/spaces/${id}`),
+
   // Quản trị gói tiệc
   packages: () => axiosClient.get('/api/v1/admin/packages'),
   createPackage: (body) => axiosClient.post('/api/v1/admin/packages', body),

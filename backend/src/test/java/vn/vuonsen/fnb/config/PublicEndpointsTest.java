@@ -48,7 +48,8 @@ class PublicEndpointsTest {
                 "/api/v1/admin/bookings",
                 "/api/v1/admin/reviews",
                 "/api/v1/admin/dishes",
-                "/api/v1/admin/packages");
+                "/api/v1/admin/packages",
+                "/api/v1/admin/spaces");
 
         for (String url : adminUrls) {
             mockMvc.perform(get(url))

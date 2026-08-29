@@ -20,7 +20,7 @@ export default function ProtectedRoute({ children, roles }) {
     return (
       <div className="wrap state">
         <h2>Không đủ quyền truy cập</h2>
-        <p className="muted">Trang này chỉ dành cho quản trị viên và nhân viên.</p>
+        <p className="muted">Tài khoản của bạn không được vào trang này.</p>
       </div>
     );
   }

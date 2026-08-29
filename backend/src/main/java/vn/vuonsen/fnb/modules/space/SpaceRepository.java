@@ -16,6 +16,9 @@ public interface SpaceRepository extends JpaRepository<Space, Long> {
 
     List<Space> findByActiveTrueOrderBySortOrderAsc();
 
+    // Trang quản trị lấy cả không gian đã ngừng kinh doanh
+    List<Space> findAllByOrderBySortOrderAsc();
+
     // Lọc không gian theo số khách, loại và giá. Tham số nào null thì bỏ qua.
     @Query("""
             SELECT s FROM Space s
