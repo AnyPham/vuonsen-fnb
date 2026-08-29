@@ -27,7 +27,7 @@ CREATE TABLE recommendation_logs (
     score               DECIMAL(6,2),
     accepted            BOOLEAN       NOT NULL DEFAULT FALSE,
     booking_id          BIGINT,
-    created_at          TIMESTAMP     NOT NULL,
+    created_at          DATETIME      NOT NULL,
     CONSTRAINT fk_rec_space   FOREIGN KEY (suggested_space_id)   REFERENCES spaces (id),
     CONSTRAINT fk_rec_package FOREIGN KEY (suggested_package_id) REFERENCES party_packages (id),
     CONSTRAINT fk_rec_booking FOREIGN KEY (booking_id) REFERENCES bookings (id) ON DELETE SET NULL

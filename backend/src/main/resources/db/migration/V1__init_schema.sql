@@ -11,8 +11,8 @@ CREATE TABLE users (
     address         VARCHAR(255),
     role            VARCHAR(20)   NOT NULL DEFAULT 'CUSTOMER',
     enabled         BOOLEAN       NOT NULL DEFAULT TRUE,
-    created_at      TIMESTAMP     NOT NULL,
-    updated_at      TIMESTAMP,
+    created_at      DATETIME      NOT NULL,
+    updated_at      DATETIME,
     CONSTRAINT uk_users_email UNIQUE (email)
 );
 CREATE INDEX idx_users_phone ON users (phone);
@@ -21,9 +21,9 @@ CREATE TABLE refresh_tokens (
     id          BIGINT AUTO_INCREMENT PRIMARY KEY,
     user_id     BIGINT       NOT NULL,
     token       VARCHAR(255) NOT NULL,
-    expires_at  TIMESTAMP    NOT NULL,
+    expires_at  DATETIME     NOT NULL,
     revoked     BOOLEAN      NOT NULL DEFAULT FALSE,
-    created_at  TIMESTAMP    NOT NULL,
+    created_at  DATETIME     NOT NULL,
     CONSTRAINT uk_refresh_token UNIQUE (token),
     CONSTRAINT fk_refresh_user FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
 );
@@ -47,8 +47,8 @@ CREATE TABLE spaces (
     longitude     DECIMAL(10,7),
     active        BOOLEAN       NOT NULL DEFAULT TRUE,
     sort_order    INT           NOT NULL DEFAULT 0,
-    created_at    TIMESTAMP     NOT NULL,
-    updated_at    TIMESTAMP,
+    created_at    DATETIME      NOT NULL,
+    updated_at    DATETIME,
     CONSTRAINT uk_spaces_code UNIQUE (code),
     CONSTRAINT uk_spaces_slug UNIQUE (slug)
 );
@@ -91,8 +91,8 @@ CREATE TABLE dishes (
     best_seller BOOLEAN       NOT NULL DEFAULT FALSE,
     available   BOOLEAN       NOT NULL DEFAULT TRUE,
     sort_order  INT           NOT NULL DEFAULT 0,
-    created_at  TIMESTAMP     NOT NULL,
-    updated_at  TIMESTAMP,
+    created_at  DATETIME      NOT NULL,
+    updated_at  DATETIME,
     CONSTRAINT fk_dish_category FOREIGN KEY (category_id) REFERENCES dish_categories (id)
 );
 CREATE INDEX idx_dishes_category ON dishes (category_id);
@@ -109,8 +109,8 @@ CREATE TABLE party_packages (
     featured        BOOLEAN       NOT NULL DEFAULT FALSE,
     active          BOOLEAN       NOT NULL DEFAULT TRUE,
     sort_order      INT           NOT NULL DEFAULT 0,
-    created_at      TIMESTAMP     NOT NULL,
-    updated_at      TIMESTAMP,
+    created_at      DATETIME      NOT NULL,
+    updated_at      DATETIME,
     CONSTRAINT uk_package_code UNIQUE (code)
 );
 
@@ -147,8 +147,8 @@ CREATE TABLE bookings (
     customer_email  VARCHAR(160),
     note            VARCHAR(1000),
     status          VARCHAR(20)   NOT NULL DEFAULT 'PENDING',
-    created_at      TIMESTAMP     NOT NULL,
-    updated_at      TIMESTAMP,
+    created_at      DATETIME      NOT NULL,
+    updated_at      DATETIME,
     CONSTRAINT uk_booking_code UNIQUE (code),
     CONSTRAINT fk_booking_user    FOREIGN KEY (user_id)    REFERENCES users (id),
     CONSTRAINT fk_booking_space   FOREIGN KEY (space_id)   REFERENCES spaces (id),
@@ -166,7 +166,7 @@ CREATE TABLE booking_status_history (
     to_status   VARCHAR(20)  NOT NULL,
     changed_by  VARCHAR(160),
     note        VARCHAR(500),
-    created_at  TIMESTAMP    NOT NULL,
+    created_at  DATETIME     NOT NULL,
     CONSTRAINT fk_history_booking FOREIGN KEY (booking_id) REFERENCES bookings (id) ON DELETE CASCADE
 );
 
@@ -180,8 +180,8 @@ CREATE TABLE reviews (
     content       VARCHAR(1000) NOT NULL,
     event_type    VARCHAR(40),
     approved      BOOLEAN      NOT NULL DEFAULT FALSE,
-    created_at    TIMESTAMP    NOT NULL,
-    updated_at    TIMESTAMP,
+    created_at    DATETIME     NOT NULL,
+    updated_at    DATETIME,
     CONSTRAINT fk_review_booking FOREIGN KEY (booking_id) REFERENCES bookings (id) ON DELETE SET NULL,
     CONSTRAINT fk_review_user    FOREIGN KEY (user_id)    REFERENCES users (id)    ON DELETE SET NULL,
     CONSTRAINT ck_review_rating  CHECK (rating BETWEEN 1 AND 5)
@@ -196,5 +196,5 @@ CREATE TABLE gallery_images (
     category   VARCHAR(60),
     sort_order INT          NOT NULL DEFAULT 0,
     active     BOOLEAN      NOT NULL DEFAULT TRUE,
-    created_at TIMESTAMP    NOT NULL
+    created_at DATETIME     NOT NULL
 );

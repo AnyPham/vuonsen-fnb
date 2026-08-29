@@ -1,0 +1,31 @@
+# Cấu hình chạy với MySQL cài trên máy cá nhân (XAMPP).
+# Khác profile prod ở chỗ ghi thẳng thông tin kết nối thay vì đọc biến môi trường,
+# vì đây là máy học chứ không phải máy chủ thật.
+#
+# Chạy bằng lệnh:
+#   mvn spring-boot:run -Dspring-boot.run.profiles=local
+spring:
+  datasource:
+    url: jdbc:mysql://localhost:3306/vuonsen_fnb?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Ho_Chi_Minh&allowPublicKeyRetrieval=true&useSSL=false
+    username: root
+    # XAMPP để trống mật khẩu root
+    password: ""
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  jpa:
+    hibernate:
+      # Flyway lo tạo bảng, Hibernate chỉ đối chiếu
+      ddl-auto: validate
+    show-sql: true
+
+  flyway:
+    enabled: true
+    baseline-on-migrate: true
+
+  h2:
+    console:
+      enabled: false
+
+logging:
+  level:
+    vn.vuonsen.fnb: DEBUG
