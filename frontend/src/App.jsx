@@ -21,6 +21,7 @@ import AdminBookingsPage from '@/pages/admin/AdminBookingsPage';
 import AdminReviewsPage from '@/pages/admin/AdminReviewsPage';
 import AdminMenuPage from '@/pages/admin/AdminMenuPage';
 import AdminPackagesPage from '@/pages/admin/AdminPackagesPage';
+import AdminSpacesPage from '@/pages/admin/AdminSpacesPage';
 import ReviewsPage from '@/pages/ReviewsPage';
 import NotFoundPage from '@/pages/NotFoundPage';
 
@@ -93,6 +94,14 @@ export default function App() {
           element={
             <ProtectedRoute roles={['ADMIN']}>
               <AdminPackagesPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/quan-tri/khong-gian"
+          element={
+            <ProtectedRoute roles={['ADMIN']}>
+              <AdminSpacesPage />
             </ProtectedRoute>
           }
         />

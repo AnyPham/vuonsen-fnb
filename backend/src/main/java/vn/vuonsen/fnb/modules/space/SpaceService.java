@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import vn.vuonsen.fnb.common.exception.BusinessException;
 import vn.vuonsen.fnb.common.exception.ResourceNotFoundException;
+import vn.vuonsen.fnb.modules.space.dto.SpaceAdminResponse;
 import vn.vuonsen.fnb.modules.space.dto.SpaceRequest;
 import vn.vuonsen.fnb.modules.space.dto.SpaceResponse;
 
@@ -38,6 +39,13 @@ public class SpaceService {
 
     // ---------- Thao tac quan tri ----------
 
+    // Danh sách cho trang quản trị, gồm cả không gian đã ngừng kinh doanh
+    public List<SpaceAdminResponse> listForAdmin() {
+        return spaceRepository.findAllByOrderBySortOrderAsc().stream()
+                .map(SpaceAdminResponse::from)
+                .toList();
+    }
+
     @Transactional
     public SpaceResponse create(SpaceRequest request) {
         if (spaceRepository.findByCode(request.code()).isPresent()) {
@@ -65,6 +73,11 @@ public class SpaceService {
     private void apply(Space space, SpaceRequest r) {
         if (r.capacityMin() > r.capacityMax()) {
             throw new BusinessException("Sức chứa tối thiểu không được lớn hơn sức chứa tối đa");
+        }
+        // Thiếu số khách mỗi chòi thì PricingService quay về tính theo buổi,
+        // giá báo cho khách sẽ sai mà không ai biết
+        if ("HUT".equals(r.feeUnit()) && (r.unitCapacity() == null || r.unitCapacity() <= 0)) {
+            throw new BusinessException("Không gian tính phí theo chòi phải khai số khách mỗi chòi");
         }
         space.setCode(r.code());
         space.setName(r.name());

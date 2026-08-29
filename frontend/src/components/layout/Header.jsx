@@ -63,6 +63,9 @@ export default function Header() {
                   <NavLink to="/quan-tri/goi-tiec" onClick={close}>
                     Sửa gói tiệc
                   </NavLink>
+                  <NavLink to="/quan-tri/khong-gian" onClick={close}>
+                    Sửa không gian
+                  </NavLink>
                 </>
               )}
               <button type="button" className="btn btn-ghost btn-sm" onClick={handleLogout}>
