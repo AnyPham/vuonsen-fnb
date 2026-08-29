@@ -51,79 +51,7 @@ Phần quản lý không gian và duyệt đánh giá hiện mới có API, chư
 - Maven 3.9 trở lên
 - MySQL 8 (không bắt buộc, xem cách chạy nhanh bên dưới)
 
-## Cài đặt và chạy
 
-### Cách 1: Chạy nhanh, không cần cài MySQL
-
-Backend dùng H2 chạy trên RAM, Flyway tự tạo bảng và nạp sẵn dữ liệu mẫu.
-
-```bash
-cd backend
-mvn spring-boot:run
-```
-
-Mở terminal thứ hai:
-
-```bash
-cd frontend
-npm run dev
-```
-
-- Giao diện: http://localhost:5173
-- Tài liệu API: http://localhost:8080/swagger-ui.html
-- Xem cơ sở dữ liệu: http://localhost:8080/h2-console
-  (JDBC URL `jdbc:h2:mem:vuonsen`, user `sa`, mật khẩu để trống)
-
-Tài khoản quản trị mặc định: `admin@vuonsen.vn` / `Admin@123`
-
-### Cách 2: Chạy với MySQL
-
-Tạo database:
-
-```sql
-CREATE DATABASE vuonsen_fnb CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-```
-
-Đặt các biến môi trường `DB_URL`, `DB_USER`, `DB_PASSWORD`, sau đó:
-
-```bash
-cd backend
-mvn spring-boot:run -Dspring-boot.run.profiles=prod
-```
-
-### Cách 3: Chạy bằng Docker
-
-```bash
-cp .env.example .env
-```
-
-Điền `JWT_SECRET` và `ADMIN_PASSWORD` vào file `.env`, rồi chạy:
-
-```bash
-docker compose up -d --build
-```
-
-Website chạy tại http://localhost, API tại http://localhost:8080.
-
-## Cấu trúc thư mục
-
-```
-backend/
-  src/main/java/vn/vuonsen/fnb/
-    common/       Lớp dùng chung, xử lý lỗi tập trung
-    config/       Cấu hình bảo mật, Swagger, tài khoản admin
-    security/     Xử lý JWT
-    modules/      auth, user, space, menu, partypackage, booking, review, gallery
-  src/main/resources/
-    db/migration/ Script tạo bảng và dữ liệu mẫu
-
-frontend/
-  src/
-    api/          Gọi API
-    features/     Redux slice
-    components/   Component dùng chung
-    pages/        Các trang giao diện
-    routes/       Phân quyền truy cập trang
 ```
 
 Mỗi module ở backend tự chứa đầy đủ entity, repository, service và controller của nghiệp vụ đó.
@@ -185,14 +113,6 @@ số tiền của đơn cũ vẫn giữ nguyên.
 cd backend
 mvn test
 ```
-
-## Hướng phát triển
-
-- Thay ảnh giữ chỗ bằng ảnh thật của nhà hàng
-- Gửi email xác nhận khi khách đặt tiệc
-- Bổ sung trang quản trị cho thực đơn và gói tiệc
-- Tích hợp thanh toán đặt cọc qua VNPay hoặc MoMo
-- Viết thêm kiểm thử tích hợp cho luồng đặt tiệc
 
 ## Tác giả
 
