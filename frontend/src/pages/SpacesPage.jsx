@@ -83,14 +83,17 @@ export default function SpacesPage() {
 
         <div className="grid grid-3">
           {items.map((space) => (
-            <article key={space.id} className="card">
+            <article key={space.id} className="card card-clickable">
               <div className="ph v2">
                 <span>🏛️</span>
                 <span>{space.typeLabel}</span>
               </div>
               <div className="card-body">
                 <h3>
-                  <Link to={`/khong-gian/${space.slug}`}>{space.name}</Link>
+                  {/* full-link làm cả thẻ bấm được, xem class trong global.css */}
+                  <Link to={`/khong-gian/${space.slug}`} className="full-link">
+                    {space.name}
+                  </Link>
                 </h3>
                 <p className="muted" style={{ fontSize: '0.92rem', margin: '8px 0 14px' }}>
                   {space.shortDesc}

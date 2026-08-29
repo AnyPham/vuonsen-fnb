@@ -74,6 +74,17 @@ img { max-width: 100%; display: block; }
   box-shadow: var(--shadow-sm); overflow: hidden;
 }
 .card-body { padding: 22px; }
+
+/* Thẻ bấm chỗ nào cũng mở được trang chi tiết.
+   Cách làm: kéo giãn đường dẫn ở tiêu đề bằng lớp giả ::after phủ kín thẻ.
+   Nhờ vậy cả thẻ bấm được mà vẫn chỉ có một đường dẫn, không lồng thẻ a vào
+   nhau, và người dùng vẫn bấm chuột phải mở tab mới được như thường. */
+.card-clickable { position: relative; transition: box-shadow 0.18s, transform 0.18s; }
+.card-clickable:hover { box-shadow: var(--shadow-md); transform: translateY(-3px); }
+.card-clickable .full-link::after { content: ''; position: absolute; inset: 0; z-index: 1; }
+/* Nút bên trong phải nổi lên trên lớp phủ thì mới bấm riêng được */
+.card-clickable .btn { position: relative; z-index: 2; }
+
 .grid { display: grid; gap: 26px; }
 .grid-3 { grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); }
 .grid-2 { grid-template-columns: repeat(auto-fit, minmax(380px, 1fr)); }
