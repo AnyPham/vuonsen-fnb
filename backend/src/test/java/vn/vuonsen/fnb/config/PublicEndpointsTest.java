@@ -44,8 +44,16 @@ class PublicEndpointsTest {
     @Test
     @DisplayName("Khách chưa đăng nhập bị chặn ở khu quản trị")
     void guestCannotReachAdminEndpoints() throws Exception {
-        mockMvc.perform(get("/api/v1/admin/bookings"))
-                .andExpect(status().is4xxClientError());
+        List<String> adminUrls = List.of(
+                "/api/v1/admin/bookings",
+                "/api/v1/admin/reviews",
+                "/api/v1/admin/dishes",
+                "/api/v1/admin/packages");
+
+        for (String url : adminUrls) {
+            mockMvc.perform(get(url))
+                    .andExpect(status().is4xxClientError());
+        }
     }
 
     @Test

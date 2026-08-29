@@ -18,4 +18,11 @@ public interface DishRepository extends JpaRepository<Dish, Long> {
     List<Dish> search(@Param("categoryCode") String categoryCode, @Param("keyword") String keyword);
 
     List<Dish> findByBestSellerTrueAndAvailableTrueOrderBySortOrderAsc();
+
+    // Trang quản trị lấy cả món đã ngừng bán nên không lọc theo available
+    @Query("""
+            SELECT d FROM Dish d JOIN FETCH d.category c
+            ORDER BY c.sortOrder ASC, d.sortOrder ASC
+            """)
+    List<Dish> findAllWithCategory();
 }

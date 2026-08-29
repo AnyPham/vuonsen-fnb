@@ -19,6 +19,8 @@ import MyBookingsPage from '@/pages/MyBookingsPage';
 import ProfilePage from '@/pages/ProfilePage';
 import AdminBookingsPage from '@/pages/admin/AdminBookingsPage';
 import AdminReviewsPage from '@/pages/admin/AdminReviewsPage';
+import AdminMenuPage from '@/pages/admin/AdminMenuPage';
+import AdminPackagesPage from '@/pages/admin/AdminPackagesPage';
 import ReviewsPage from '@/pages/ReviewsPage';
 import NotFoundPage from '@/pages/NotFoundPage';
 
@@ -74,6 +76,23 @@ export default function App() {
           element={
             <ProtectedRoute roles={['ADMIN', 'STAFF']}>
               <AdminReviewsPage />
+            </ProtectedRoute>
+          }
+        />
+        {/* Sửa thực đơn và bảng giá là việc của quản trị, nhân viên không vào được */}
+        <Route
+          path="/quan-tri/thuc-don"
+          element={
+            <ProtectedRoute roles={['ADMIN']}>
+              <AdminMenuPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/quan-tri/goi-tiec"
+          element={
+            <ProtectedRoute roles={['ADMIN']}>
+              <AdminPackagesPage />
             </ProtectedRoute>
           }
         />
