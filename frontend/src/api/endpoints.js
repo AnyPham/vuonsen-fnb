@@ -54,4 +54,16 @@ export const adminApi = {
   reviews: (params) => axiosClient.get('/api/v1/admin/reviews', { params }),
   approveReview: (id) => axiosClient.patch(`/api/v1/admin/reviews/${id}/approve`),
   rejectReview: (id) => axiosClient.delete(`/api/v1/admin/reviews/${id}`),
+
+  // Quản trị thực đơn
+  dishes: () => axiosClient.get('/api/v1/admin/dishes'),
+  createDish: (body) => axiosClient.post('/api/v1/admin/dishes', body),
+  updateDish: (id, body) => axiosClient.put(`/api/v1/admin/dishes/${id}`, body),
+  stopDish: (id) => axiosClient.delete(`/api/v1/admin/dishes/${id}`),
+
+  // Quản trị gói tiệc
+  packages: () => axiosClient.get('/api/v1/admin/packages'),
+  createPackage: (body) => axiosClient.post('/api/v1/admin/packages', body),
+  updatePackage: (id, body) => axiosClient.put(`/api/v1/admin/packages/${id}`, body),
+  stopPackage: (id) => axiosClient.delete(`/api/v1/admin/packages/${id}`),
 };
