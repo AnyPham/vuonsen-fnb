@@ -13,6 +13,7 @@ import {
 import { fetchPackages, fetchSpaces, selectPackages, selectSpaces } from '@/features/catalog/catalogSlice';
 import { formatCurrency } from '@/utils/format';
 import { ErrorBlock } from '@/components/common/StateBlock';
+import SuggestionBox from '@/components/common/SuggestionBox';
 
 const STEP_LABELS = ['1. Sự kiện & số khách', '2. Không gian & gói tiệc', '3. Thông tin liên hệ'];
 
@@ -275,6 +276,13 @@ function StepChoices({ form, set, spaces, packages, errors, slotHours, fullDayHo
 
   return (
     <>
+      <SuggestionBox
+        guestCount={form.guestCount}
+        eventType={form.eventType}
+        eventDate={form.eventDate}
+        onPick={(spaceId, packageId) => set({ spaceId, packageId })}
+      />
+
       <div className="fgroup">
         <label>Chọn không gian *</label>
         <div className="picks">
