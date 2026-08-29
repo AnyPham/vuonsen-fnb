@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.List;
@@ -62,5 +63,37 @@ class PublicEndpointsTest {
     void guestCannotReachProfile() throws Exception {
         mockMvc.perform(get("/api/v1/me"))
                 .andExpect(status().is4xxClientError());
+    }
+
+    @Test
+    @DisplayName("Quản trị vào được ba màn hình quản trị danh mục")
+    @WithMockUser(roles = "ADMIN")
+    void adminCanReachCatalogueScreens() throws Exception {
+        List<String> adminUrls = List.of(
+                "/api/v1/admin/dishes",
+                "/api/v1/admin/packages",
+                "/api/v1/admin/spaces");
+
+        for (String url : adminUrls) {
+            mockMvc.perform(get(url))
+                    .andExpect(status().isOk());
+        }
+    }
+
+    @Test
+    @DisplayName("Nhân viên không sửa được thực đơn và bảng giá")
+    @WithMockUser(roles = "STAFF")
+    void staffCannotReachCatalogueScreens() throws Exception {
+        // Nhân viên duyệt đơn được nhưng không được đổi giá, nên ba màn hình này
+        // đánh dấu chỉ ADMIN bằng @PreAuthorize ở controller
+        List<String> adminUrls = List.of(
+                "/api/v1/admin/dishes",
+                "/api/v1/admin/packages",
+                "/api/v1/admin/spaces");
+
+        for (String url : adminUrls) {
+            mockMvc.perform(get(url))
+                    .andExpect(status().isForbidden());
+        }
     }
 }
