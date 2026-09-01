@@ -78,6 +78,27 @@ export default function SuggestionBox({ guestCount, eventType, eventDate, onPick
                 ))}
               </ul>
 
+              {/* Thực đơn gợi ý sẵn cho gói, gấp lại cho đỡ dài */}
+              {item.menu?.length > 0 && (
+                <details style={{ marginTop: 12 }}>
+                  <summary style={{ cursor: 'pointer', fontSize: '0.84rem', fontWeight: 600 }}>
+                    Thực đơn gợi ý ({item.menu.length} món)
+                  </summary>
+                  <ul style={{ paddingLeft: 16, marginTop: 8, fontSize: '0.82rem' }}>
+                    {item.menu.map((dish) => (
+                      <li key={dish.id} style={{ marginBottom: 4 }}>
+                        {dish.name}
+                        <span className="muted" style={{ display: 'block', fontSize: '0.76rem' }}>
+                          {dish.categoryName}
+                          {' · '}
+                          {dish.price ? formatCurrency(dish.price) : dish.priceNote}
+                        </span>
+                      </li>
+                    ))}
+                  </ul>
+                </details>
+              )}
+
               <button
                 type="button"
                 className="btn btn-outline btn-sm"

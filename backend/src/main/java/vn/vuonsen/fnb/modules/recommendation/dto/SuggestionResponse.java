@@ -13,12 +13,15 @@ public record SuggestionResponse(
         int tableCount,
         BigDecimal totalAmount,
         BigDecimal score,
-        List<String> reasons
+        List<String> reasons,
+        // Thực đơn gợi ý sẵn cho gói này
+        List<DishBrief> menu
 ) {
     public static SuggestionResponse from(Suggestion s) {
         return new SuggestionResponse(
                 s.space().getId(), s.space().getName(), s.space().getSlug(),
                 s.partyPackage().getId(), s.partyPackage().getName(),
-                s.tableCount(), s.totalAmount(), s.score(), s.reasons());
+                s.tableCount(), s.totalAmount(), s.score(), s.reasons(),
+                s.dishes().stream().map(DishBrief::from).toList());
     }
 }

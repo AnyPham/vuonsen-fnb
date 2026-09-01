@@ -44,6 +44,7 @@ public class RecommendationService {
     private final SpaceEventTypeRepository spaceEventTypeRepository;
     private final RecommendationLogRepository logRepository;
     private final PricingService pricingService;
+    private final MenuSuggestionService menuSuggestionService;
 
     public List<Suggestion> suggest(RecommendationRequest request) {
         List<Space> spaces = spaceRepository.findByActiveTrueOrderBySortOrderAsc();
@@ -65,9 +66,13 @@ public class RecommendationService {
             }
         }
 
+        // Chỉ dựng thực đơn cho các phương án được chọn, không dựng cho toàn bộ
+        // tổ hợp vì phần lớn sẽ bị loại ngay sau khi xếp hạng
         return all.stream()
                 .sorted(Comparator.comparing(Suggestion::score).reversed())
                 .limit(TOP_N)
+                .map(s -> s.withDishes(
+                        menuSuggestionService.suggestMenu(request.eventType(), s.partyPackage())))
                 .toList();
     }
 
@@ -124,7 +129,8 @@ public class RecommendationService {
         }
 
         BigDecimal rounded = BigDecimal.valueOf(total).setScale(2, RoundingMode.HALF_UP);
-        return new Suggestion(space, pkg, rounded, totalAmount, quote.tableCount(), reasons);
+        // Thực đơn để trống ở bước này, dựng sau cho các phương án được chọn
+        return new Suggestion(space, pkg, rounded, totalAmount, quote.tableCount(), reasons, List.of());
     }
 
     private Map<Long, Integer> suitabilityMap(EventType eventType) {
