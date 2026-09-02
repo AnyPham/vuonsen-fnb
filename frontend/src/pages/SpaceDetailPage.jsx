@@ -120,7 +120,12 @@ export default function SpaceDetailPage() {
             <div className="card">
               <div className="card-body">
                 <h3 style={{ marginBottom: 14 }}>Vị trí</h3>
-                <GoogleMap lat={space.latitude} lng={space.longitude} height={220} />
+                <GoogleMap
+                  lat={space.latitude}
+                  lng={space.longitude}
+                  height={220}
+                  title={space.name}
+                />
               </div>
             </div>
           </aside>
