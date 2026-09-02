@@ -65,6 +65,22 @@ class RecommendationServiceTest {
     }
 
     @Test
+    @DisplayName("Chưa chọn loại sự kiện vẫn gợi ý được theo số khách")
+    void suggestsWithoutEventType() {
+        // Trang danh sách không gian gọi API khi khách mới điền số khách, chưa
+        // chọn loại sự kiện. Đường đi này phải chạy được chứ không báo lỗi.
+        var result = recommendationService.suggest(new RecommendationRequest(
+                40, null, null, LocalDate.now().plusDays(30)));
+
+        assertThat(result).hasSize(3);
+        assertThat(result).allSatisfy(s ->
+                assertThat(s.score()).isBetween(BigDecimal.ZERO, new BigDecimal("100")));
+        // Không biết loại tiệc thì chưa dựng được thực đơn, phải trả rỗng chứ
+        // không được lỗi
+        assertThat(result).allSatisfy(s -> assertThat(s.dishes()).isEmpty());
+    }
+
+    @Test
     @DisplayName("Điểm luôn nằm trong thang 0 đến 100 dù có tiêu chí bị bỏ qua")
     void scoreStaysWithinHundred() {
         // Không khai ngân sách nên tiêu chí ngân sách bị bỏ qua, điểm vẫn phải

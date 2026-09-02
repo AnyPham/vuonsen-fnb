@@ -3,17 +3,30 @@ import { recommendationApi } from '@/api/endpoints';
 import { formatCurrency } from '@/utils/format';
 
 /*
- * Khối gợi ý hiện ở bước 2 của form đặt tiệc.
- * Gọi API mỗi khi khách đổi số khách hoặc loại sự kiện, đưa ra ba tổ hợp
- * không gian và gói tiệc phù hợp nhất kèm lý do.
+ * Khối gợi ý, dùng ở bước 2 của form đặt tiệc và ở trang danh sách không gian.
+ *
+ * Gọi API mỗi khi khách đổi số khách hoặc loại sự kiện, đưa ra ba tổ hợp không
+ * gian và gói tiệc phù hợp nhất kèm lý do.
+ *
+ * Chỉ số khách là bắt buộc, giống ràng buộc của API. Chưa chọn loại sự kiện thì
+ * vẫn gợi ý được, chỉ là dựa chủ yếu vào sức chứa nên kém sát hơn. Ở trang không
+ * gian khách hay xem lướt trước khi biết mình tổ chức tiệc gì, bắt chọn loại sự
+ * kiện mới cho xem gợi ý thì mất tác dụng.
  */
-export default function SuggestionBox({ guestCount, eventType, eventDate, onPick }) {
+export default function SuggestionBox({
+  guestCount,
+  eventType,
+  eventDate,
+  onPick,
+  nhanNut = 'Chọn phương án này',
+  tieuDe = 'Gợi ý cho bạn',
+}) {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     const guests = Number(guestCount);
-    if (!guests || !eventType) {
+    if (!guests) {
       setItems([]);
       return undefined;
     }
@@ -21,7 +34,11 @@ export default function SuggestionBox({ guestCount, eventType, eventDate, onPick
     setLoading(true);
     const timer = setTimeout(() => {
       recommendationApi
-        .suggest({ guestCount: guests, eventType, eventDate: eventDate || null })
+        .suggest({
+          guestCount: guests,
+          eventType: eventType || null,
+          eventDate: eventDate || null,
+        })
         .then(setItems)
         .catch(() => setItems([]))
         .finally(() => setLoading(false));
@@ -30,7 +47,7 @@ export default function SuggestionBox({ guestCount, eventType, eventDate, onPick
     return () => clearTimeout(timer);
   }, [guestCount, eventType, eventDate]);
 
-  if (!eventType || !guestCount) return null;
+  if (!Number(guestCount)) return null;
 
   return (
     <div
@@ -42,10 +59,12 @@ export default function SuggestionBox({ guestCount, eventType, eventDate, onPick
       }}
     >
       <div className="eyebrow" style={{ marginBottom: 4 }}>
-        Gợi ý cho bạn
+        {tieuDe}
       </div>
       <p className="muted" style={{ fontSize: '0.86rem', marginBottom: 14 }}>
-        Dựa trên số khách, loại sự kiện và lịch sử đặt tiệc của khách trước.
+        {eventType
+          ? 'Dựa trên số khách, loại sự kiện, tầm giá gói tiệc và lịch sử đặt tiệc của khách trước.'
+          : 'Đang gợi ý theo số khách. Chọn thêm loại sự kiện để gợi ý sát hơn.'}
       </p>
 
       {loading && <p className="muted">Đang tìm phương án phù hợp…</p>}
@@ -105,7 +124,7 @@ export default function SuggestionBox({ guestCount, eventType, eventDate, onPick
                 style={{ marginTop: 12, width: '100%' }}
                 onClick={() => onPick(item.spaceId, item.packageId)}
               >
-                Chọn phương án này
+                {nhanNut}
               </button>
             </div>
           </div>
