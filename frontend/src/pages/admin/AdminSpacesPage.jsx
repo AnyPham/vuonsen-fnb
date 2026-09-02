@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { adminApi, spaceApi } from '@/api/endpoints';
 import { formatCurrency } from '@/utils/format';
 import { Empty, ErrorBlock, Loading } from '@/components/common/StateBlock';
+import ImageUpload from '@/components/common/ImageUpload';
 
 const EMPTY_FORM = {
   code: '',
@@ -10,6 +11,7 @@ const EMPTY_FORM = {
   spaceType: 'OUTDOOR',
   shortDesc: '',
   description: '',
+  thumbnailUrl: '',
   capacityMin: '',
   capacityMax: '',
   rentalFee: '',
@@ -74,6 +76,7 @@ export default function AdminSpacesPage() {
       spaceType: space.type,
       shortDesc: space.shortDesc || '',
       description: space.description || '',
+      thumbnailUrl: space.thumbnailUrl || '',
       capacityMin: space.capacityMin ?? '',
       capacityMax: space.capacityMax ?? '',
       rentalFee: space.rentalFee ?? '',
@@ -114,6 +117,7 @@ export default function AdminSpacesPage() {
         spaceType: form.spaceType,
         shortDesc: form.shortDesc.trim() || null,
         description: form.description.trim() || null,
+        thumbnailUrl: form.thumbnailUrl.trim() || null,
         capacityMin: Number(form.capacityMin),
         capacityMax: Number(form.capacityMax),
         rentalFee: Number(form.rentalFee),
@@ -306,6 +310,13 @@ export default function AdminSpacesPage() {
                 onChange={(e) => change('description', e.target.value)}
               />
             </div>
+
+            <ImageUpload
+              id="space-thumb"
+              label="Ảnh đại diện"
+              value={form.thumbnailUrl}
+              onChange={(url) => change('thumbnailUrl', url)}
+            />
 
             <div className="fgroup">
               <label htmlFor="space-amenities">Tiện ích</label>

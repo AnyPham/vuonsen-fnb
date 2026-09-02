@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { galleryApi } from '@/api/endpoints';
 import { Empty, Loading } from '@/components/common/StateBlock';
+import Thumb from '@/components/common/Thumb';
 
 // Thư viện ảnh dạng lưới, bấm vào ảnh để xem lớn
 export default function GalleryPage() {
@@ -53,10 +54,13 @@ export default function GalleryPage() {
               style={{ padding: 0, border: 0, cursor: 'zoom-in' }}
               onClick={() => setCurrent(index)}
             >
-              <div className={`ph ${index % 3 === 1 ? 'v2' : index % 3 === 2 ? 'v3' : ''}`}>
-                <span>🖼️</span>
-                <span>{image.caption}</span>
-              </div>
+              <Thumb
+                url={image.url}
+                variant={index % 3 === 1 ? 'v2' : index % 3 === 2 ? 'v3' : ''}
+                icon="🖼️"
+                label={image.caption}
+                alt={image.caption}
+              />
             </button>
           ))}
         </div>
@@ -89,10 +93,14 @@ export default function GalleryPage() {
           </button>
 
           <div onClick={(e) => e.stopPropagation()} style={{ maxWidth: 900, width: '100%' }}>
-            <div className="ph v3" style={{ borderRadius: 'var(--r)' }}>
-              <span>🖼️</span>
-              <span>{images[current].caption}</span>
-            </div>
+            <Thumb
+              url={images[current].url}
+              variant="v3"
+              icon="🖼️"
+              label={images[current].caption}
+              alt={images[current].caption}
+              style={{ borderRadius: 'var(--r)' }}
+            />
             <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 16 }}>
               <button
                 type="button"

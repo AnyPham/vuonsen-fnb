@@ -4,6 +4,7 @@ import { spaceApi } from '@/api/endpoints';
 import { formatCurrency } from '@/utils/format';
 import { ErrorBlock, Loading } from '@/components/common/StateBlock';
 import GoogleMap from '@/components/common/GoogleMap';
+import Thumb from '@/components/common/Thumb';
 
 // Trang chi tiết một không gian, vào bằng đường dẫn /khong-gian/<slug>
 export default function SpaceDetailPage() {
@@ -53,10 +54,14 @@ export default function SpaceDetailPage() {
 
         <div className="grid grid-2" style={{ alignItems: 'start' }}>
           <div>
-            <div className="ph v2" style={{ borderRadius: 'var(--r)', marginBottom: 22 }}>
-              <span>🏛️</span>
-              <span>{space.name}</span>
-            </div>
+            <Thumb
+              url={space.thumbnailUrl}
+              variant="v2"
+              icon="🏛️"
+              label={space.name}
+              alt={space.name}
+              style={{ borderRadius: 'var(--r)', marginBottom: 22 }}
+            />
 
             <div className="section-head" style={{ marginBottom: 18 }}>
               <div className="eyebrow">{space.typeLabel}</div>
