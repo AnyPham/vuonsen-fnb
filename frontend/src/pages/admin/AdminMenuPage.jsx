@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { adminApi, menuApi } from '@/api/endpoints';
 import { formatCurrency } from '@/utils/format';
 import { Empty, ErrorBlock, Loading } from '@/components/common/StateBlock';
+import ImageUpload from '@/components/common/ImageUpload';
 
 // Form rỗng dùng khi bấm nút thêm món mới
 const EMPTY_FORM = {
@@ -10,6 +11,7 @@ const EMPTY_FORM = {
   description: '',
   price: '',
   priceNote: '',
+  imageUrl: '',
   bestSeller: false,
   available: true,
   sortOrder: 0,
@@ -60,6 +62,7 @@ export default function AdminMenuPage() {
       description: dish.description || '',
       price: dish.price ?? '',
       priceNote: dish.priceNote || '',
+      imageUrl: dish.imageUrl || '',
       bestSeller: dish.bestSeller,
       available: dish.available,
       sortOrder: dish.sortOrder ?? 0,
@@ -86,6 +89,7 @@ export default function AdminMenuPage() {
         // Món tính giá linh hoạt thì để trống ô giá và ghi chú cách tính
         price: form.price === '' ? null : Number(form.price),
         priceNote: form.priceNote.trim() || null,
+        imageUrl: form.imageUrl.trim() || null,
         bestSeller: form.bestSeller,
         available: form.available,
         sortOrder: Number(form.sortOrder) || 0,
@@ -201,6 +205,13 @@ export default function AdminMenuPage() {
                 maxLength={500}
               />
             </div>
+
+            <ImageUpload
+              id="dish-image"
+              label="Ảnh món ăn"
+              value={form.imageUrl}
+              onChange={(url) => change('imageUrl', url)}
+            />
 
             <div className="fgroup">
               <label htmlFor="dish-sort">Thứ tự hiển thị</label>

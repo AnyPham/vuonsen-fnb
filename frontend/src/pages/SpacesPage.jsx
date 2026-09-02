@@ -5,6 +5,7 @@ import { fetchSpaces, selectSpaces } from '@/features/catalog/catalogSlice';
 import { spaceApi } from '@/api/endpoints';
 import { formatCurrency } from '@/utils/format';
 import { Empty, ErrorBlock, Loading } from '@/components/common/StateBlock';
+import Thumb from '@/components/common/Thumb';
 
 // Trang cho thuê không gian, lọc theo số khách, loại và giá
 export default function SpacesPage() {
@@ -84,10 +85,13 @@ export default function SpacesPage() {
         <div className="grid grid-3">
           {items.map((space) => (
             <article key={space.id} className="card card-clickable">
-              <div className="ph v2">
-                <span>🏛️</span>
-                <span>{space.typeLabel}</span>
-              </div>
+              <Thumb
+                url={space.thumbnailUrl}
+                variant="v2"
+                icon="🏛️"
+                label={space.typeLabel}
+                alt={space.name}
+              />
               <div className="card-body">
                 <h3>
                   {/* full-link làm cả thẻ bấm được, xem class trong global.css */}

@@ -9,6 +9,7 @@ import {
 import { menuApi } from '@/api/endpoints';
 import { formatCurrency } from '@/utils/format';
 import { Empty, Loading } from '@/components/common/StateBlock';
+import Thumb from '@/components/common/Thumb';
 
 // Thực đơn chia tab theo danh mục món
 export default function MenuPage() {
@@ -43,10 +44,13 @@ export default function MenuPage() {
             <div className="grid grid-3">
               {bestSellers.map((dish) => (
                 <div key={dish.id} className="card">
-                  <div className="ph v3">
-                    <span>🍲</span>
-                    <span>{dish.categoryName}</span>
-                  </div>
+                  <Thumb
+                    url={dish.imageUrl}
+                    variant="v3"
+                    icon="🍲"
+                    label={dish.categoryName}
+                    alt={dish.name}
+                  />
                   <div className="card-body">
                     <strong>{dish.name}</strong>
                     <p className="muted" style={{ fontSize: '0.88rem', margin: '8px 0 12px' }}>

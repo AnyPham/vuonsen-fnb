@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { fetchPackages, fetchSpaces, selectPackages, selectSpaces } from '@/features/catalog/catalogSlice';
 import { formatCurrency } from '@/utils/format';
+import Thumb from '@/components/common/Thumb';
 
 export default function HomePage() {
   const dispatch = useDispatch();
@@ -49,10 +50,7 @@ export default function HomePage() {
           <div className="grid grid-3">
             {spaces.items.slice(0, 6).map((space) => (
               <article key={space.id} className="card">
-                <div className="ph">
-                  <span>🌿</span>
-                  <span>{space.name}</span>
-                </div>
+                <Thumb url={space.thumbnailUrl} icon="🌿" label={space.name} alt={space.name} />
                 <div className="card-body">
                   <h3>{space.name}</h3>
                   <p className="muted" style={{ fontSize: '0.92rem', margin: '8px 0 14px' }}>

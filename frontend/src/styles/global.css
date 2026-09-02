@@ -114,6 +114,9 @@ img { max-width: 100%; display: block; }
 .ph.v4 { background: linear-gradient(140deg, var(--green-900), var(--green-400)); }
 .ph span:first-child { font-size: 2rem; }
 
+/* Ảnh thật, giữ đúng khung như khối màu giữ chỗ để đổi qua lại không vỡ bố cục */
+.thumb { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; background: var(--cream-2); }
+
 /* Thanh menu trên cùng */
 .nav {
   position: sticky; top: 0; z-index: 50; background: rgba(251, 247, 239, 0.92);
