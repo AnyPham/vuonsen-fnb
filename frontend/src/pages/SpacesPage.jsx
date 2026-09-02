@@ -1,21 +1,30 @@
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { fetchSpaces, selectSpaces } from '@/features/catalog/catalogSlice';
-import { spaceApi } from '@/api/endpoints';
+import { goToStep, updateForm } from '@/features/booking/bookingSlice';
+import { bookingApi, spaceApi } from '@/api/endpoints';
 import { formatCurrency } from '@/utils/format';
 import { Empty, ErrorBlock, Loading } from '@/components/common/StateBlock';
+import SuggestionBox from '@/components/common/SuggestionBox';
 import Thumb from '@/components/common/Thumb';
 
 // Trang cho thuê không gian, lọc theo số khách, loại và giá
 export default function SpacesPage() {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const { items, status, error } = useSelector(selectSpaces);
   const [types, setTypes] = useState([]);
-  const [filters, setFilters] = useState({ guests: '', type: '', maxPrice: '' });
+  const [eventTypes, setEventTypes] = useState([]);
+  const [filters, setFilters] = useState({ guests: '', type: '', maxPrice: '', eventType: '' });
 
   useEffect(() => {
     spaceApi.types().then(setTypes).catch(() => setTypes([]));
+    // Loại sự kiện chỉ dùng cho khối gợi ý, không phải điều kiện lọc không gian
+    bookingApi
+      .options()
+      .then((o) => setEventTypes(o.eventTypes || []))
+      .catch(() => setEventTypes([]));
   }, []);
 
   useEffect(() => {
@@ -27,6 +36,19 @@ export default function SpacesPage() {
   }, [dispatch, filters]);
 
   const set = (patch) => setFilters((prev) => ({ ...prev, ...patch }));
+
+  // Khách bấm chọn một phương án gợi ý thì điền sẵn vào form đặt tiệc rồi
+  // chuyển thẳng sang bước 2, khỏi phải nhập lại số khách và loại sự kiện
+  const chonPhuongAn = (spaceId, packageId) => {
+    dispatch(updateForm({
+      spaceId,
+      packageId,
+      guestCount: filters.guests,
+      eventType: filters.eventType,
+    }));
+    dispatch(goToStep(2));
+    navigate('/dat-tiec');
+  };
 
   return (
     <section className="section">
@@ -73,8 +95,36 @@ export default function SpacesPage() {
                 onChange={(e) => set({ maxPrice: e.target.value })}
               />
             </div>
+
+            <div className="fgroup" style={{ marginBottom: 0 }}>
+              <label htmlFor="f-event">Loại sự kiện</label>
+              <select
+                id="f-event"
+                value={filters.eventType}
+                onChange={(e) => set({ eventType: e.target.value })}
+              >
+                <option value="">Chưa chọn</option>
+                {eventTypes.map((type) => (
+                  <option key={type.value} value={type.value}>
+                    {type.label}
+                  </option>
+                ))}
+              </select>
+              <div className="muted" style={{ fontSize: '0.8rem', marginTop: 6 }}>
+                Dùng để gợi ý, không lọc danh sách
+              </div>
+            </div>
           </div>
         </div>
+
+        {/* Điền số khách là có gợi ý ngay, chọn thêm loại sự kiện thì sát hơn */}
+        <SuggestionBox
+          guestCount={filters.guests}
+          eventType={filters.eventType}
+          onPick={chonPhuongAn}
+          tieuDe="Gợi ý dành cho bạn"
+          nhanNut="Đặt tiệc với phương án này"
+        />
 
         {status === 'loading' && <Loading />}
         {status === 'failed' && <ErrorBlock message={error} />}
