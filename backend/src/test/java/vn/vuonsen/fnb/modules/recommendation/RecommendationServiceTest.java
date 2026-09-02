@@ -21,6 +21,78 @@ class RecommendationServiceTest {
     @Autowired
     private RecommendationService recommendationService;
 
+    // ---------- Các kiểm thử thêm sau đợt tinh chỉnh trọng số ----------
+
+    @Test
+    @DisplayName("Đủ không gian thì ba phương án là ba không gian khác nhau")
+    void topThreeCoverDifferentSpaces() {
+        // 40 khách thì cả sáu không gian đều chứa được, nên phải ra ba sảnh khác nhau.
+        // Trước khi tinh chỉnh, cả ba phương án rơi vào cùng một sảnh chỉ khác gói
+        // tiệc, khách không có gì để so sánh.
+        var result = recommendationService.suggest(new RecommendationRequest(
+                40, EventType.FAMILY, null, LocalDate.now().plusDays(30)));
+
+        assertThat(result).extracting(s -> s.space().getId())
+                .doesNotHaveDuplicates();
+    }
+
+    @Test
+    @DisplayName("Ít không gian đủ sức chứa thì vẫn trả đủ ba phương án")
+    void stillReturnsThreeWhenFewSpacesFit() {
+        // 300 khách thì chỉ Sảnh Ven Sông và Sảnh Sen Vàng chứa nổi. Không đủ ba
+        // sảnh khác nhau nên hệ thống nới giới hạn, lấy thêm gói tiệc khác của
+        // sảnh đã dùng, miễn là vẫn đủ ba phương án cho khách chọn.
+        var result = recommendationService.suggest(new RecommendationRequest(
+                300, EventType.WEDDING, null, LocalDate.now().plusDays(30)));
+
+        assertThat(result).hasSize(3);
+        assertThat(result).extracting(s -> s.space().getId())
+                .as("hai phương án đầu vẫn phải là hai sảnh khác nhau")
+                .containsAnyOf(result.get(0).space().getId());
+        assertThat(result.get(0).space().getId())
+                .isNotEqualTo(result.get(1).space().getId());
+    }
+
+    @Test
+    @DisplayName("Điểm ba phương án phải khác nhau, không được hòa hết")
+    void scoresMustDiscriminate() {
+        var result = recommendationService.suggest(new RecommendationRequest(
+                300, EventType.WEDDING, null, LocalDate.now().plusDays(30)));
+
+        // Lỗi cũ: khách không khai ngân sách thì mọi tổ hợp cùng 62,5 điểm,
+        // thứ tự ba phương án trở thành ngẫu nhiên
+        assertThat(result).extracting(Suggestion::score).doesNotHaveDuplicates();
+    }
+
+    @Test
+    @DisplayName("Điểm luôn nằm trong thang 0 đến 100 dù có tiêu chí bị bỏ qua")
+    void scoreStaysWithinHundred() {
+        // Không khai ngân sách nên tiêu chí ngân sách bị bỏ qua, điểm vẫn phải
+        // quy về thang 100 chứ không tụt xuống vì thiếu tiêu chí
+        for (EventType loai : EventType.values()) {
+            var result = recommendationService.suggest(new RecommendationRequest(
+                    200, loai, null, LocalDate.now().plusDays(30)));
+
+            assertThat(result).allSatisfy(s -> {
+                assertThat(s.score()).isBetween(BigDecimal.ZERO, new BigDecimal("100"));
+            });
+        }
+    }
+
+    @Test
+    @DisplayName("Tiệc cưới được gợi ý gói cao cấp, họp mặt gia đình được gói phổ thông")
+    void packageTierFollowsEventType() {
+        var tiecCuoi = recommendationService.suggest(new RecommendationRequest(
+                300, EventType.WEDDING, null, LocalDate.now().plusDays(30)));
+        var giaDinh = recommendationService.suggest(new RecommendationRequest(
+                40, EventType.FAMILY, null, LocalDate.now().plusDays(30)));
+
+        // Gói Thượng Uyển 6,8 triệu một mâm, Gói Đồng Quê 2,9 triệu
+        assertThat(tiecCuoi.get(0).partyPackage().getPricePerTable())
+                .as("tiệc cưới nên được gợi ý gói đắt hơn")
+                .isGreaterThan(giaDinh.get(0).partyPackage().getPricePerTable());
+    }
+
     @Test
     @DisplayName("Trả về đúng ba gợi ý, xếp theo điểm giảm dần")
     void returnsTopThreeSortedByScore() {

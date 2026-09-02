@@ -76,6 +76,21 @@ app:
     large-party-min-days: 7      # tiệc lớn phải báo trước 7 ngày
     full-day-package-hours: 8     # gói từ 8 tiếng trở lên tính là thuê trọn ngày
 
+  # Trong so cua thuat toan goi y. Tong nam trong so bang 100 cho de doc diem.
+  # Tinh chinh o day roi chay lai, khong phai dich lai ma nguon.
+  recommendation:
+    weight-event-type: 30       # khong gian hop voi loai su kien den dau
+    weight-capacity-fit: 25     # so khach lap day suc chua den dau
+    weight-package-tier: 20     # tam gia goi tiec co hop voi loai tiec khong
+    weight-budget: 15           # tong chi phi co nam trong ngan sach khach khai
+    weight-popularity: 10       # to hop nay da duoc bao nhieu khach truoc chon
+
+    capacity-fit-threshold: 0.6 # lap day tu 60% tro len coi la vua van
+    budget-tolerance: 0.15      # vuot ngan sach duoi 15% van duoc nua diem
+
+    top-n: 3                    # tra ve ba phuong an
+    max-per-space: 1            # moi khong gian chi xuat hien mot lan
+
   admin:
     # Tài khoản admin tạo tự động khi chạy lần đầu
     default-email: ${ADMIN_EMAIL:admin@vuonsen.vn}
