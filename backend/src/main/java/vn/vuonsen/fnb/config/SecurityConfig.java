@@ -51,9 +51,9 @@ public class SecurityConfig {
                                 "/api/v1/spaces/**", "/api/v1/menu/**", "/api/v1/packages/**",
                                 "/api/v1/reviews/**", "/api/v1/gallery/**").permitAll()
 
-                        // khách chưa đăng nhập vẫn đặt tiệc được
+                        // khách chưa đăng nhập vẫn đặt tiệc và hỏi trợ lý được
                         .requestMatchers(HttpMethod.POST, "/api/v1/bookings", "/api/v1/bookings/quote",
-                                "/api/v1/recommendations").permitAll()
+                                "/api/v1/recommendations", "/api/v1/assistant/ask").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/v1/bookings/options",
                                 "/api/v1/bookings/track/**").permitAll()
 
