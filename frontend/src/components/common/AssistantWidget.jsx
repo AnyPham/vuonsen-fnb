@@ -16,6 +16,18 @@ const LOI_CHAO = {
 };
 
 /*
+ * Nhãn hiện dưới tên trợ lý, cho khách biết câu trả lời vừa rồi do đâu mà ra.
+ *
+ * Nói thật chuyện này có lợi cho cả hai phía: khách biết mình đang nói chuyện với
+ * máy, còn lúc bảo vệ đồ án thì nhìn vào đây thấy ngay cơ chế dự phòng có chạy hay
+ * không, khỏi phải mở nhật ký máy chủ ra dò.
+ */
+const NHAN_NGUON = {
+  MO_HINH_NGON_NGU: 'Trả lời bằng mô hình ngôn ngữ, dựa trên dữ liệu nhà hàng',
+  DU_PHONG: 'Trả lời từ dữ liệu nhà hàng',
+};
+
+/*
  * Hộp thoại trợ lý tư vấn, hiện ở góc dưới bên phải mọi trang.
  *
  * Câu trả lời do máy chủ dựng từ dữ liệu thật, phía giao diện chỉ hiển thị.
@@ -27,6 +39,7 @@ export default function AssistantWidget() {
   const [tinNhan, setTinNhan] = useState([LOI_CHAO]);
   const [dangGo, setDangGo] = useState('');
   const [dangCho, setDangCho] = useState(false);
+  const [nguon, setNguon] = useState(null);
 
   const cuoiDanhSach = useRef(null);
   const oNhap = useRef(null);
@@ -63,6 +76,7 @@ export default function AssistantWidget() {
 
     try {
       const kq = await assistantApi.ask(cau);
+      setNguon(kq.source ?? null);
       setTinNhan((truoc) => [...truoc, {
         vaiTro: 'bot',
         noiDung: kq.answer,
@@ -104,7 +118,7 @@ export default function AssistantWidget() {
         <div>
           <strong>Trợ lý Vườn Sen</strong>
           <div className="muted" style={{ fontSize: '0.76rem' }}>
-            Trả lời dựa trên dữ liệu của nhà hàng
+            {NHAN_NGUON[nguon] || 'Trả lời dựa trên dữ liệu của nhà hàng'}
           </div>
         </div>
         <button type="button" aria-label="Đóng" onClick={() => setMoRong(false)}>

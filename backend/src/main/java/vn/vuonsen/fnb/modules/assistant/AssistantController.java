@@ -19,11 +19,11 @@ import vn.vuonsen.fnb.modules.assistant.dto.AskRequest;
 @Tag(name = "15. Trợ lý tư vấn")
 public class AssistantController {
 
-    private final AssistantService assistantService;
+    private final AssistantFacade assistantFacade;
 
     @PostMapping("/ask")
     @Operation(summary = "Hỏi trợ lý về dịch vụ, trả lời dựa trên dữ liệu của hệ thống")
     public ResponseEntity<AnswerResponse> ask(@Valid @RequestBody AskRequest request) {
-        return ResponseEntity.ok(assistantService.answer(request.question()));
+        return ResponseEntity.ok(assistantFacade.answer(request.question()));
     }
 }

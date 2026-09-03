@@ -98,6 +98,26 @@ app:
     email: datban@vuonsen.vn
     opening-hours: "9:00 - 22:00 hang ngay"
 
+  # Tro ly tu van. Mac dinh chay bang co che du phong trong he thong: khong can
+  # khoa API, khong ton phi, tai ve la chay duoc ngay.
+  #
+  # Muon bat nhanh goi mo hinh ngon ngu ngoai thi dat bien moi truong
+  # ASSISTANT_LLM_API_KEY roi khoi dong lai. Tuyet doi khong ghi khoa vao day
+  # vi tep nay nam trong git.
+  #
+  # Goi hong, het han cho hay sai khoa deu tu dong quay ve co che du phong,
+  # khach khong thay loi.
+  assistant:
+    llm:
+      enabled: ${ASSISTANT_LLM_ENABLED:true}
+      api-key: ${ASSISTANT_LLM_API_KEY:}
+      # Doi duoc sang dich vu khac cung chuan, hoac tro vao may gia de thu nghiem
+      base-url: ${ASSISTANT_LLM_BASE_URL:https://api.anthropic.com}
+      # Doi sang claude-haiku-4-5-20251001 neu muon nhanh hon va re hon
+      model: ${ASSISTANT_LLM_MODEL:claude-sonnet-5}
+      max-tokens: 500
+      timeout-seconds: 8    # khach dang doi trong hop thoai nen khong cho lau
+
   admin:
     # Tài khoản admin tạo tự động khi chạy lần đầu
     default-email: ${ADMIN_EMAIL:admin@vuonsen.vn}

@@ -15,11 +15,7 @@ import vn.vuonsen.fnb.modules.space.Space;
 import vn.vuonsen.fnb.modules.space.SpaceRepository;
 
 import java.math.BigDecimal;
-import java.math.RoundingMode;
-import java.text.DecimalFormat;
-import java.text.DecimalFormatSymbols;
 import java.util.List;
-import java.util.Locale;
 
 /*
  * Trợ lý tư vấn dịch vụ.
@@ -270,11 +266,6 @@ public class AssistantService {
     }
 
     private String tien(BigDecimal amount) {
-        if (amount == null) {
-            return "liên hệ";
-        }
-        DecimalFormatSymbols ky = new DecimalFormatSymbols(Locale.forLanguageTag("vi-VN"));
-        ky.setGroupingSeparator('.');
-        return new DecimalFormat("#,###", ky).format(amount.setScale(0, RoundingMode.HALF_UP)) + "đ";
+        return TienTe.dinhDang(amount);
     }
 }
