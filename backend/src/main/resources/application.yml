@@ -91,6 +91,13 @@ app:
     top-n: 3                    # tra ve ba phuong an
     max-per-space: 1            # moi khong gian chi xuat hien mot lan
 
+  # Thong tin lien he, tro ly AI dung de tra loi khach
+  contact:
+    address: "1147 Binh Quoi, Phuong 28, Binh Thanh, TP.HCM"
+    phone: "(028) 1234 5678"
+    email: datban@vuonsen.vn
+    opening-hours: "9:00 - 22:00 hang ngay"
+
   admin:
     # Tài khoản admin tạo tự động khi chạy lần đầu
     default-email: ${ADMIN_EMAIL:admin@vuonsen.vn}

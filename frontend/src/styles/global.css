@@ -245,3 +245,61 @@ th { background: var(--cream-2); font-weight: 600; white-space: nowrap; }
   margin-top: 34px; padding-top: 18px; border-top: 1px solid rgba(255, 255, 255, 0.12);
   font-size: 0.84rem; text-align: center;
 }
+
+/* Hộp thoại trợ lý tư vấn, nổi ở góc dưới bên phải mọi trang */
+.tro-ly-nut {
+  position: fixed; right: 22px; bottom: 22px; z-index: 80;
+  width: 56px; height: 56px; border-radius: 50%; border: 0; cursor: pointer;
+  background: var(--green-800); color: var(--cream); font-size: 1.5rem;
+  box-shadow: var(--shadow-md); transition: transform 0.18s ease;
+}
+.tro-ly-nut:hover { transform: translateY(-3px); }
+
+.tro-ly {
+  position: fixed; right: 22px; bottom: 22px; z-index: 80;
+  width: min(380px, calc(100vw - 32px)); height: min(560px, calc(100vh - 100px));
+  display: flex; flex-direction: column; overflow: hidden;
+  background: var(--cream); border: 1px solid var(--line);
+  border-radius: var(--r); box-shadow: var(--shadow-lg);
+}
+
+.tro-ly-dau {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  padding: 14px 16px; background: var(--green-800); color: var(--cream);
+}
+.tro-ly-dau .muted { color: rgba(251, 247, 239, 0.7); }
+.tro-ly-dau button {
+  background: none; border: 0; color: inherit; font-size: 1.4rem;
+  line-height: 1; cursor: pointer; padding: 0 4px;
+}
+
+.tro-ly-than { flex: 1; overflow-y: auto; padding: 16px; }
+
+.tro-ly-tin { margin-bottom: 14px; }
+.tro-ly-tin .bong {
+  display: inline-block; max-width: 92%; padding: 10px 14px;
+  border-radius: 14px; font-size: 0.88rem; line-height: 1.55;
+  white-space: pre-line;   /* giữ xuống dòng trong câu trả lời nhiều ý */
+}
+.tro-ly-tin.bot .bong { background: #fff; border: 1px solid var(--line); }
+.tro-ly-tin.khach { text-align: right; }
+.tro-ly-tin.khach .bong { background: var(--green-800); color: var(--cream); }
+
+.tro-ly-goi-y { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+.tro-ly-goi-y button {
+  padding: 6px 12px; border-radius: 999px; cursor: pointer;
+  background: var(--cream-2); border: 1px solid var(--line);
+  font: inherit; font-size: 0.78rem; color: var(--ink-soft);
+}
+.tro-ly-goi-y button:hover:not(:disabled) { border-color: var(--gold); color: var(--green-800); }
+.tro-ly-goi-y button:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.tro-ly-chan {
+  display: flex; gap: 8px; padding: 12px 14px;
+  border-top: 1px solid var(--line); background: #fff;
+}
+.tro-ly-chan input {
+  flex: 1; padding: 10px 12px; font: inherit; font-size: 0.88rem;
+  border: 1px solid var(--line); border-radius: 999px; background: var(--cream);
+}
+.tro-ly-chan input:focus { outline: 2px solid var(--gold-light); border-color: var(--gold); }
