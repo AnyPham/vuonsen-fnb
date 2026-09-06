@@ -1,0 +1,36 @@
+# Những thứ không gửi vào build context của Docker.
+#
+# QUAN TRỌNG nhất là dòng node_modules. Dockerfile chạy `npm ci` để cài thư viện
+# bên trong ảnh Linux, nhưng ngay sau đó có lệnh `COPY . .`. Nếu không chặn ở đây
+# thì thư mục node_modules cài trên Windows sẽ được chép đè lên bản vừa cài.
+# Vite và esbuild có tệp nhị phân riêng cho từng hệ điều hành, nên chép đè kiểu
+# đó làm bước `npm run build` hỏng ngay, chứ không phải chỉ nặng thêm.
+node_modules/
+
+# Vite tự dựng lại trong ảnh, không cần bản dựng sẵn trên máy
+dist/
+dist-ssr/
+.vite/
+
+# Cấu hình riêng của máy đang phát triển, không nướng vào ảnh.
+# Muốn ảnh Docker có các biến VITE_ thì truyền bằng build args lúc dựng ảnh,
+# đừng chép tệp này vào. Giữ .env.example để người khác biết cần biến gì.
+.env
+.env.local
+.env.*.local
+
+# Docker tự lo, không cần đưa vào context
+Dockerfile
+.dockerignore
+
+# Nhật ký và tệp tạm
+*.log
+npm-debug.log*
+yarn-error.log*
+
+# IDE và hệ điều hành
+.idea/
+.vscode/
+*.iml
+.DS_Store
+Thumbs.db
