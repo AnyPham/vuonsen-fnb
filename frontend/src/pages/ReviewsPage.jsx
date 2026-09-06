@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { reviewApi } from '@/api/endpoints';
 import { formatDate } from '@/utils/format';
 import { Empty, ErrorBlock, Loading } from '@/components/common/StateBlock';
+import Thumb from '@/components/common/Thumb';
 
 // Vẽ số sao từ điểm đánh giá
 function Stars({ value }) {
@@ -93,6 +94,19 @@ export default function ReviewsPage() {
                   <p className="muted" style={{ margin: '10px 0' }}>
                     {review.content}
                   </p>
+
+                  {/* Ảnh khách chụp tại tiệc. Bấm vào mở ảnh gốc ở thẻ mới, đủ dùng
+                      mà không phải dựng thêm khung xem ảnh phóng to. */}
+                  {review.images?.length > 0 && (
+                    <div className="anh-danh-gia">
+                      {review.images.map((url) => (
+                        <a key={url} href={url} target="_blank" rel="noreferrer">
+                          <Thumb url={url} icon="📷" alt={`Ảnh của ${review.customerName}`} />
+                        </a>
+                      ))}
+                    </div>
+                  )}
+
                   <small className="muted">{formatDate(review.createdAt)}</small>
                 </div>
               </div>

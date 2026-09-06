@@ -8,6 +8,7 @@ import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OrderColumn;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -91,4 +92,14 @@ public class Space extends BaseEntity {
     @Column(name = "amenity", length = 120)
     @Builder.Default
     private List<String> amenities = new ArrayList<>();
+
+    /*
+     * Thư viện ảnh của không gian. Thứ tự hiển thị lấy theo cột sort_order, để
+     * người quản trị sắp được ảnh nào lên trước mà không phải xóa rồi thêm lại.
+     */
+    @ElementCollection(fetch = FetchType.LAZY)
+    @CollectionTable(name = "space_images", joinColumns = @JoinColumn(name = "space_id"))
+    @OrderColumn(name = "sort_order")
+    @Builder.Default
+    private List<SpaceImage> images = new ArrayList<>();
 }

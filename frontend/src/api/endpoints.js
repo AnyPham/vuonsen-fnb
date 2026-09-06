@@ -19,6 +19,7 @@ export const menuApi = {
   categories: () => axiosClient.get('/api/v1/menu/categories'),
   dishes: (params) => axiosClient.get('/api/v1/menu/dishes', { params }),
   bestSellers: () => axiosClient.get('/api/v1/menu/best-sellers'),
+  detail: (slug) => axiosClient.get(`/api/v1/menu/dishes/${slug}`),
 };
 
 export const packageApi = {

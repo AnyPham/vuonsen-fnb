@@ -6,6 +6,8 @@ import org.springframework.transaction.annotation.Transactional;
 import vn.vuonsen.fnb.common.exception.BusinessException;
 import vn.vuonsen.fnb.common.exception.ResourceNotFoundException;
 import vn.vuonsen.fnb.modules.menu.dto.DishAdminResponse;
+
+import java.text.Normalizer;
 import vn.vuonsen.fnb.modules.menu.dto.DishRequest;
 
 import java.util.List;
@@ -65,6 +67,7 @@ public class MenuAdminService {
 
         dish.setCategory(category);
         dish.setName(r.name());
+        dish.setSlug(sinhSlug(r.name(), dish.getId()));
         dish.setDescription(r.description());
         dish.setPrice(r.price());
         dish.setPriceNote(r.priceNote());
@@ -72,5 +75,26 @@ public class MenuAdminService {
         dish.setBestSeller(r.bestSeller() != null && r.bestSeller());
         dish.setAvailable(r.available() == null || r.available());
         dish.setSortOrder(r.sortOrder() == null ? 0 : r.sortOrder());
+    }
+
+    /*
+     * Dựng đường dẫn từ tên món: bỏ dấu tiếng Việt, đổi khoảng trắng thành gạch nối.
+     *
+     * Trùng tên thì nối thêm mã món phía sau. Không dùng số ngẫu nhiên vì đường dẫn
+     * cần ổn định, sửa tên món xong mở lại vẫn phải ra đúng trang đó.
+     */
+    private String sinhSlug(String ten, Long id) {
+        String goc = Normalizer.normalize(ten, Normalizer.Form.NFD)
+                .replaceAll("\\p{InCombiningDiacriticalMarks}+", "")
+                .replace('đ', 'd').replace('Đ', 'D')
+                .toLowerCase()
+                .replaceAll("[^a-z0-9]+", "-")
+                .replaceAll("^-|-$", "");
+
+        var trung = dishRepository.findBySlugForDetail(goc);
+        if (trung.isPresent() && !trung.get().getId().equals(id)) {
+            return goc + "-" + (id == null ? System.currentTimeMillis() % 10000 : id);
+        }
+        return goc;
     }
 }

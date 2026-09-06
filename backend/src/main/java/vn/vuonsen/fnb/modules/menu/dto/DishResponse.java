@@ -7,6 +7,8 @@ import java.math.BigDecimal;
 public record DishResponse(
         Long id,
         String name,
+        // Đường dẫn sang trang chi tiết món
+        String slug,
         String description,
         BigDecimal price,
         String priceNote,
@@ -17,7 +19,7 @@ public record DishResponse(
 ) {
     public static DishResponse from(Dish d) {
         return new DishResponse(
-                d.getId(), d.getName(), d.getDescription(),
+                d.getId(), d.getName(), d.getSlug(), d.getDescription(),
                 d.getPrice(), d.getPriceNote(), d.getImageUrl(), d.isBestSeller(),
                 d.getCategory().getCode(), d.getCategory().getName());
     }

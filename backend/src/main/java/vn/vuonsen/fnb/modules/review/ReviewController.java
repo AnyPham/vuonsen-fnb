@@ -12,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -26,6 +27,7 @@ import vn.vuonsen.fnb.modules.booking.BookingRepository;
 import vn.vuonsen.fnb.modules.booking.BookingStatus;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -47,15 +49,21 @@ public class ReviewController {
     }
 
     public record ReviewResponse(Long id, String customerName, Integer rating, String content,
-                                 String eventType, LocalDateTime createdAt) {
+                                 String eventType, LocalDateTime createdAt,
+                                 // Ảnh khách chụp tại tiệc, gửi kèm đánh giá
+                                 List<String> images) {
         static ReviewResponse from(Review r) {
             return new ReviewResponse(r.getId(), r.getCustomerName(), r.getRating(),
-                    r.getContent(), r.getEventType(), r.getCreatedAt());
+                    r.getContent(), r.getEventType(), r.getCreatedAt(),
+                    List.copyOf(r.getImages()));
         }
     }
 
     @GetMapping
     @Operation(summary = "Danh sách đánh giá đã duyệt")
+    // Cần giao dịch mở thì mới đọc được danh sách ảnh, vì dự án tắt open-in-view
+    // và ảnh để chế độ nạp trễ.
+    @Transactional(readOnly = true)
     public ResponseEntity<PageResponse<ReviewResponse>> list(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "6") int size) {

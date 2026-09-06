@@ -12,10 +12,13 @@ export default function SpaceDetailPage() {
   const [space, setSpace] = useState(null);
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(true);
+  // Ảnh đang xem ở khung lớn. Để null nghĩa là đang xem ảnh đại diện.
+  const [anhDangXem, setAnhDangXem] = useState(null);
 
   useEffect(() => {
     setLoading(true);
     setError(null);
+    setAnhDangXem(null);
     spaceApi
       .detail(slug)
       .then(setSpace)
@@ -55,13 +58,46 @@ export default function SpaceDetailPage() {
         <div className="grid grid-2" style={{ alignItems: 'start' }}>
           <div>
             <Thumb
-              url={space.thumbnailUrl}
+              url={anhDangXem?.url || space.thumbnailUrl}
               variant="v2"
               icon="🏛️"
               label={space.name}
-              alt={space.name}
-              style={{ borderRadius: 'var(--r)', marginBottom: 22 }}
+              alt={anhDangXem?.caption || space.name}
+              style={{ borderRadius: 'var(--r)', marginBottom: anhDangXem?.caption ? 8 : 12 }}
             />
+
+            {anhDangXem?.caption && (
+              <p className="muted" style={{ fontSize: '0.84rem', marginBottom: 12 }}>
+                {anhDangXem.caption}
+              </p>
+            )}
+
+            {/* Dải ảnh nhỏ, bấm vào thì đổi ảnh ở khung lớn phía trên.
+                Ảnh đại diện luôn đứng đầu để quay lại được. */}
+            {space.images?.length > 0 && (
+              <div className="dai-anh" style={{ marginBottom: 22 }}>
+                <button
+                  type="button"
+                  className={anhDangXem === null ? 'dang-chon' : ''}
+                  onClick={() => setAnhDangXem(null)}
+                  aria-label="Xem ảnh đại diện"
+                >
+                  <Thumb url={space.thumbnailUrl} icon="🏛️" alt={space.name} />
+                </button>
+
+                {space.images.map((anh) => (
+                  <button
+                    type="button"
+                    key={anh.url}
+                    className={anhDangXem?.url === anh.url ? 'dang-chon' : ''}
+                    onClick={() => setAnhDangXem(anh)}
+                    aria-label={anh.caption || 'Xem ảnh không gian'}
+                  >
+                    <Thumb url={anh.url} icon="🏛️" alt={anh.caption || space.name} />
+                  </button>
+                ))}
+              </div>
+            )}
 
             <div className="section-head" style={{ marginBottom: 18 }}>
               <div className="eyebrow">{space.typeLabel}</div>

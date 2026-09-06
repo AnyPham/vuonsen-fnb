@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import {
   fetchCategories,
@@ -93,12 +94,15 @@ export default function MenuPage() {
           {items.map((dish) => (
             <div
               key={dish.id}
-              className="card"
+              className="card card-clickable"
               style={{ display: 'flex', justifyContent: 'space-between', gap: 16, padding: '16px 20px' }}
             >
               <div>
                 <strong>
-                  {dish.name}
+                  {/* Bấm vào đâu trong thẻ cũng mở được trang chi tiết món */}
+                  <Link className="full-link" to={`/thuc-don/${dish.slug}`}>
+                    {dish.name}
+                  </Link>
                   {dish.bestSeller && (
                     <span className="tag tag-PENDING" style={{ marginLeft: 8 }}>
                       Best

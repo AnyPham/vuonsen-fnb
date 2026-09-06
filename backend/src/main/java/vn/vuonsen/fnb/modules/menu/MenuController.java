@@ -6,10 +6,13 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import vn.vuonsen.fnb.common.exception.ResourceNotFoundException;
 import vn.vuonsen.fnb.modules.menu.dto.CategoryResponse;
+import vn.vuonsen.fnb.modules.menu.dto.DishDetailResponse;
 import vn.vuonsen.fnb.modules.menu.dto.DishResponse;
 
 import java.util.List;
@@ -39,6 +42,15 @@ public class MenuController {
             @RequestParam(required = false) String keyword) {
         return ResponseEntity.ok(dishRepository.search(category, keyword)
                 .stream().map(DishResponse::from).toList());
+    }
+
+    @GetMapping("/dishes/{slug}")
+    @Transactional(readOnly = true)
+    @Operation(summary = "Chi tiết một món: nguyên liệu, cách chế biến, lưu ý khi đặt")
+    public ResponseEntity<DishDetailResponse> detail(@PathVariable String slug) {
+        return ResponseEntity.ok(dishRepository.findBySlugForDetail(slug)
+                .map(DishDetailResponse::from)
+                .orElseThrow(() -> ResourceNotFoundException.of("món ăn", slug)));
     }
 
     @GetMapping("/best-sellers")

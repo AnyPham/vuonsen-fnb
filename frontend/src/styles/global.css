@@ -303,3 +303,116 @@ th { background: var(--cream-2); font-weight: 600; white-space: nowrap; }
   border: 1px solid var(--line); border-radius: 999px; background: var(--cream);
 }
 .tro-ly-chan input:focus { outline: 2px solid var(--gold-light); border-color: var(--gold); }
+
+/* Dải ảnh nhỏ dưới ảnh lớn ở trang chi tiết không gian.
+   Cuộn ngang khi nhiều ảnh, để không đẩy vỡ bố cục cột. */
+.dai-anh {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding-bottom: 4px;
+}
+
+.dai-anh button {
+  flex: 0 0 72px;
+  height: 56px;
+  padding: 0;
+  border: 2px solid transparent;
+  border-radius: 8px;
+  overflow: hidden;
+  background: none;
+  cursor: pointer;
+  opacity: 0.65;
+  transition: opacity 0.15s, border-color 0.15s;
+}
+
+.dai-anh button:hover,
+.dai-anh button:focus-visible {
+  opacity: 1;
+}
+
+.dai-anh button.dang-chon {
+  opacity: 1;
+  border-color: var(--gold);
+}
+
+.dai-anh .thumb,
+.dai-anh .ph {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 6px;
+}
+
+/* Ảnh khách gửi kèm đánh giá */
+.anh-danh-gia {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0 0 12px;
+}
+
+.anh-danh-gia a {
+  display: block;
+  width: 88px;
+  height: 66px;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.anh-danh-gia .thumb,
+.anh-danh-gia .ph {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Bảng thông số ở trang chi tiết món */
+.bang-thong-so {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.bang-thong-so th,
+.bang-thong-so td {
+  padding: 9px 0;
+  text-align: left;
+  vertical-align: top;
+  border-bottom: 1px solid var(--line, #e8e0ce);
+  font-size: 0.92rem;
+}
+
+.bang-thong-so th {
+  width: 42%;
+  font-weight: 500;
+  color: var(--muted, #7a7266);
+}
+
+.bang-thong-so tr:last-child th,
+.bang-thong-so tr:last-child td {
+  border-bottom: none;
+}
+
+/* Khối lưu ý khi đặt món. Viền trái đậm cho khách khó bỏ qua, vì đây là chỗ
+   ghi món nào phải báo trước, món nào cay, món nào còn xương. */
+.luu-y-dat-mon {
+  border-left: 3px solid var(--gold, #c9a227);
+  background: #fbf7ec;
+  border-radius: 6px;
+  padding: 14px 16px;
+  margin-bottom: 18px;
+}
+
+.luu-y-dat-mon strong {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 0.94rem;
+}
+
+.luu-y-dat-mon p {
+  margin: 0;
+  font-size: 0.9rem;
+  line-height: 1.55;
+  color: var(--muted, #7a7266);
+}
+
