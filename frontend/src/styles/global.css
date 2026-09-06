@@ -416,3 +416,130 @@ th { background: var(--cream-2); font-weight: 600; white-space: nowrap; }
   color: var(--muted, #7a7266);
 }
 
+/* ---------- Đặt món lẻ ---------- */
+
+/* Một dòng món trong giỏ */
+.dong-gio {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--line, #e8e0ce);
+}
+
+.dong-gio .thumb,
+.dong-gio .ph {
+  width: 64px;
+  height: 48px;
+  object-fit: cover;
+  border-radius: 6px;
+  flex: 0 0 64px;
+}
+
+/* Nút tăng giảm số phần, dùng chung ở giỏ và trang chi tiết món */
+.dieu-chinh-so {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  border: 1px solid var(--line, #e8e0ce);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.dieu-chinh-so button {
+  width: 32px;
+  height: 34px;
+  border: none;
+  background: #faf7ef;
+  cursor: pointer;
+  font-size: 1.05rem;
+  line-height: 1;
+}
+
+.dieu-chinh-so button:hover {
+  background: #f0e9d8;
+}
+
+.dieu-chinh-so span {
+  min-width: 34px;
+  text-align: center;
+  font-weight: 500;
+}
+
+.dong-gio .bo-mon {
+  border: none;
+  background: none;
+  color: var(--muted, #7a7266);
+  font-size: 1.3rem;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0 4px;
+}
+
+.dong-gio .bo-mon:hover {
+  color: #b23c3c;
+}
+
+/* Chọn giao tận nhà hay ăn tại chỗ */
+.chon-hinh-thuc {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+.chon-hinh-thuc button {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  align-items: flex-start;
+  text-align: left;
+  padding: 12px 14px;
+  border: 2px solid var(--line, #e8e0ce);
+  border-radius: 10px;
+  background: #fff;
+  cursor: pointer;
+}
+
+.chon-hinh-thuc button.dang-chon {
+  border-color: var(--gold, #c9a227);
+  background: #fbf7ec;
+}
+
+.chon-hinh-thuc button span {
+  font-size: 0.82rem;
+}
+
+/* Khối thêm vào giỏ ở trang chi tiết món */
+.them-vao-gio {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+/* Nút giỏ món trên thanh menu */
+.nut-gio {
+  position: relative;
+}
+
+.nut-gio .so-mon {
+  position: absolute;
+  top: -6px;
+  right: -8px;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 4px;
+  border-radius: 9px;
+  background: var(--gold, #c9a227);
+  color: #fff;
+  font-size: 0.68rem;
+  line-height: 18px;
+  text-align: center;
+  font-weight: 600;
+}
+
+@media (max-width: 640px) {
+  .chon-hinh-thuc {
+    grid-template-columns: 1fr;
+  }
+}

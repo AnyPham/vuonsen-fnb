@@ -22,6 +22,13 @@ export const menuApi = {
   detail: (slug) => axiosClient.get(`/api/v1/menu/dishes/${slug}`),
 };
 
+export const dishOrderApi = {
+  quote: (body) => axiosClient.post('/api/v1/dish-orders/quote', body),
+  create: (body) => axiosClient.post('/api/v1/dish-orders', body),
+  track: (code) => axiosClient.get(`/api/v1/dish-orders/track/${code}`),
+  mine: (params) => axiosClient.get('/api/v1/dish-orders/my', { params }),
+};
+
 export const packageApi = {
   list: () => axiosClient.get('/api/v1/packages'),
 };

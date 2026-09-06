@@ -91,6 +91,19 @@ app:
     top-n: 3                    # tra ve ba phuong an
     max-per-space: 1            # moi khong gian chi xuat hien mot lan
 
+  # Quy dinh nhan don dat mon le: giao tan nha hoac dat truoc roi toi an tai cho.
+  # Day la nhung con so kinh doanh hay doi nen de o day, khong viet cung trong ma.
+  dish-order:
+    delivery-fee: 30000           # phi giao mot don
+    free-delivery-from: 500000    # don tu muc nay tro len duoc mien phi giao
+    min-delivery-amount: 150000   # don giao tan nha phai dat muc toi thieu
+
+    min-hours-ahead: 2            # muc san, mon lam lau hon thi tu doi hoi bao som hon
+    max-days-ahead: 30            # khong nhan don qua xa vi nguyen lieu tuoi
+
+    min-guests-dine-in: 1
+    max-guests-dine-in: 40        # dong hon thi chuyen sang dat tiec theo goi
+
   # Thong tin lien he, tro ly AI dung de tra loi khach
   contact:
     address: "1147 Binh Quoi, Phuong 28, Binh Thanh, TP.HCM"

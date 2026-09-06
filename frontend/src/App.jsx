@@ -10,6 +10,8 @@ import SpacesPage from '@/pages/SpacesPage';
 import SpaceDetailPage from '@/pages/SpaceDetailPage';
 import MenuPage from '@/pages/MenuPage';
 import DishDetailPage from '@/pages/DishDetailPage';
+import DishOrderPage from '@/pages/DishOrderPage';
+import TrackDishOrderPage from '@/pages/TrackDishOrderPage';
 import PackagesPage from '@/pages/PackagesPage';
 import GalleryPage from '@/pages/GalleryPage';
 import BookingPage from '@/pages/BookingPage';
@@ -42,6 +44,8 @@ export default function App() {
         <Route path="/khong-gian/:slug" element={<SpaceDetailPage />} />
         <Route path="/thuc-don" element={<MenuPage />} />
         <Route path="/thuc-don/:slug" element={<DishDetailPage />} />
+        <Route path="/dat-mon" element={<DishOrderPage />} />
+        <Route path="/tra-cuu-mon" element={<TrackDishOrderPage />} />
         <Route path="/goi-tiec" element={<PackagesPage />} />
         <Route path="/thu-vien" element={<GalleryPage />} />
         <Route path="/danh-gia" element={<ReviewsPage />} />

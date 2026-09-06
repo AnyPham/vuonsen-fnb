@@ -57,6 +57,11 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/api/v1/bookings/options",
                                 "/api/v1/bookings/track/**").permitAll()
 
+                        // Đặt món lẻ cũng không bắt đăng nhập, giống đặt tiệc
+                        .requestMatchers(HttpMethod.POST, "/api/v1/dish-orders",
+                                "/api/v1/dish-orders/quote").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/v1/dish-orders/track/**").permitAll()
+
                         // Khu vực quản trị
                         .requestMatchers("/api/v1/admin/**")
                         .hasAnyAuthority(Role.ADMIN.authority(), Role.STAFF.authority())

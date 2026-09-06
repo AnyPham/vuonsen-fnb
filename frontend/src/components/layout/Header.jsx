@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { logout, selectIsAdmin, selectUser } from '@/features/auth/authSlice';
+import { chonSoMon } from '@/features/dishorder/cartSlice';
 
 const NAV_ITEMS = [
   { to: '/khong-gian', label: 'Không gian' },
@@ -29,6 +30,7 @@ export default function Header() {
   const isAdmin = useSelector(selectIsAdmin);
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const soMonTrongGio = useSelector(chonSoMon);
 
   const close = () => {
     setOpen(false);
@@ -125,6 +127,15 @@ export default function Header() {
           ) : (
             <NavLink to="/dang-nhap" onClick={close}>
               Đăng nhập
+            </NavLink>
+          )}
+
+          {/* Chỉ hiện khi giỏ có món, để thanh menu không thêm một mục thừa
+              với những khách chỉ vào xem tiệc */}
+          {soMonTrongGio > 0 && (
+            <NavLink to="/dat-mon" className="nut-gio" onClick={close} aria-label="Giỏ món">
+              🛒
+              <span className="so-mon">{soMonTrongGio}</span>
             </NavLink>
           )}
 
