@@ -2,11 +2,13 @@ import { useCallback, useEffect, useState } from 'react';
 import { adminApi } from '@/api/endpoints';
 import { formatDate } from '@/utils/format';
 import { Empty, ErrorBlock, Loading } from '@/components/common/StateBlock';
+import Pagination from '@/components/common/Pagination';
 
 // Màn hình duyệt đánh giá của khách trước khi cho hiển thị lên website
 export default function AdminReviewsPage() {
   const [approved, setApproved] = useState(false);
   const [page, setPage] = useState(null);
+  const [trang, setTrang] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -14,13 +16,13 @@ export default function AdminReviewsPage() {
     setLoading(true);
     setError(null);
     try {
-      setPage(await adminApi.reviews({ approved, page: 0, size: 30 }));
+      setPage(await adminApi.reviews({ approved, page: trang, size: 20 }));
     } catch (err) {
       setError(err.message);
     } finally {
       setLoading(false);
     }
-  }, [approved]);
+  }, [approved, trang]);
 
   useEffect(() => {
     load();
@@ -58,6 +60,7 @@ export default function AdminReviewsPage() {
             type="button"
             className={`btn btn-sm ${!approved ? 'btn-dark' : 'btn-outline'}`}
             onClick={() => setApproved(false)}
+            data-test="tab-pending"
           >
             Chờ duyệt
           </button>
@@ -65,6 +68,7 @@ export default function AdminReviewsPage() {
             type="button"
             className={`btn btn-sm ${approved ? 'btn-dark' : 'btn-outline'}`}
             onClick={() => setApproved(true)}
+            data-test="tab-approved"
           >
             Đã duyệt
           </button>
@@ -91,11 +95,11 @@ export default function AdminReviewsPage() {
               </thead>
               <tbody>
                 {page.content.map((review) => (
-                  <tr key={review.id}>
+                  <tr key={review.id} data-test="admin-review-row">
                     <td>{review.customerName}</td>
                     <td>{review.bookingCode || '—'}</td>
                     <td>{review.rating}/5</td>
-                    <td style={{ maxWidth: 320 }}>{review.content}</td>
+                    <td style={{ maxWidth: 320 }} data-test="admin-review-content">{review.content}</td>
                     <td>{formatDate(review.createdAt)}</td>
                     <td>
                       <div style={{ display: 'flex', gap: 6 }}>
@@ -104,6 +108,7 @@ export default function AdminReviewsPage() {
                             type="button"
                             className="btn btn-sm btn-dark"
                             onClick={() => approve(review)}
+                            data-test="action-approve"
                           >
                             Duyệt
                           </button>
@@ -123,6 +128,8 @@ export default function AdminReviewsPage() {
             </table>
           </div>
         )}
+
+        <Pagination trang={page} doiTrang={setTrang} donVi="đánh giá" />
       </div>
     </section>
   );

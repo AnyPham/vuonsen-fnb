@@ -14,6 +14,7 @@ import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
+import java.util.UUID;
 import java.util.Map;
 
 // Tạo và kiểm tra JWT bằng thuật toán HS256
@@ -56,6 +57,9 @@ public class JwtService {
                 .subject(user.getEmail())
                 .issuer(properties.issuer())
                 .claim(CLAIM_TYPE, "refresh")
+                // Mã định danh riêng cho từng token: hai lần đăng nhập trong cùng một giây
+                // vẫn ra hai chuỗi khác nhau, không đụng ràng buộc duy nhất của cột token
+                .id(UUID.randomUUID().toString())
                 .issuedAt(Date.from(now))
                 .expiration(Date.from(now.plus(properties.refreshTokenDays(), ChronoUnit.DAYS)))
                 .signWith(key)

@@ -1,0 +1,30 @@
+# Những thứ không gửi vào build context của Docker.
+#
+# Dockerfile phía backend chỉ chép pom.xml và src, nên các thư mục dưới đây không
+# lọt vào ảnh dù có hay không tệp này. Nhưng toàn bộ thư mục vẫn bị gửi sang Docker
+# trước khi lệnh COPY chạy, nên chặn ở đây giúp bước dựng ảnh nhanh hơn.
+#
+# Riêng target/ còn một lý do nữa: Dockerfile chạy `mvn clean package` để biên dịch
+# lại từ đầu trong ảnh Linux. Bản .class biên dịch trên máy này không dùng tới, gửi
+# sang chỉ tổ mất thời gian.
+target/
+*.jar
+*.war
+
+# Docker tự lo, không cần đưa vào context
+Dockerfile
+.dockerignore
+
+# Nhật ký và tệp tạm
+*.log
+logs/
+
+# IDE và hệ điều hành
+.idea/
+.vscode/
+*.iml
+.settings/
+.classpath
+.project
+.DS_Store
+Thumbs.db

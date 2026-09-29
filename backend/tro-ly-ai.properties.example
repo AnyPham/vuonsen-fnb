@@ -1,0 +1,14 @@
+# Khoa API cua tro ly tu van, backend doc tu dong moi lan khoi dong.
+#
+# Cach dung:
+#   1. Chep tep nay thanh tro-ly-ai.properties, dat cung thu muc backend.
+#   2. Dan khoa API cua Anthropic vao dong app.assistant.llm.api-key ben duoi.
+#   3. Khoi dong lai backend. Nhat ky khoi dong se bao "da bat AI".
+#
+# Tep tro-ly-ai.properties da nam trong .gitignore nen khoa khong bi day len git.
+# Tuyet doi khong dan khoa vao tep .example nay vi tep nay nam trong git.
+app.assistant.llm.api-key=
+
+# Tuy chon: doi mo hinh hoac muc cong suc suy luan (low, medium, high)
+# app.assistant.llm.model=claude-opus-5
+# app.assistant.llm.effort=low

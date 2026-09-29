@@ -24,7 +24,8 @@ public record BookingRequest(
 
         // Bước 2: chọn không gian và gói tiệc
         @NotNull(message = "Vui lòng chọn không gian") Long spaceId,
-        @NotNull(message = "Vui lòng chọn gói tiệc") Long packageId,
+        // Để trống nghĩa là chỉ thuê không gian, không kèm gói tiệc
+        Long packageId,
 
         // Bước 3: thông tin liên hệ
         @NotBlank(message = "Vui lòng nhập họ tên")

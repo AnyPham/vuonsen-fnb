@@ -5,6 +5,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface DishRepository extends JpaRepository<Dish, Long> {
 
@@ -18,6 +19,14 @@ public interface DishRepository extends JpaRepository<Dish, Long> {
     List<Dish> search(@Param("categoryCode") String categoryCode, @Param("keyword") String keyword);
 
     List<Dish> findByBestSellerTrueAndAvailableTrueOrderBySortOrderAsc();
+
+    // Trang chi tiet mot mon. Lay kem danh muc de khoi phai truy van them lan nua.
+    @Query("SELECT d FROM Dish d JOIN FETCH d.category WHERE d.slug = :slug AND d.available = true")
+    Optional<Dish> findBySlugForDetail(@Param("slug") String slug);
+
+    // Món đã từng nằm trong đơn thì không xóa hẳn được, hóa đơn cũ còn phải tra ra tên món
+    @Query("SELECT COUNT(i) FROM DishOrderItem i WHERE i.dish.id = :dishId")
+    long demLanDuocDat(@Param("dishId") Long dishId);
 
     // Trang quản trị lấy cả món đã ngừng bán nên không lọc theo available
     @Query("""

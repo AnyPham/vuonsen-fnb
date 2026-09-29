@@ -8,6 +8,7 @@ import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OrderColumn;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -36,6 +37,10 @@ public class Space extends BaseEntity {
     @Column(nullable = false, length = 120)
     private String name;
 
+    // Để trống thì giao diện tự dùng bản tiếng Việt, xem NoiDungSongNgu
+    @Column(name = "name_en", length = 120)
+    private String nameEn;
+
     @Column(nullable = false, unique = true, length = 140)
     private String slug;
 
@@ -46,8 +51,14 @@ public class Space extends BaseEntity {
     @Column(name = "short_desc", length = 500)
     private String shortDesc;
 
+    @Column(name = "short_desc_en", length = 500)
+    private String shortDescEn;
+
     @Column(columnDefinition = "TEXT")
     private String description;
+
+    @Column(name = "description_en", columnDefinition = "TEXT")
+    private String descriptionEn;
 
     @Column(name = "capacity_min", nullable = false)
     private Integer capacityMin;
@@ -91,4 +102,14 @@ public class Space extends BaseEntity {
     @Column(name = "amenity", length = 120)
     @Builder.Default
     private List<String> amenities = new ArrayList<>();
+
+    /*
+     * Thư viện ảnh của không gian. Thứ tự hiển thị lấy theo cột sort_order, để
+     * người quản trị sắp được ảnh nào lên trước mà không phải xóa rồi thêm lại.
+     */
+    @ElementCollection(fetch = FetchType.LAZY)
+    @CollectionTable(name = "space_images", joinColumns = @JoinColumn(name = "space_id"))
+    @OrderColumn(name = "sort_order")
+    @Builder.Default
+    private List<SpaceImage> images = new ArrayList<>();
 }

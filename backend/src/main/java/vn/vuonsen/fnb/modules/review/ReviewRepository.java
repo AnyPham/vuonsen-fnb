@@ -16,4 +16,7 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
 
     @Query("SELECT AVG(r.rating) FROM Review r WHERE r.approved = true")
     Double averageRating();
+
+    // Số đánh giá đã duyệt, trợ lý tư vấn dùng khi nói về điểm trung bình
+    long countByApprovedTrue();
 }

@@ -38,7 +38,7 @@ public class SpaceController {
     @Operation(summary = "Danh sách loại không gian dùng cho bộ lọc")
     public ResponseEntity<List<Map<String, String>>> types() {
         return ResponseEntity.ok(Arrays.stream(SpaceType.values())
-                .map(t -> Map.of("value", t.name(), "label", t.getLabel()))
+                .map(t -> Map.of("value", t.name(), "label", t.getLabel(), "labelEn", t.getLabelEn()))
                 .toList());
     }
 

@@ -6,6 +6,8 @@ import org.springframework.transaction.annotation.Transactional;
 import vn.vuonsen.fnb.common.exception.BusinessException;
 import vn.vuonsen.fnb.common.exception.ResourceNotFoundException;
 import vn.vuonsen.fnb.modules.menu.dto.DishAdminResponse;
+
+import java.text.Normalizer;
 import vn.vuonsen.fnb.modules.menu.dto.DishRequest;
 
 import java.util.List;
@@ -48,6 +50,29 @@ public class MenuAdminService {
         dishRepository.save(dish);
     }
 
+    /*
+     * Xóa hẳn khỏi cơ sở dữ liệu, khác với ngừng bán.
+     *
+     * Dùng cho hai việc: quản trị tạo nhầm một món rồi muốn dọn sạch, và bộ kiểm thử tự
+     * động tự dọn những món nó tạo ra. Trước khi có hàm này, mỗi lần chạy kiểm thử lại đẻ
+     * thêm vài món tên kiểu "Món thử giá 317610324460300" nằm lẫn trong thực đơn thật,
+     * khách vào web cũng đọc thấy.
+     *
+     * Chặn khi món đã từng nằm trong một đơn: hóa đơn cũ vẫn phải tra ra được tên món,
+     * xóa đi thì đơn cũ mất thông tin. Trường hợp đó dùng ngừng bán.
+     */
+    @Transactional
+    public void deletePermanently(Long id) {
+        Dish dish = getEntity(id);
+        long soLanDat = dishRepository.demLanDuocDat(id);
+        if (soLanDat > 0) {
+            throw new BusinessException(
+                    "Món \"%s\" đã nằm trong %d đơn nên không xóa hẳn được. Hãy dùng chức năng ngừng bán."
+                            .formatted(dish.getName(), soLanDat));
+        }
+        dishRepository.delete(dish);
+    }
+
     private Dish getEntity(Long id) {
         return dishRepository.findById(id)
                 .orElseThrow(() -> ResourceNotFoundException.of("món ăn", id));
@@ -65,6 +90,7 @@ public class MenuAdminService {
 
         dish.setCategory(category);
         dish.setName(r.name());
+        dish.setSlug(sinhSlug(r.name(), dish.getId()));
         dish.setDescription(r.description());
         dish.setPrice(r.price());
         dish.setPriceNote(r.priceNote());
@@ -72,5 +98,26 @@ public class MenuAdminService {
         dish.setBestSeller(r.bestSeller() != null && r.bestSeller());
         dish.setAvailable(r.available() == null || r.available());
         dish.setSortOrder(r.sortOrder() == null ? 0 : r.sortOrder());
+    }
+
+    /*
+     * Dựng đường dẫn từ tên món: bỏ dấu tiếng Việt, đổi khoảng trắng thành gạch nối.
+     *
+     * Trùng tên thì nối thêm mã món phía sau. Không dùng số ngẫu nhiên vì đường dẫn
+     * cần ổn định, sửa tên món xong mở lại vẫn phải ra đúng trang đó.
+     */
+    private String sinhSlug(String ten, Long id) {
+        String goc = Normalizer.normalize(ten, Normalizer.Form.NFD)
+                .replaceAll("\\p{InCombiningDiacriticalMarks}+", "")
+                .replace('đ', 'd').replace('Đ', 'D')
+                .toLowerCase()
+                .replaceAll("[^a-z0-9]+", "-")
+                .replaceAll("^-|-$", "");
+
+        var trung = dishRepository.findBySlugForDetail(goc);
+        if (trung.isPresent() && !trung.get().getId().equals(id)) {
+            return goc + "-" + (id == null ? System.currentTimeMillis() % 10000 : id);
+        }
+        return goc;
     }
 }

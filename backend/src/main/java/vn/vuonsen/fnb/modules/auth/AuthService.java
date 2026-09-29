@@ -1,11 +1,13 @@
 package vn.vuonsen.fnb.modules.auth;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import vn.vuonsen.fnb.common.concurrency.ThuLaiKhiTrungMa;
 import vn.vuonsen.fnb.common.exception.BusinessException;
 import vn.vuonsen.fnb.common.exception.ResourceNotFoundException;
 import vn.vuonsen.fnb.config.props.JwtProperties;
@@ -47,7 +49,22 @@ public class AuthService {
                 .enabled(true)
                 .build();
 
-        return issueTokens(userRepository.save(user));
+        User daLuu;
+        try {
+            // saveAndFlush để lệnh ghi chạy ngay tại đây, lỗi trùng lộ ra đúng chỗ bắt được
+            daLuu = userRepository.saveAndFlush(user);
+        } catch (DataIntegrityViolationException e) {
+            /*
+             * Hai người đăng ký cùng một email cùng lúc: cả hai đều qua bước kiểm tra ở
+             * trên vì chưa bên nào kịp lưu. Database chặn người sau bằng ràng buộc UNIQUE.
+             * Báo đúng lý do thay vì để lọt thành lỗi 500.
+             */
+            if (ThuLaiKhiTrungMa.viPham(e, "uk_users_email")) {
+                throw new BusinessException("Email này đã được đăng ký");
+            }
+            throw e;
+        }
+        return issueTokens(daLuu);
     }
 
     @Transactional

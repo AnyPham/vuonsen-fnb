@@ -4,7 +4,8 @@ import { Link, useNavigate } from 'react-router-dom';
 import { fetchSpaces, selectSpaces } from '@/features/catalog/catalogSlice';
 import { goToStep, updateForm } from '@/features/booking/bookingSlice';
 import { bookingApi, spaceApi } from '@/api/endpoints';
-import { formatCurrency } from '@/utils/format';
+import { useI18n } from '@/i18n';
+import { useDinhDang } from '@/i18n/dinhDang';
 import { Empty, ErrorBlock, Loading } from '@/components/common/StateBlock';
 import SuggestionBox from '@/components/common/SuggestionBox';
 import Thumb from '@/components/common/Thumb';
@@ -17,6 +18,11 @@ export default function SpacesPage() {
   const [types, setTypes] = useState([]);
   const [eventTypes, setEventTypes] = useState([]);
   const [filters, setFilters] = useState({ guests: '', type: '', maxPrice: '', eventType: '' });
+  const { t, tDb, tDbList, lang } = useI18n();
+  const dd = useDinhDang();
+
+  // Backend trả về label (Việt) và labelEn (Anh); chưa có bản tiếng Anh thì dùng bản tiếng Việt
+  const nhanTuyChon = (tuyChon) => (lang === 'en' && tuyChon.labelEn ? tuyChon.labelEn : tuyChon.label);
 
   useEffect(() => {
     spaceApi.types().then(setTypes).catch(() => setTypes([]));
@@ -54,64 +60,66 @@ export default function SpacesPage() {
     <section className="section">
       <div className="wrap">
         <div className="section-head">
-          <div className="eyebrow">Cho thuê không gian</div>
-          <h2>Chọn không gian phù hợp</h2>
+          <div className="eyebrow">{t('spaces.eyebrow')}</div>
+          <h2>{t('spaces.title')}</h2>
         </div>
 
         <div className="card" style={{ marginBottom: 32 }}>
           <div className="card-body form-row">
             <div className="fgroup" style={{ marginBottom: 0 }}>
-              <label htmlFor="f-guests">Số khách</label>
+              <label htmlFor="f-guests">{t('spaces.filterGuests')}</label>
               <input
                 id="f-guests"
+                data-test="filter-guests"
                 type="number"
                 min="1"
-                placeholder="Ví dụ: 150"
+                placeholder={t('spaces.guestsPlaceholder')}
                 value={filters.guests}
                 onChange={(e) => set({ guests: e.target.value })}
               />
             </div>
 
             <div className="fgroup" style={{ marginBottom: 0 }}>
-              <label htmlFor="f-type">Loại không gian</label>
-              <select id="f-type" value={filters.type} onChange={(e) => set({ type: e.target.value })}>
-                <option value="">Tất cả</option>
+              <label htmlFor="f-type">{t('spaces.filterType')}</label>
+              <select id="f-type" data-test="filter-type" value={filters.type} onChange={(e) => set({ type: e.target.value })}>
+                <option value="">{t('spaces.all')}</option>
                 {types.map((type) => (
                   <option key={type.value} value={type.value}>
-                    {type.label}
+                    {nhanTuyChon(type)}
                   </option>
                 ))}
               </select>
             </div>
 
             <div className="fgroup" style={{ marginBottom: 0 }}>
-              <label htmlFor="f-price">Giá thuê tối đa</label>
+              <label htmlFor="f-price">{t('spaces.filterMaxPrice')}</label>
               <input
                 id="f-price"
+                data-test="filter-max-price"
                 type="number"
                 step="1000000"
-                placeholder="Ví dụ: 10000000"
+                placeholder={t('spaces.pricePlaceholder')}
                 value={filters.maxPrice}
                 onChange={(e) => set({ maxPrice: e.target.value })}
               />
             </div>
 
             <div className="fgroup" style={{ marginBottom: 0 }}>
-              <label htmlFor="f-event">Loại sự kiện</label>
+              <label htmlFor="f-event">{t('spaces.filterEvent')}</label>
               <select
                 id="f-event"
                 value={filters.eventType}
                 onChange={(e) => set({ eventType: e.target.value })}
               >
-                <option value="">Chưa chọn</option>
+                <option value="">{t('spaces.notChosen')}</option>
                 {eventTypes.map((type) => (
                   <option key={type.value} value={type.value}>
-                    {type.label}
+                    {nhanTuyChon(type)}
                   </option>
                 ))}
               </select>
               <div className="muted" style={{ fontSize: '0.8rem', marginTop: 6 }}>
-                Dùng để gợi ý, không lọc danh sách
+                {t('spaces.eventHint')}
               </div>
             </div>
           </div>
@@ -122,38 +130,38 @@ export default function SpacesPage() {
           guestCount={filters.guests}
           eventType={filters.eventType}
           onPick={chonPhuongAn}
-          tieuDe="Gợi ý dành cho bạn"
-          nhanNut="Đặt tiệc với phương án này"
+          tieuDe={t('spaces.suggestTitle')}
+          nhanNut={t('spaces.suggestButton')}
         />
 
         {status === 'loading' && <Loading />}
         {status === 'failed' && <ErrorBlock message={error} />}
         {status === 'succeeded' && items.length === 0 && (
-          <Empty label="Không có không gian nào phù hợp với bộ lọc. Thử nới rộng điều kiện xem sao." />
+          <Empty label={t('spaces.empty')} />
         )}
 
         <div className="grid grid-3">
           {items.map((space) => (
-            <article key={space.id} className="card card-clickable">
+            <article key={space.id} className="card card-clickable" data-test="space-card">
               <Thumb
                 url={space.thumbnailUrl}
                 variant="v2"
                 icon="🏛️"
-                label={space.typeLabel}
-                alt={space.name}
+                label={lang === 'en' ? space.typeLabelEn || space.typeLabel : space.typeLabel}
+                alt={tDb(space, 'name')}
               />
               <div className="card-body">
                 <h3>
                   {/* full-link làm cả thẻ bấm được, xem class trong global.css */}
-                  <Link to={`/khong-gian/${space.slug}`} className="full-link">
-                    {space.name}
+                  <Link to={`/khong-gian/${space.slug}`} className="full-link" data-test="space-card-link">
+                    {tDb(space, 'name')}
                   </Link>
                 </h3>
                 <p className="muted" style={{ fontSize: '0.92rem', margin: '8px 0 14px' }}>
-                  {space.shortDesc}
+                  {tDb(space, 'shortDesc')}
                 </p>
                 <div>
-                  {space.amenities.map((amenity) => (
+                  {tDbList(space.amenities, space.amenitiesEn).map((amenity) => (
                     <span key={amenity} className="chip">
                       {amenity}
                     </span>
@@ -168,14 +176,14 @@ export default function SpacesPage() {
                   }}
                 >
                   <strong style={{ color: 'var(--green-800)' }}>
-                    {formatCurrency(space.rentalFee)}
+                    {dd.tien(space.rentalFee)}
                     <small className="muted">
                       {' '}
-                      / {space.feeUnit === 'HUT' ? 'chòi' : 'buổi'}
+                      / {space.feeUnit === 'HUT' ? t('spaces.perHut') : t('spaces.perSession')}
                     </small>
                   </strong>
                   <Link to={`/khong-gian/${space.slug}`} className="btn btn-outline btn-sm">
-                    Xem chi tiết →
+                    {t('spaces.viewDetail')}
                   </Link>
                 </div>
               </div>

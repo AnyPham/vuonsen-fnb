@@ -28,7 +28,7 @@ public class SpaceService {
 
     public SpaceResponse getBySlug(String slug) {
         return spaceRepository.findBySlug(slug)
-                .map(SpaceResponse::from)
+                .map(SpaceResponse::withImages)
                 .orElseThrow(() -> ResourceNotFoundException.of("không gian", slug));
     }
 

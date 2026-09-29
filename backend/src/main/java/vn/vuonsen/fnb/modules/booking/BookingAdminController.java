@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import vn.vuonsen.fnb.common.dto.PageResponse;
 import vn.vuonsen.fnb.modules.booking.dto.BookingResponse;
+import vn.vuonsen.fnb.modules.booking.dto.DepositRequest;
 import vn.vuonsen.fnb.modules.booking.dto.StatusUpdateRequest;
 import vn.vuonsen.fnb.security.AppUserDetails;
 
@@ -51,6 +52,21 @@ public class BookingAdminController {
     @Operation(summary = "Chi tiết một đơn")
     public ResponseEntity<BookingResponse> detail(@PathVariable String code) {
         return ResponseEntity.ok(bookingService.getByCode(code));
+    }
+
+    /*
+     * Ghi nhận tiền cọc khách đã đóng.
+     *
+     * Chưa có cổng thanh toán nên đây là chỗ duy nhất đánh dấu đơn đã có tiền hay chưa,
+     * thay cho quyển sổ ghi tay ở quầy.
+     */
+    @PatchMapping("/{id}/deposit")
+    @Operation(summary = "Ghi nhận tiền cọc khách đã chuyển khoản hoặc đóng tại quầy")
+    public ResponseEntity<BookingResponse> ghiNhanCoc(@PathVariable Long id,
+                                                      @Valid @RequestBody DepositRequest request,
+                                                      @AuthenticationPrincipal AppUserDetails principal) {
+        return ResponseEntity.ok(bookingService.ghiNhanCoc(
+                id, request.amount(), request.method(), principal.getEmail()));
     }
 
     @PatchMapping("/{id}/status")

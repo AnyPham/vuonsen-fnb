@@ -18,7 +18,7 @@ export default function ProtectedRoute({ children, roles }) {
 
   if (roles?.length && !roles.includes(user.role)) {
     return (
-      <div className="wrap state">
+      <div className="wrap state" data-test="access-denied">
         <h2>Không đủ quyền truy cập</h2>
         <p className="muted">Tài khoản của bạn không được vào trang này.</p>
       </div>

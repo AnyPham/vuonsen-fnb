@@ -44,6 +44,8 @@ services:
       ADMIN_EMAIL: ${ADMIN_EMAIL:-admin@vuonsen.vn}
       ADMIN_PASSWORD: ${ADMIN_PASSWORD:?Dat ADMIN_PASSWORD trong file .env truoc khi chay}
       CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost}
+      # Khoa API cua tro ly AI, dat trong file .env; bo trong thi tro ly dung co che du phong
+      ASSISTANT_LLM_API_KEY: ${ASSISTANT_LLM_API_KEY:-}
     ports:
       - "8080:8080"
 

@@ -4,6 +4,12 @@ spring:
   profiles:
     active: dev
 
+  config:
+    # Khoa API cua tro ly AI dat o tep rieng tro-ly-ai.properties, khong nam trong git.
+    # Co tep thi tro ly tu bat AI moi lan khoi dong, khong phai dat bien moi truong bang tay.
+    # Hai duong dan de chay duoc ca tu thu muc backend lan tu thu muc goc du an.
+    import: "optional:file:./tro-ly-ai.properties,optional:file:./backend/tro-ly-ai.properties"
+
   datasource:
     url: ${DB_URL:jdbc:mysql://localhost:3306/vuonsen_fnb?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Ho_Chi_Minh&allowPublicKeyRetrieval=true&useSSL=false}
     username: ${DB_USER:root}
@@ -91,12 +97,103 @@ app:
     top-n: 3                    # tra ve ba phuong an
     max-per-space: 1            # moi khong gian chi xuat hien mot lan
 
-  # Thong tin lien he, tro ly AI dung de tra loi khach
+  # Quy dinh nhan don dat mon le: giao tan nha hoac dat truoc roi toi an tai cho.
+  # Day la nhung con so kinh doanh hay doi nen de o day, khong viet cung trong ma.
+  dish-order:
+    delivery-fee: 30000           # phi giao mot don
+    free-delivery-from: 500000    # don tu muc nay tro len duoc mien phi giao
+    min-delivery-amount: 150000   # don giao tan nha phai dat muc toi thieu
+
+    min-hours-ahead: 2            # muc san, mon lam lau hon thi tu doi hoi bao som hon
+    max-days-ahead: 30            # khong nhan don qua xa vi nguyen lieu tuoi
+
+    min-guests-dine-in: 1
+    max-guests-dine-in: 40        # dong hon thi chuyen sang dat tiec theo goi
+
+  # Thu di cua nha hang: email xac nhan don va email dat lai mat khau.
+  #
+  # Khong khai bao may chu thu thi he thong khong gui that, chi ghi noi dung thu vao bang
+  # email_logs va in ra man hinh. Tai ma nguon ve la chay duoc ngay, khong bi chan o buoc
+  # phai co tai khoan email.
+  #
+  # Muon gui that bang Gmail: bat xac thuc hai buoc cho tai khoan, tao mot "Mat khau ung dung",
+  # roi dat ba bien moi truong truoc khi khoi dong:
+  #   SPRING_MAIL_HOST=smtp.gmail.com
+  #   SPRING_MAIL_USERNAME=<email cua nha hang>
+  #   SPRING_MAIL_PASSWORD=<mat khau ung dung vua tao>
+  # Khong ghi mat khau thang vao tep nay vi tep nay nam trong kho ma nguon.
+  mail:
+    from: ${MAIL_FROM:Vuon Sen <khong-tra-loi@vuonsen.vn>}
+    base-url: ${APP_BASE_URL:http://localhost:5173}
+
+  # Tai khoan ngan hang nhan tien, dung de dung ma VietQR cho khach quet.
+  #
+  # De trong so tai khoan thi website van nhan don binh thuong nhung khong hien ma QR, chi
+  # nhac khach lien he nha hang. Khong ghi san mot so tai khoan gia vao day, vi so gia van
+  # co the la tai khoan that cua nguoi khac.
+  payment:
+    bank-bin: ${PAYMENT_BANK_BIN:970422}            # 970422 la MB Bank, 970415 la VietinBank
+    account-number: ${PAYMENT_ACCOUNT_NUMBER:}      # dien so tai khoan that cua nha hang vao day
+    account-name: ${PAYMENT_ACCOUNT_NAME:VUON SEN}
+    bank-name: ${PAYMENT_BANK_NAME:MB Bank}
+
+    # Che do chay thu.
+    #
+    # Bat thi he thong dung so tai khoan toan so 0 de van dung duoc ma QR va di het luong,
+    # dong thoi mo them mot duong dan gia lap ngan hang bao co de xac nhan phieu thu ma
+    # khong can chuyen tien that. Giao dien hien canh bao ro dang o che do thu.
+    #
+    # PHAI tat khi chay that: dat PAYMENT_SANDBOX=false va dien so tai khoan that o tren.
+    sandbox: ${PAYMENT_SANDBOX:true}
+
+  # Cong thanh toan VNPay.
+  #
+  # Khac VietQR o cho: VietQR chi la ma chuyen khoan, nhan vien phai tu doi soat; VNPay la
+  # cong that, khach tra xong thi cong goi nguoc ve bao ket qua nen he thong biet ngay.
+  #
+  # De trong tmn-code thi coi nhu chua mo cong: website van chay va van thanh toan duoc bang
+  # ma VietQR, chi khong hien lua chon tra qua VNPay.
+  #
+  # Lay ma thu nghiem mien phi tai sandbox.vnpayment.vn, roi dat hai bien moi truong
+  # VNPAY_TMN_CODE va VNPAY_HASH_SECRET. Khong ghi thang vao tep nay.
+  vnpay:
+    tmn-code: ${VNPAY_TMN_CODE:}
+    hash-secret: ${VNPAY_HASH_SECRET:}
+    pay-url: ${VNPAY_PAY_URL:https://sandbox.vnpayment.vn/paymentv2/vpcpay.html}
+    return-url: ${VNPAY_RETURN_URL:http://localhost:5173/thanh-toan/ket-qua}
+    expire-minutes: 15
+
+  # Thong tin lien he, tro ly AI dung de tra loi khach.
+  # Phai viet co dau vi tro ly doc thang cac gia tri nay roi doc lai cho khach.
   contact:
-    address: "1147 Binh Quoi, Phuong 28, Binh Thanh, TP.HCM"
+    address: "1147 Bình Quới, Phường 28, Bình Thạnh, TP.HCM"
     phone: "(028) 1234 5678"
     email: datban@vuonsen.vn
-    opening-hours: "9:00 - 22:00 hang ngay"
+    opening-hours: "9:00 - 22:00 hằng ngày"
+
+  # Tro ly tu van. Mac dinh chay bang co che du phong trong he thong: khong can
+  # khoa API, khong ton phi, tai ve la chay duoc ngay.
+  #
+  # Bat nhanh goi Claude: chep backend/tro-ly-ai.properties.example thanh
+  # backend/tro-ly-ai.properties, dan khoa vao do mot lan; tu lan sau khoi dong la AI tu bat.
+  # Cung nhan khoa tu bien moi truong ASSISTANT_LLM_API_KEY hoac ANTHROPIC_API_KEY.
+  # Tuyet doi khong ghi khoa vao day vi tep nay nam trong git.
+  #
+  # Goi hong, het han cho hay sai khoa deu tu dong quay ve co che du phong,
+  # khach khong thay loi.
+  assistant:
+    llm:
+      enabled: ${ASSISTANT_LLM_ENABLED:true}
+      api-key: ${ASSISTANT_LLM_API_KEY:${ANTHROPIC_API_KEY:}}
+      # Doi duoc sang dich vu khac cung chuan, hoac tro vao may gia de thu nghiem
+      base-url: ${ASSISTANT_LLM_BASE_URL:https://api.anthropic.com}
+      # Mac dinh Claude Opus 5. Dat ASSISTANT_LLM_MODEL=claude-sonnet-5 neu muon re hon.
+      model: ${ASSISTANT_LLM_MODEL:claude-opus-5}
+      # Muc cong suc suy luan: low du cho cau tu van ngan, tra loi nhanh va it ton token
+      effort: ${ASSISTANT_LLM_EFFORT:low}
+      # Tran do dai cau tra loi, gom ca phan suy luan; de rong de khong bi cat giua chung
+      max-tokens: 4000
+      timeout-seconds: 20   # qua han thi tra loi bang co che du phong, khach khong phai doi mai
 
   admin:
     # Tài khoản admin tạo tự động khi chạy lần đầu

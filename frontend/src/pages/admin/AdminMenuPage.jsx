@@ -130,7 +130,7 @@ export default function AdminMenuPage() {
         {error && <ErrorBlock message={error} />}
 
         {editingId === null && (
-          <button type="button" className="btn btn-dark btn-sm" onClick={openNew} style={{ marginBottom: 22 }}>
+          <button type="button" className="btn btn-dark btn-sm" onClick={openNew} style={{ marginBottom: 22 }} data-test="dish-new">
             Thêm món mới
           </button>
         )}
@@ -146,6 +146,7 @@ export default function AdminMenuPage() {
                 <label htmlFor="dish-category">Danh mục *</label>
                 <select
                   id="dish-category"
+                  data-test="dish-category"
                   value={form.categoryId}
                   onChange={(e) => change('categoryId', e.target.value)}
                   required
@@ -160,6 +161,7 @@ export default function AdminMenuPage() {
                 <label htmlFor="dish-name">Tên món *</label>
                 <input
                   id="dish-name"
+                  data-test="dish-name"
                   value={form.name}
                   onChange={(e) => change('name', e.target.value)}
                   maxLength={160}
@@ -173,6 +175,7 @@ export default function AdminMenuPage() {
                 <label htmlFor="dish-price">Giá một phần</label>
                 <input
                   id="dish-price"
+                  data-test="dish-price"
                   type="number"
                   min="0"
                   step="1000"
@@ -200,6 +203,7 @@ export default function AdminMenuPage() {
               <label htmlFor="dish-description">Mô tả</label>
               <input
                 id="dish-description"
+                data-test="dish-description"
                 value={form.description}
                 onChange={(e) => change('description', e.target.value)}
                 maxLength={500}
@@ -243,7 +247,7 @@ export default function AdminMenuPage() {
             </div>
 
             <div style={{ display: 'flex', gap: 10 }}>
-              <button type="submit" className="btn btn-dark btn-sm" disabled={saving}>
+              <button type="submit" className="btn btn-dark btn-sm" disabled={saving} data-test="dish-save">
                 {saving ? 'Đang lưu…' : 'Lưu'}
               </button>
               <button type="button" className="btn btn-ghost btn-sm" onClick={closeForm}>
@@ -271,7 +275,7 @@ export default function AdminMenuPage() {
               </thead>
               <tbody>
                 {dishes.map((dish) => (
-                  <tr key={dish.id}>
+                  <tr key={dish.id} data-test="admin-dish-row">
                     <td>{dish.name}</td>
                     <td>{dish.categoryName}</td>
                     <td>{dish.price ? formatCurrency(dish.price) : dish.priceNote || '—'}</td>

@@ -1,0 +1,709 @@
+{
+  "goi-cuon-tom-thit": {
+    "tep": "Spring rolls",
+    "url": "https://live.staticflickr.com/2095/2393234452_5d279033cc_b.jpg",
+    "trangGoc": "https://www.flickr.com/photos/19709871@N00/2393234452",
+    "giayPhep": "BY 2.0",
+    "tacGia": "morning_rumtea",
+    "nguon": "flickr"
+  },
+  "nem-nuong-nha-trang": {
+    "tep": "Nem chua nuong",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/a/a8/Nem_chua_nuong.JPG",
+    "trangGoc": "https://commons.wikimedia.org/w/index.php?curid=10824538",
+    "giayPhep": "BY-SA 3.0",
+    "tacGia": "Rungbachduong at Vietnamese Wikipedia",
+    "nguon": "wikimedia"
+  },
+  "banh-bot-loc-la-chuoi": {
+    "tep": "Banh Beo, Banh Bot Loc, Banh It Tran plated VND15000 1",
+    "url": "https://live.staticflickr.com/4078/4926523630_2e0e027732_b.jpg",
+    "trangGoc": "https://www.flickr.com/photos/10559879@N00/4926523630",
+    "giayPhep": "BY-SA 2.0",
+    "tacGia": "avlxyz",
+    "nguon": "flickr"
+  },
+  "goi-xoai-kho-ca-sac": {
+    "tep": "File:Yum pladook foo.jpg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/d/d8/Yum_pladook_foo.jpg",
+    "trangGoc": "https://commons.wikimedia.org/w/index.php?curid=8129134",
+    "giayPhep": "BY-SA 3.0",
+    "tacGia": "Takeaway",
+    "nguon": "wikimedia"
+  },
+  "banh-uot-thit-nuong": {
+    "tep": "File:Nhà mình Lễ 30th4n2023 (bánh ướt Phương Lang, thịt heo nướng ăn kèm) (1).jpg",
+    "theLoai": [
+      "Category:CC-BY-SA-4.0",
+      "Category:Meat dishes of Vietnam",
+      "Category:Self-published work"
+    ],
+    "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/2/21/Nh%C3%A0_m%C3%ACnh_L%E1%BB%85_30th4n2023_%28b%C3%A1nh_%C6%B0%E1%BB%9Bt_Ph%C6%B0%C6%A1ng_Lang%2C_th%E1%BB%8Bt_heo_n%C6%B0%E1%BB%9Bng_%C4%83n_k%C3%A8m%29_%281%29.jpg/1280px-Nh%C3%A0_m%C3%ACnh_L%E1%BB%85_30th4n2023_%28b%C3%A1nh_%C6%B0%E1%BB%9Bt_Ph%C6%B0%C6%A1ng_Lang%2C_th%E1%BB%8Bt_heo_n%C6%B0%E1%BB%9Bng_%C4%83n_k%C3%A8m%29_%281%29.jpg",
+    "trangGoc": "https://commons.wikimedia.org/wiki/File:Nh%C3%A0_m%C3%ACnh_L%E1%BB%85_30th4n2023_(b%C3%A1nh_%C6%B0%E1%BB%9Bt_Ph%C6%B0%C6%A1ng_Lang,_th%E1%BB%8Bt_heo_n%C6%B0%E1%BB%9Bng_%C4%83n_k%C3%A8m)_(1).jpg",
+    "giayPhep": "CC BY-SA 4.0",
+    "tacGia": "Phương Huy"
+  },
+  "so-diep-nuong-mo-hanh": {
+    "tep": "File:Scallop-Sausages-DSC2415.jpg",
+    "theLoai": [
+      "Category:Files by User:Fg2",
+      "Category:Grilled clams",
+      "Category:PD-self",
+      "Category:Scallop dishes",
+      "Category:Self-published work",
+      "Category:Yatai"
+    ],
+    "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/a/ac/Scallop-Sausages-DSC2415.jpg/1280px-Scallop-Sausages-DSC2415.jpg",
+    "trangGoc": "https://commons.wikimedia.org/wiki/File:Scallop-Sausages-DSC2415.jpg",
+    "giayPhep": "Public domain",
+    "tacGia": "Fg2"
+  },
+  "ca-tim-nuong-mo-hanh": {
+    "tep": "File:Grilled eggplant appetizer.jpg",
+    "theLoai": [
+      "Category:Appetizers",
+      "Category:CC-BY-2.0",
+      "Category:Eggplant-based food",
+      "Category:Files from Rick Audet Flickr stream",
+      "Category:Flickr images reviewed by FlickreviewR",
+      "Category:Grilled vegetables"
+    ],
+    "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/bb/Grilled_eggplant_appetizer.jpg/1280px-Grilled_eggplant_appetizer.jpg",
+    "trangGoc": "https://commons.wikimedia.org/wiki/File:Grilled_eggplant_appetizer.jpg",
+    "giayPhep": "CC BY 2.0",
+    "tacGia": "Rick Audet from San Francisco, USA"
+  },
+  "ca-tai-tuong-chien-xu": {
+    "tep": "File:Flash fried whole scup.jpg",
+    "theLoai": [
+      "Category:PD US NOAA",
+      "Category:Sparidae as food",
+      "Category:Stenotomus chrysops",
+      "Category:Taken with Nikon D80",
+      "Category:Template Unknown (author)"
+    ],
+    "url": "https://upload.wikimedia.org/wikipedia/commons/8/87/Flash_fried_whole_scup.jpg",
+    "trangGoc": "https://commons.wikimedia.org/wiki/File:Flash_fried_whole_scup.jpg",
+    "giayPhep": "Public domain",
+    "tacGia": "Unknown authorUnknown author"
+  },
+  "ca-kho-to-mien-tay": {
+    "tep": "File:Cá kho tộ.JPG",
+    "theLoai": [
+      "Category:Braised food",
+      "Category:Fish dishes of Vietnam",
+      "Category:PD-user",
+      "Category:Pictures by Binh Giang",
+      "Category:Taken with Canon DC40"
+    ],
+    "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b4/C%C3%A1_kho_t%E1%BB%99.JPG/1280px-C%C3%A1_kho_t%E1%BB%99.JPG",
+    "trangGoc": "https://commons.wikimedia.org/wiki/File:C%C3%A1_kho_t%E1%BB%99.JPG",
+    "giayPhep": "Public domain",
+    "tacGia": "Binh Giang"
+  },
+  "canh-chua-ca-loc": {
+    "tep": "File:Canhchua2.jpg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/a/a0/Canhchua2.jpg",
+    "trangGoc": "https://commons.wikimedia.org/w/index.php?curid=2500892",
+    "giayPhep": "BY 2.0",
+    "tacGia": "Jason Hutchens",
+    "nguon": "wikimedia"
+  },
+  "vit-quay-la-mac-mat": {
+    "tep": "烧鸭 烧肉 饭 Roast duck and roast pork on rice - Pacific BBQ Cafe",
+    "url": "https://live.staticflickr.com/2224/2418785280_4a045965bd_b.jpg",
+    "trangGoc": "https://www.flickr.com/photos/10559879@N00/2418785280",
+    "giayPhep": "BY-SA 2.0",
+    "tacGia": "avlxyz",
+    "nguon": "flickr"
+  },
+  "com-chien-hai-san-trai-thom": {
+    "tep": "Pineapple Fried Rice",
+    "url": "https://live.staticflickr.com/5235/7090014075_1675dc6a35_b.jpg",
+    "trangGoc": "https://www.flickr.com/photos/54063325@N07/7090014075",
+    "giayPhep": "BY 2.0",
+    "tacGia": "Ruocaled",
+    "nguon": "flickr"
+  },
+  "hu-tieu-nam-vang": {
+    "tep": "Hu Tieu Nam Vang - Hoa Tran AUD8.50",
+    "url": "https://live.staticflickr.com/4079/4735655334_6236f51f41_b.jpg",
+    "trangGoc": "https://www.flickr.com/photos/10559879@N00/4735655334",
+    "giayPhep": "BY-SA 2.0",
+    "tacGia": "avlxyz",
+    "nguon": "flickr"
+  },
+  "banh-canh-cua": {
+    "tep": "Pork leg, pork blood, prawn, heart - Banh Canh Thit Cua - Hoa Tran AUD9.50",
+    "url": "https://live.staticflickr.com/4138/4735655640_b4452fdf01_b.jpg",
+    "trangGoc": "https://www.flickr.com/photos/10559879@N00/4735655640",
+    "giayPhep": "BY-SA 2.0",
+    "tacGia": "avlxyz",
+    "nguon": "flickr"
+  },
+  "bo-kho-banh-mi": {
+    "tep": "Pho So 1 - Pho Bo Kho – Beef Stew Noodle Soup",
+    "url": "https://live.staticflickr.com/8658/16479866370_c6e7f9e8a5_b.jpg",
+    "trangGoc": "https://www.flickr.com/photos/91188380@N05/16479866370",
+    "giayPhep": "BY 2.0",
+    "tacGia": "elsie.hui",
+    "nguon": "flickr"
+  },
+  "cua-rang-me": {
+    "tep": "Tamarind crab",
+    "url": "https://live.staticflickr.com/2687/4444630274_b5aa8c65ca_b.jpg",
+    "trangGoc": "https://www.flickr.com/photos/27454212@N00/4444630274",
+    "giayPhep": "BY-SA 2.0",
+    "tacGia": "Kent Wang",
+    "nguon": "flickr"
+  },
+  "muc-nhoi-thit-hap": {
+    "tep": "File:Red Wine & Stuffed Squid, Calamari.jpg",
+    "theLoai": [
+      "Category:CC-BY-SA-2.0",
+      "Category:Flickr images uploaded by Flickr upload bot",
+      "Category:Food with red wine",
+      "Category:Squid dishes",
+      "Category:Wine and food pairing"
+    ],
+    "url": "https://upload.wikimedia.org/wikipedia/commons/f/f1/Red_Wine_%26_Stuffed_Squid%2C_Calamari.jpg",
+    "trangGoc": "https://commons.wikimedia.org/wiki/File:Red_Wine_%26_Stuffed_Squid,_Calamari.jpg",
+    "giayPhep": "CC BY-SA 2.0",
+    "tacGia": "Kirti Poddar"
+  },
+  "ga-nuong-muoi-ot": {
+    "tep": "Grilled Chicken, Papaya Salad, Sticky Rice - Pad Thai AUD14.50",
+    "url": "https://live.staticflickr.com/4042/4372059601_c91f5eb8f0_b.jpg",
+    "trangGoc": "https://www.flickr.com/photos/10559879@N00/4372059601",
+    "giayPhep": "BY-SA 2.0",
+    "tacGia": "avlxyz",
+    "nguon": "flickr"
+  },
+  "canh-kho-qua-nhoi-thit": {
+    "tep": "Soup made from stuffed bitter melon, Canh Kho Qua",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/a/ae/Soup_made_from_stuffed_bitter_melon%2C_Canh_Kho_Qua.jpg",
+    "trangGoc": "https://commons.wikimedia.org/w/index.php?curid=87521892",
+    "giayPhep": "BY 2.0",
+    "tacGia": "HungryHuy",
+    "nguon": "wikimedia"
+  },
+  "chim-cut-roti": {
+    "tep": "Roasted Quail",
+    "url": "https://live.staticflickr.com/3010/2631820544_0aa712ba87_b.jpg",
+    "trangGoc": "https://www.flickr.com/photos/86537625@N00/2631820544",
+    "giayPhep": "BY-SA 2.0",
+    "tacGia": "Aaron Gustafson",
+    "nguon": "flickr"
+  },
+  "lau-ca-bop-la-giang": {
+    "tep": "203-365 Sauteed fish in clay pot",
+    "url": "https://live.staticflickr.com/5497/10639477323_aca39e00d2_b.jpg",
+    "trangGoc": "https://www.flickr.com/photos/91188380@N05/10639477323",
+    "giayPhep": "BY 2.0",
+    "tacGia": "elsie.hui",
+    "nguon": "flickr"
+  },
+  "lau-riu-rieu-cua-dong": {
+    "tep": "Bun Rieu Cua soup, crab roe pate, fried shallots, fish cakes, pork, pork sausages, beansprouts, water spinach - Ly Quoc Su",
+    "url": "https://live.staticflickr.com/4001/4687454915_8c959aa3c6_b.jpg",
+    "trangGoc": "https://www.flickr.com/photos/10559879@N00/4687454915",
+    "giayPhep": "BY-SA 2.0",
+    "tacGia": "avlxyz",
+    "nguon": "flickr"
+  },
+  "ba-chi-nuong-sa": {
+    "tep": "File:Grilled kurobuta pork belly 02.jpg",
+    "theLoai": [
+      "Category:CC-BY-2.0",
+      "Category:Files with coordinates missing SDC location of creation",
+      "Category:Flickr images reviewed by FlickreviewR 2",
+      "Category:Grilled Kurobuta Pork Belly at Other Mama",
+      "Category:March 2019 in Las Vegas"
+    ],
+    "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/89/Grilled_kurobuta_pork_belly_02.jpg/1280px-Grilled_kurobuta_pork_belly_02.jpg",
+    "trangGoc": "https://commons.wikimedia.org/wiki/File:Grilled_kurobuta_pork_belly_02.jpg",
+    "giayPhep": "CC BY 2.0",
+    "tacGia": "T.Tseng"
+  },
+  "ga-nuong-lu": {
+    "tep": "Tandoori Chicken in restaurent",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/c/c1/Tandoori_Chicken_in_restaurent.jpg",
+    "trangGoc": "https://commons.wikimedia.org/w/index.php?curid=113168373",
+    "giayPhep": "BY-SA 4.0",
+    "tacGia": "Akshaya govindasamy",
+    "nguon": "wikimedia"
+  },
+  "bo-bit-tet-tieu-den": {
+    "tep": "Hickory Grilled NY Strip",
+    "url": "https://live.staticflickr.com/7034/6523198789_3746417f7c_b.jpg",
+    "trangGoc": "https://www.flickr.com/photos/92269745@N00/6523198789",
+    "giayPhep": "BY 2.0",
+    "tacGia": "ralph and jenny",
+    "nguon": "flickr"
+  },
+  "che-ba-mau": {
+    "tep": "File:Chendol2.jpg",
+    "theLoai": [
+      "Category:CC-BY-2.0",
+      "Category:Cendol",
+      "Category:Chè",
+      "Category:Flickr images reviewed by File Upload Bot (Magnus Manske)",
+      "Category:Mung bean dishes",
+      "Category:Taken with Pentax Optio S4i"
+    ],
+    "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/75/Chendol2.jpg/1280px-Chendol2.jpg",
+    "trangGoc": "https://commons.wikimedia.org/wiki/File:Chendol2.jpg",
+    "giayPhep": "CC BY 2.0",
+    "tacGia": "Jess Lander from Los Angeles, CA, USA"
+  },
+  "che-troi-nuoc": {
+    "tep": "File:Món chè ở Bình Long năm 2020.jpg",
+    "theLoai": [
+      "Category:CC-BY-SA-4.0",
+      "Category:Cuisine of Vietnam",
+      "Category:Self-published work"
+    ],
+    "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/fd/M%C3%B3n_ch%C3%A8_%E1%BB%9F_B%C3%ACnh_Long_n%C4%83m_2020.jpg/1280px-M%C3%B3n_ch%C3%A8_%E1%BB%9F_B%C3%ACnh_Long_n%C4%83m_2020.jpg",
+    "trangGoc": "https://commons.wikimedia.org/wiki/File:M%C3%B3n_ch%C3%A8_%E1%BB%9F_B%C3%ACnh_Long_n%C4%83m_2020.jpg",
+    "giayPhep": "CC BY-SA 4.0",
+    "tacGia": "Phương Huy"
+  },
+  "che-khoai-deo": {
+    "tep": "Meet fresh Taro Balls Dessert 5",
+    "url": "https://live.staticflickr.com/4145/5082856547_fce57739fd_b.jpg",
+    "trangGoc": "https://www.flickr.com/photos/19349404@N00/5082856547",
+    "giayPhep": "BY 2.0",
+    "tacGia": "goosmurf",
+    "nguon": "flickr"
+  },
+  "banh-flan-ca-phe": {
+    "tep": "File:Homemade Flan.jpg",
+    "theLoai": [
+      "Category:CC-BY-SA-2.5",
+      "Category:Crème caramel",
+      "Category:Featured pictures on Wikipedia, Vietnamese",
+      "Category:Homemade desserts",
+      "Category:Media by Cary Bass-Deschênes",
+      "Category:Quality images",
+      "Category:Self-published work",
+      "Category:Taken with Panasonic Lumix DMC-TZ1",
+      "Category:Truncated cone-shaped flans"
+    ],
+    "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/43/Homemade_Flan.jpg/1280px-Homemade_Flan.jpg",
+    "trangGoc": "https://commons.wikimedia.org/wiki/File:Homemade_Flan.jpg",
+    "giayPhep": "CC BY-SA 2.5",
+    "tacGia": "Cary Bass"
+  },
+  "xoi-xoai-nuoc-cot-dua": {
+    "tep": "Mango Sticky Rice Vendor",
+    "url": "https://live.staticflickr.com/575/22525075347_d687b6c71e_b.jpg",
+    "trangGoc": "https://www.flickr.com/photos/63234672@N04/22525075347",
+    "giayPhep": "CC0 1.0",
+    "tacGia": "Mustang Joe",
+    "nguon": "flickr"
+  },
+  "banh-tet-la-cam": {
+    "tep": "How to make Banh Chung Vietnamese Tet Rice Cakes",
+    "url": "https://live.staticflickr.com/7443/16545390385_d29abdbb4b.jpg",
+    "trangGoc": "https://www.flickr.com/photos/41993463@N08/16545390385",
+    "giayPhep": "BY 2.0",
+    "tacGia": "Andrea_Nguyen",
+    "nguon": "flickr"
+  },
+  "che-thai-sau-rieng": {
+    "tep": "File:Durian Gelato.JPG",
+    "theLoai": [
+      "Category:CC-BY-SA-3.0-migrated",
+      "Category:Desserts of Singapore",
+      "Category:Durian-based food",
+      "Category:Durians in Singapore",
+      "Category:GFDL",
+      "Category:Gelato",
+      "Category:License migration completed",
+      "Category:Self-published work",
+      "Category:User-created GFDL images"
+    ],
+    "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/6/69/Durian_Gelato.JPG/1280px-Durian_Gelato.JPG",
+    "trangGoc": "https://commons.wikimedia.org/wiki/File:Durian_Gelato.JPG",
+    "giayPhep": "CC BY-SA 3.0",
+    "tacGia": "Timothyngim"
+  },
+  "ca-phe-sua-da": {
+    "tep": "WAKE UP AND SMELL THE COFFEE [HANOI HANOI RESTAURANT]-105806",
+    "url": "https://live.staticflickr.com/297/18863269318_2c4b93d0dc_b.jpg",
+    "trangGoc": "https://www.flickr.com/photos/80824546@N00/18863269318",
+    "giayPhep": "BY-SA 2.0",
+    "tacGia": "infomatique",
+    "nguon": "flickr"
+  },
+  "ca-phe-den-da": {
+    "tep": "File:A small cup of coffee.JPG",
+    "theLoai": [
+      "Category:CC-BY-SA-2.0",
+      "Category:Cups of black coffee",
+      "Category:Featured pictures on Wikipedia, Azeri",
+      "Category:Featured pictures on Wikipedia, Bengali",
+      "Category:Formerly featured pictures on Wikimedia Commons",
+      "Category:Images at Village pumps and Community portals",
+      "Category:Pictures of the day (2006)",
+      "Category:Self-published work",
+      "Category:White coffee cups"
+    ],
+    "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/45/A_small_cup_of_coffee.JPG/1280px-A_small_cup_of_coffee.JPG",
+    "trangGoc": "https://commons.wikimedia.org/wiki/File:A_small_cup_of_coffee.JPG",
+    "giayPhep": "CC BY-SA 2.0",
+    "tacGia": "Julius Schorzman"
+  },
+  "ca-phe-muoi": {
+    "tep": "Two glasses of Vietnamese coffee sit on a wooden table along Hanoi’s Train Street — one creamy coconut, the other salt",
+    "url": "https://pd.w.org/2025/09/568bab0b319be82.36307954-1536x2048.jpg",
+    "trangGoc": "https://wordpress.org/photos/photo/568bab0b31/",
+    "giayPhep": "CC0 1.0",
+    "tacGia": "vgnavada",
+    "nguon": "wordpress"
+  },
+  "sinh-to-xoai": {
+    "tep": "Vegan Smoothie Made With Almond Milk, Fresh Nectarine and Frozen Mango Chunks 082909Sa",
+    "url": "https://live.staticflickr.com/3546/3872794615_2e252d3ed0.jpg",
+    "trangGoc": "https://www.flickr.com/photos/33549343@N04/3872794615",
+    "giayPhep": "BY 2.0",
+    "tacGia": "vmiramontes",
+    "nguon": "flickr"
+  },
+  "nuoc-ep-dua-hau": {
+    "tep": "Watermelon Juice",
+    "url": "https://live.staticflickr.com/4073/4782853161_74f25c86f4_b.jpg",
+    "trangGoc": "https://www.flickr.com/photos/68535680@N00/4782853161",
+    "giayPhep": "BY 2.0",
+    "tacGia": "Sikachu!",
+    "nguon": "flickr"
+  },
+  "soda-chanh-bac-ha": {
+    "tep": "Mojito",
+    "url": "https://live.staticflickr.com/4147/5084101811_9f84644414_b.jpg",
+    "trangGoc": "https://www.flickr.com/photos/72949902@N00/5084101811",
+    "giayPhep": "BY 2.0",
+    "tacGia": "TheCulinaryGeek",
+    "nguon": "flickr"
+  },
+  "nuoc-dua-tac-nong": {
+    "tep": "Saenggang cha, Korean tea",
+    "url": "https://live.staticflickr.com/4026/4384541378_10f294fc92_b.jpg",
+    "trangGoc": "https://www.flickr.com/photos/42438955@N05/4384541378",
+    "giayPhep": "BY-SA 2.0",
+    "tacGia": "KOREA.NET - Official page of the Republic of Korea",
+    "nguon": "flickr"
+  },
+  "vang-do-ly": {
+    "tep": "Two glasses of Red Wine",
+    "url": "https://live.staticflickr.com/2551/3665139018_3c3c7b33f7_b.jpg",
+    "trangGoc": "https://www.flickr.com/photos/35166455@N00/3665139018",
+    "giayPhep": "BY 2.0",
+    "tacGia": "L.C.Nøttaasen",
+    "nguon": "flickr"
+  },
+  "banh-khot-vung-tau": {
+    "tep": "Banh khot aka Banh can - Thanh Ha AUD8",
+    "url": "https://live.staticflickr.com/2569/4171696432_5acdf19f1c_b.jpg",
+    "trangGoc": "https://www.flickr.com/photos/10559879@N00/4171696432",
+    "giayPhep": "BY-SA 2.0",
+    "tacGia": "avlxyz",
+    "nguon": "flickr"
+  },
+  "sup-mang-cua-ga-xe": {
+    "tep": "Chef Seamus Mullen Soft Shell Crab Soup",
+    "url": "https://live.staticflickr.com/7286/8736444970_b966dea186_b.jpg",
+    "trangGoc": "https://www.flickr.com/photos/38102750@N06/8736444970",
+    "giayPhep": "BY 2.0",
+    "tacGia": "Breville USA",
+    "nguon": "flickr"
+  },
+  "goi-ngo-sen-tom-thit": {
+    "tep": "Lotus papaya salad, green papaya, lotus stems, dried shrimp, carrots, special house vinaigrette, beef jerky and toasted peanuts",
+    "url": "https://live.staticflickr.com/1779/42037845750_3842c3ea0b_b.jpg",
+    "trangGoc": "https://www.flickr.com/photos/68147320@N02/42037845750",
+    "giayPhep": "BY 2.0",
+    "tacGia": "T.Tseng",
+    "nguon": "flickr"
+  },
+  "cha-ca-la-vong": {
+    "tep": "Fish and dill for 2 - close-up - Cha Ca La Vong VND120000 each",
+    "url": "https://live.staticflickr.com/4085/4837078209_a54697140c_b.jpg",
+    "trangGoc": "https://www.flickr.com/photos/10559879@N00/4837078209",
+    "giayPhep": "BY-SA 2.0",
+    "tacGia": "avlxyz",
+    "nguon": "flickr"
+  },
+  "chao-tom-boc-mia": {
+    "tep": "Chao tom",
+    "url": "https://live.staticflickr.com/4021/4239380430_3f0892fb38_b.jpg",
+    "trangGoc": "https://www.flickr.com/photos/87232391@N00/4239380430",
+    "giayPhep": "BY-SA 2.0",
+    "tacGia": "Charles Haynes",
+    "nguon": "flickr"
+  },
+  "ngheu-hap-sa": {
+    "tep": "Steamed clam with lemongrass and ginger",
+    "url": "https://live.staticflickr.com/3241/3032559724_97930809d4_b.jpg",
+    "trangGoc": "https://www.flickr.com/photos/19709871@N00/3032559724",
+    "giayPhep": "BY 2.0",
+    "tacGia": "morning_rumtea",
+    "nguon": "flickr"
+  },
+  "khoai-lang-ken-chien": {
+    "tep": "Fried Sweet Potato Balls, Mar 2026",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/7/73/Fried_Sweet_Potato_Balls%2C_Mar_2026.jpg",
+    "trangGoc": "https://commons.wikimedia.org/w/index.php?curid=187717324",
+    "giayPhep": "BY-SA 4.0",
+    "tacGia": "Ralff Nestor Nacor",
+    "nguon": "wikimedia"
+  },
+  "thit-kho-trung-nuoc-dua": {
+    "tep": "Vietnamese thit kho, braised pork belly and boiled eggs - 47693228262",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/c/ca/Vietnamese_thit_kho%2C_braised_pork_belly_and_boiled_eggs_-_47693228262.jpg",
+    "trangGoc": "https://commons.wikimedia.org/w/index.php?curid=87521811",
+    "giayPhep": "BY 2.0",
+    "tacGia": "HungryHuy",
+    "nguon": "wikimedia"
+  },
+  "bun-thit-nuong-cha-gio": {
+    "tep": "Bun thit nuong",
+    "url": "https://live.staticflickr.com/2553/3730861055_7249a18df5.jpg",
+    "trangGoc": "https://www.flickr.com/photos/51035727839@N01/3730861055",
+    "giayPhep": "BY-SA 2.0",
+    "tacGia": "thomaswanhoff",
+    "nguon": "flickr"
+  },
+  "mi-quang-ga": {
+    "tep": "Mi Quang - detail - Quan Hat Mi Quang, Cao Lau VND2000",
+    "url": "https://live.staticflickr.com/4093/4926723822_ce8873d50b_b.jpg",
+    "trangGoc": "https://www.flickr.com/photos/10559879@N00/4926723822",
+    "giayPhep": "BY-SA 2.0",
+    "tacGia": "avlxyz",
+    "nguon": "flickr"
+  },
+  "lau-thai-hai-san": {
+    "tep": "Tom yum",
+    "url": "https://live.staticflickr.com/7051/6928723901_dd26ef45cf_b.jpg",
+    "trangGoc": "https://www.flickr.com/photos/74105777@N00/6928723901",
+    "giayPhep": "BY 2.0",
+    "tacGia": "adactio",
+    "nguon": "flickr"
+  },
+  "lau-nam-chay": {
+    "tep": "Thai Vegetarian Hot Pot",
+    "url": "https://live.staticflickr.com/8233/8586109722_3ceaab89d9_b.jpg",
+    "trangGoc": "https://www.flickr.com/photos/34003965@N00/8586109722",
+    "giayPhep": "BY 2.0",
+    "tacGia": "Azchael",
+    "nguon": "flickr"
+  },
+  "lau-vit-nau-chao": {
+    "tep": "Ginger duck hot pot",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/0/0e/Ginger_duck_hot_pot.jpg",
+    "trangGoc": "https://commons.wikimedia.org/w/index.php?curid=51174391",
+    "giayPhep": "BY-SA 4.0",
+    "tacGia": "Mk2010",
+    "nguon": "wikimedia"
+  },
+  "suon-nuong-bbq": {
+    "tep": "BBQ Pork and Marinated Duck Wings - Choi Palace",
+    "url": "https://live.staticflickr.com/1432/659524476_1561f96a48_b.jpg",
+    "trangGoc": "https://www.flickr.com/photos/10559879@N00/659524476",
+    "giayPhep": "BY-SA 2.0",
+    "tacGia": "avlxyz",
+    "nguon": "flickr"
+  },
+  "combo-lau-nuong-gia-dinh": {
+    "tep": "불고기 Pork Bulgogi - Hello Cook AUD9.50",
+    "url": "https://live.staticflickr.com/4066/4210126172_4e3789dab3_b.jpg",
+    "trangGoc": "https://www.flickr.com/photos/10559879@N00/4210126172",
+    "giayPhep": "BY-SA 2.0",
+    "tacGia": "avlxyz",
+    "nguon": "flickr"
+  },
+  "che-hat-sen-nhan-nhuc": {
+    "tep": "Sesame filled rice-dumplings, lily bulb, lotus seed and longan sweet soup",
+    "url": "https://live.staticflickr.com/2151/2103310712_bb744fb156_b.jpg",
+    "trangGoc": "https://www.flickr.com/photos/10559879@N00/2103310712",
+    "giayPhep": "BY-SA 2.0",
+    "tacGia": "avlxyz",
+    "nguon": "flickr"
+  },
+  "suong-sa-hat-luu": {
+    "tep": "Tub tim krob in Singapore - 20050520",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/f/f6/Tub_tim_krob_in_Singapore_-_20050520.jpg",
+    "trangGoc": "https://commons.wikimedia.org/w/index.php?curid=25366115",
+    "giayPhep": "BY-SA 3.0",
+    "tacGia": "Chensiyuan at English Wikipedia",
+    "nguon": "wikimedia"
+  },
+  "kem-dua-trai-dua": {
+    "tep": "i got coconut shell ice cream",
+    "url": "https://live.staticflickr.com/2493/3843771409_f16640362d_b.jpg",
+    "trangGoc": "https://www.flickr.com/photos/78011127@N00/3843771409",
+    "giayPhep": "BY-SA 2.0",
+    "tacGia": "ginnerobot",
+    "nguon": "flickr"
+  },
+  "sinh-to-bo-kem": {
+    "tep": "[Video] Cách làm Sinh Tố Bơ cực chuẩn thơm ngậy",
+    "url": "https://live.staticflickr.com/4525/38768201132_cc6cccb1a9.jpg",
+    "trangGoc": "https://www.flickr.com/photos/148481438@N03/38768201132",
+    "giayPhep": "BY-SA 2.0",
+    "tacGia": "Đam Mê Ẩm Thực",
+    "nguon": "flickr"
+  },
+  "tau-hu-nuoc-duong": {
+    "tep": "SWEETS: Tofu Pudding with Ginger Syrup - Dou Hua",
+    "url": "https://live.staticflickr.com/5109/5567285168_428757f673.jpg",
+    "trangGoc": "https://www.flickr.com/photos/41993463@N08/5567285168",
+    "giayPhep": "BY 2.0",
+    "tacGia": "Andrea_Nguyen",
+    "nguon": "flickr"
+  },
+  "banh-cam-nhan-dau-xanh": {
+    "tep": "Banh Cam - Vietnamese fried sesame balls",
+    "url": "https://live.staticflickr.com/4838/44062921970_90ba668638.jpg",
+    "trangGoc": "https://www.flickr.com/photos/142284085@N06/44062921970",
+    "giayPhep": "BY 2.0",
+    "tacGia": "HungryHuy",
+    "nguon": "flickr"
+  },
+  "tra-tac-mat-ong": {
+    "tep": "Kumquat Habanero Marmalade Tea",
+    "url": "https://live.staticflickr.com/7680/16874980828_a65eee95fa_b.jpg",
+    "trangGoc": "https://www.flickr.com/photos/63669472@N00/16874980828",
+    "giayPhep": "BY 2.0",
+    "tacGia": "eekim",
+    "nguon": "flickr"
+  },
+  "nuoc-mia-tac": {
+    "tep": "Sugar cane juice shop 03t.JPG",
+    "url": "https://live.staticflickr.com/3030/2892843607_75266c1abb_b.jpg",
+    "trangGoc": "https://www.flickr.com/photos/9802162@N03/2892843607",
+    "giayPhep": "BY 2.0",
+    "tacGia": "midorisyu",
+    "nguon": "flickr"
+  },
+  "nuoc-rau-ma-dau-xanh": {
+    "tep": "Rau Ma?",
+    "url": "https://live.staticflickr.com/5185/5749930962_0883a04e65_b.jpg",
+    "trangGoc": "https://www.flickr.com/photos/45449692@N00/5749930962",
+    "giayPhep": "BY 2.0",
+    "tacGia": "floluong",
+    "nguon": "flickr"
+  },
+  "hoanh-thanh-chien-gion": {
+    "tep": "fried wontons, crab rangoon, dipping sauces",
+    "url": "https://live.staticflickr.com/4082/4739410312_1abbb43307_b.jpg",
+    "trangGoc": "https://www.flickr.com/photos/7927684@N03/4739410312",
+    "giayPhep": "BY 2.0",
+    "tacGia": "jeffreyw",
+    "nguon": "flickr"
+  },
+  "rau-muong-xao-toi": {
+    "tep": "Rau muống xào - Pho Cardiff",
+    "url": "https://live.staticflickr.com/65535/48831098842_d1dbbf3592_b.jpg",
+    "trangGoc": "https://www.flickr.com/photos/54549113@N00/48831098842",
+    "giayPhep": "BY-SA 2.0",
+    "tacGia": "Haydn Blackey",
+    "nguon": "flickr"
+  },
+  "muc-nuong-sa-te": {
+    "tep": "GRILLED SQUID",
+    "url": "https://live.staticflickr.com/4109/4997841338_86f3aaa01e_b.jpg",
+    "trangGoc": "https://www.flickr.com/photos/60417477@N00/4997841338",
+    "giayPhep": "BY 2.0",
+    "tacGia": "whologwhy",
+    "nguon": "flickr"
+  },
+  "ca-nuc-nuong-giay-bac": {
+    "tep": "mackerel",
+    "url": "https://live.staticflickr.com/3044/2321144530_528500d30d_b.jpg",
+    "trangGoc": "https://www.flickr.com/photos/69024001@N00/2321144530",
+    "giayPhep": "BY 2.0",
+    "tacGia": "ndrwfgg",
+    "nguon": "flickr"
+  },
+  "tra-dao-cam-sa": {
+    "tep": "Lipton Peach Ice Tea",
+    "url": "https://live.staticflickr.com/3589/3421019933_c67db24087.jpg",
+    "trangGoc": "https://www.flickr.com/photos/29071316@N06/3421019933",
+    "giayPhep": "BY 2.0",
+    "tacGia": "sacks08",
+    "nguon": "flickr"
+  },
+  "nuoc-chanh-day": {
+    "tep": "from @exoticsfruits - Passion fruits juice/fruit, guava juice/fruit Mamey, Tamarindo, Dragon fruit red flesh and white flesh. #yellowgreenfarmermarket #exotics #fruits #dulcedelechoza #pitihaya #mamey #passionfruits #dragonFruits #farmersmarket #228#Ye",
+    "url": "https://live.staticflickr.com/2832/34488746945_1260832462_b.jpg",
+    "trangGoc": "https://www.flickr.com/photos/82179181@N04/34488746945",
+    "giayPhep": "BY 2.0",
+    "tacGia": "YellowGreenFarmersMarket",
+    "nguon": "flickr"
+  },
+  "tra-atiso-da-lat": {
+    "tep": "White Tea",
+    "url": "https://live.staticflickr.com/5159/5872068364_fea1a605e2_b.jpg",
+    "trangGoc": "https://www.flickr.com/photos/64277901@N08/5872068364",
+    "giayPhep": "BY 2.0",
+    "tacGia": "Forban300",
+    "nguon": "flickr"
+  },
+  "muc-chien-nuoc-mam": {
+    "tep": "salt and pepper squid",
+    "url": "https://live.staticflickr.com/2167/2369430695_1a5d337b0d_b.jpg",
+    "trangGoc": "https://www.flickr.com/photos/35034346243@N01/2369430695",
+    "giayPhep": "BY-SA 2.0",
+    "tacGia": "stu_spivack",
+    "nguon": "flickr"
+  },
+  "ga-hap-la-sen": {
+    "tep": "Steamed rice with minced chicken and pork dim sum",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/2/23/Steamed_rice_with_minced_chicken_and_pork_dim_sum.jpg",
+    "trangGoc": "https://commons.wikimedia.org/w/index.php?curid=82218228",
+    "giayPhep": "BY-SA 4.0",
+    "tacGia": "Geoffreyrabbit",
+    "nguon": "wikimedia"
+  },
+  "tom-hum-nuong-pho-mai": {
+    "tep": "Grilled Lobster",
+    "url": "https://live.staticflickr.com/8246/8558909573_cd5a71f0fa_b.jpg",
+    "trangGoc": "https://www.flickr.com/photos/34128007@N04/8558909573",
+    "giayPhep": "BY 2.0",
+    "tacGia": "Prayitno / Thank you for (12 millions +) view",
+    "nguon": "flickr"
+  },
+  "banh-chuoi-hap-nuoc-cot-dua": {
+    "tep": "Steamed banana cake",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/b/b4/Steamed_banana_cake.jpg",
+    "trangGoc": "https://commons.wikimedia.org/w/index.php?curid=97358985",
+    "giayPhep": "BY-SA 4.0",
+    "tacGia": "Baoothersks",
+    "nguon": "wikimedia"
+  },
+  "bo-luc-lac-khoai-tay": {
+    "tep": "Bo Luc Lac- the shaking beef",
+    "url": "https://live.staticflickr.com/3600/3322431400_90671f4172_b.jpg",
+    "trangGoc": "https://www.flickr.com/photos/24606258@N05/3322431400",
+    "giayPhep": "BY-SA 2.0",
+    "tacGia": "NickNguyen",
+    "nguon": "flickr"
+  },
+  "dau-hu-chien-sa-ot": {
+    "tep": "Viet stir-fried tofu, lemongrass, chile, green beans",
+    "url": "https://live.staticflickr.com/7216/7306390296_63d54bc718.jpg",
+    "trangGoc": "https://www.flickr.com/photos/41993463@N08/7306390296",
+    "giayPhep": "BY 2.0",
+    "tacGia": "Andrea_Nguyen",
+    "nguon": "flickr"
+  },
+  "nom-hoa-chuoi": {
+    "tep": "03 River Trout with Banana Blossom Salad - Longrain Melbourne",
+    "url": "https://live.staticflickr.com/50/141663065_bc9305b794.jpg",
+    "trangGoc": "https://www.flickr.com/photos/10559879@N00/141663065",
+    "giayPhep": "BY-SA 2.0",
+    "tacGia": "avlxyz",
+    "nguon": "flickr"
+  }
+}

@@ -10,6 +10,7 @@ import vn.vuonsen.fnb.modules.space.SpaceType;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -34,7 +35,8 @@ class PricingServiceTest {
                 10, 800,
                 3, 20, 14,                   // báo trước 3 ngày, tiệc lớn 20 mâm báo trước 14 ngày
                 8);                          // gói từ 8 tiếng là thuê trọn ngày
-        pricingService = new PricingService(properties);
+        // Ngày thường, không có dịp lễ nào
+        pricingService = new PricingService(properties, ngay -> Optional.empty());
 
         sanhVenSong = Space.builder()
                 .name("Sảnh Ven Sông").spaceType(SpaceType.OUTDOOR)
@@ -177,5 +179,32 @@ class PricingServiceTest {
                 .subtract(quote.discountAmount())
                 .add(quote.vatAmount());
         assertThat(quote.totalAmount()).isEqualByComparingTo(expected);
+    }
+    // ---------------- Chỉ thuê không gian, không kèm gói tiệc ----------------
+
+    @Test
+    @DisplayName("Chỉ thuê không gian: không mâm, không tiền ăn, trả đủ phí thuê cộng VAT")
+    void chiThueKhongGianTraDuPhiThue() {
+        var quote = pricingService.calculate(sanhSenVang, null, 150, null);
+
+        assertThat(quote.tableCount()).isZero();
+        assertThat(quote.unitPrice()).isEqualByComparingTo("0");
+        assertThat(quote.foodAmount()).isEqualByComparingTo("0");
+        // Mức giảm phí thuê dựa trên tiền ăn, không có tiền ăn thì trả đủ 12 triệu
+        assertThat(quote.spaceFee()).isEqualByComparingTo("12000000");
+        assertThat(quote.vatAmount()).isEqualByComparingTo("960000");
+        assertThat(quote.totalAmount()).isEqualByComparingTo("12960000");
+        assertThat(quote.depositAmount()).isEqualByComparingTo("3888000");
+    }
+
+    @Test
+    @DisplayName("Chỉ thuê không gian thì không áp mức mâm tối thiểu của sảnh")
+    void chiThueKhongGianKhongApMamToiThieu() {
+        // Sảnh Ven Sông nhận tối thiểu 30 mâm khi có tiệc, thuê riêng thì không áp
+        var quote = pricingService.calculate(sanhVenSong, null, 200, null);
+
+        assertThat(quote.tableCount()).isZero();
+        assertThat(quote.spaceFee()).isEqualByComparingTo("15000000");
+        assertThat(quote.appliedRules()).noneMatch(r -> r.contains("tối thiểu"));
     }
 }

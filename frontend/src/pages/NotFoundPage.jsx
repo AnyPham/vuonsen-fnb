@@ -1,15 +1,18 @@
 import { Link } from 'react-router-dom';
+import { useI18n } from '@/i18n';
 
 export default function NotFoundPage() {
+  const { t } = useI18n();
+
   return (
     <section className="section">
       <div className="wrap state">
-        <h2>Không tìm thấy trang</h2>
+        <h2>{t('notFound.title')}</h2>
         <p className="muted" style={{ marginBottom: 22 }}>
-          Đường dẫn bạn truy cập không tồn tại hoặc đã được chuyển đi.
+          {t('notFound.desc')}
         </p>
         <Link to="/" className="btn btn-dark">
-          Về trang chủ
+          {t('notFound.home')}
         </Link>
       </div>
     </section>

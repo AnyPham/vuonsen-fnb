@@ -26,6 +26,7 @@ export default function GoogleMap({ lat, lng, height = 320, zoom = 16, title }) 
   return (
     <div>
       <iframe
+        data-test="map"
         title={title ? `Vị trí ${title} trên bản đồ` : 'Vị trí Vườn Sen trên bản đồ'}
         width="100%"
         height={height}

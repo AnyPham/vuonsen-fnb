@@ -20,6 +20,7 @@ import vn.vuonsen.fnb.modules.user.User;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 // Đơn đặt tiệc.
 // Các cột tiền lưu lại giá lúc đặt, sau này nhà hàng tăng giá thì đơn cũ không đổi.
@@ -44,8 +45,9 @@ public class Booking extends BaseEntity {
     @JoinColumn(name = "space_id", nullable = false)
     private Space space;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "package_id", nullable = false)
+    // Để trống khi khách chỉ thuê không gian, không kèm gói tiệc
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "package_id")
     private PartyPackage partyPackage;
 
     @Enumerated(EnumType.STRING)
@@ -105,4 +107,34 @@ public class Booking extends BaseEntity {
     @Column(nullable = false, length = 20)
     @Builder.Default
     private BookingStatus status = BookingStatus.PENDING;
+
+    /*
+     * Tiền đặt cọc.
+     *
+     * Chưa nối cổng thanh toán nên khách vẫn chuyển khoản hoặc đóng tiền mặt, quản trị ghi
+     * nhận lại bằng tay. depositAmount là khoản phải đóng, chốt lúc đặt nên đổi tỉ lệ cọc
+     * về sau không làm thay đổi đơn cũ; depositPaid là khoản thật sự đã thu.
+     */
+    @Column(name = "deposit_amount", nullable = false, precision = 15, scale = 2)
+    @Builder.Default
+    private BigDecimal depositAmount = BigDecimal.ZERO;
+
+    @Column(name = "deposit_paid", nullable = false, precision = 15, scale = 2)
+    @Builder.Default
+    private BigDecimal depositPaid = BigDecimal.ZERO;
+
+    @Column(name = "deposit_paid_at")
+    private LocalDateTime depositPaidAt;
+
+    // CASH hoặc TRANSFER
+    @Column(name = "deposit_method", length = 20)
+    private String depositMethod;
+
+    /** Nhãn dùng thay tên gói ở mọi nơi hiển thị, khi đơn chỉ thuê không gian. */
+    public static final String KHONG_KEM_GOI = "Chỉ thuê không gian";
+
+    /** Tên gói để hiển thị. Đơn không kèm gói thì trả nhãn chỉ thuê không gian. */
+    public String tenGoiHienThi() {
+        return partyPackage == null ? KHONG_KEM_GOI : partyPackage.getName();
+    }
 }

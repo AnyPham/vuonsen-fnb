@@ -2,12 +2,15 @@ import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { fetchPackages, selectPackages } from '@/features/catalog/catalogSlice';
-import { formatCurrency } from '@/utils/format';
 import { Loading } from '@/components/common/StateBlock';
+import { useI18n } from '@/i18n';
+import { useDinhDang } from '@/i18n/dinhDang';
 
 export default function PackagesPage() {
   const dispatch = useDispatch();
   const { items, status } = useSelector(selectPackages);
+  const { t, tDb, tDbList } = useI18n();
+  const dd = useDinhDang();
 
   useEffect(() => {
     dispatch(fetchPackages());
@@ -17,8 +20,8 @@ export default function PackagesPage() {
     <section className="section">
       <div className="wrap">
         <div className="section-head center">
-          <div className="eyebrow center">Bảng giá combo</div>
-          <h2>Gói tiệc tính theo mâm 10 khách</h2>
+          <div className="eyebrow center">{t('packages.eyebrow')}</div>
+          <h2>{t('packages.title')}</h2>
         </div>
 
         {status === 'loading' && <Loading />}
@@ -31,10 +34,10 @@ export default function PackagesPage() {
               style={pkg.featured ? { borderColor: 'var(--gold)', borderWidth: 2 } : undefined}
             >
               <div className="card-body">
-                {pkg.featured && <span className="tag tag-CONFIRMED">Được chọn nhiều nhất</span>}
-                <h3 style={{ marginTop: 10 }}>{pkg.name}</h3>
+                {pkg.featured && <span className="tag tag-CONFIRMED">{t('packages.featured')}</span>}
+                <h3 style={{ marginTop: 10 }}>{tDb(pkg, 'name')}</h3>
                 <p className="muted" style={{ fontSize: '0.9rem' }}>
-                  {pkg.tagline}
+                  {tDb(pkg, 'tagline')}
                 </p>
                 <div
                   style={{
@@ -44,14 +47,14 @@ export default function PackagesPage() {
                     margin: '14px 0',
                   }}
                 >
-                  {formatCurrency(pkg.pricePerTable)}
+                  {dd.tien(pkg.pricePerTable)}
                   <span className="muted" style={{ fontSize: '0.9rem' }}>
                     {' '}
-                    / mâm
+                    / {t('packages.perTable')}
                   </span>
                 </div>
                 <ul style={{ paddingLeft: 18, fontSize: '0.92rem' }}>
-                  {pkg.features.map((feature) => (
+                  {tDbList(pkg.features, pkg.featuresEn).map((feature) => (
                     <li key={feature}>{feature}</li>
                   ))}
                 </ul>
@@ -60,7 +63,7 @@ export default function PackagesPage() {
                   className={`btn ${pkg.featured ? 'btn-gold' : 'btn-outline'}`}
                   style={{ marginTop: 18 }}
                 >
-                  Chọn gói này
+                  {t('packages.choose')}
                 </Link>
               </div>
             </div>
@@ -68,7 +71,7 @@ export default function PackagesPage() {
         </div>
 
         <p className="muted center" style={{ marginTop: 28, fontSize: '0.9rem' }}>
-          Tiền ăn đạt mức tối thiểu của từng không gian thì miễn phí tiền thuê · Đặt trước 60 ngày giảm thêm 5%
+          {t('packages.footnote')}
         </p>
       </div>
     </section>
