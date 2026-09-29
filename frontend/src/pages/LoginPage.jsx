@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { clearError, login, selectAuthStatus, selectUser } from '@/features/auth/authSlice';
 import { ErrorBlock } from '@/components/common/StateBlock';
+import { useI18n } from '@/i18n';
 
 export default function LoginPage() {
   const [form, setForm] = useState({ email: '', password: '' });
@@ -12,6 +13,7 @@ export default function LoginPage() {
   const user = useSelector(selectUser);
   const status = useSelector(selectAuthStatus);
   const error = useSelector((state) => state.auth.error);
+  const { t } = useI18n();
 
   useEffect(() => {
     dispatch(clearError());
@@ -32,15 +34,16 @@ export default function LoginPage() {
       <div className="wrap" style={{ maxWidth: 440 }}>
         <div className="card">
           <div className="card-body">
-            <h2 style={{ marginBottom: 20 }}>Đăng nhập</h2>
+            <h2 style={{ marginBottom: 20 }}>{t('login.title')}</h2>
 
             {error && <ErrorBlock message={error} />}
 
-            <form onSubmit={handleSubmit}>
+            <form onSubmit={handleSubmit} data-test="login-form">
               <div className="fgroup">
-                <label htmlFor="email">Email</label>
+                <label htmlFor="email">{t('common.email')}</label>
                 <input
                   id="email"
+                  data-test="email"
                   type="email"
                   required
                   value={form.email}
@@ -49,9 +52,10 @@ export default function LoginPage() {
               </div>
 
               <div className="fgroup">
-                <label htmlFor="password">Mật khẩu</label>
+                <label htmlFor="password">{t('common.password')}</label>
                 <input
                   id="password"
+                  data-test="password"
                   type="password"
                   required
                   value={form.password}
@@ -59,13 +63,23 @@ export default function LoginPage() {
                 />
               </div>
 
-              <button type="submit" className="btn btn-dark" style={{ width: '100%' }} disabled={status === 'loading'}>
-                {status === 'loading' ? 'Đang xử lý…' : 'Đăng nhập'}
+              <button
+                type="submit"
+                data-test="submit-login"
+                className="btn btn-dark"
+                style={{ width: '100%' }}
+                disabled={status === 'loading'}
+              >
+                {status === 'loading' ? t('common.processing') : t('login.submit')}
               </button>
             </form>
 
             <p className="muted center" style={{ marginTop: 18, fontSize: '0.9rem' }}>
-              Chưa có tài khoản? <Link to="/dang-ky">Đăng ký</Link>
+              <Link to="/quen-mat-khau" data-test="link-forgot">{t('login.forgot')}</Link>
+            </p>
+
+            <p className="muted center" style={{ marginTop: 8, fontSize: '0.9rem' }}>
+              {t('login.noAccount')} <Link to="/dang-ky">{t('login.register')}</Link>
             </p>
           </div>
         </div>

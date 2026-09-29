@@ -24,6 +24,10 @@ public interface DishRepository extends JpaRepository<Dish, Long> {
     @Query("SELECT d FROM Dish d JOIN FETCH d.category WHERE d.slug = :slug AND d.available = true")
     Optional<Dish> findBySlugForDetail(@Param("slug") String slug);
 
+    // Món đã từng nằm trong đơn thì không xóa hẳn được, hóa đơn cũ còn phải tra ra tên món
+    @Query("SELECT COUNT(i) FROM DishOrderItem i WHERE i.dish.id = :dishId")
+    long demLanDuocDat(@Param("dishId") Long dishId);
+
     // Trang quản trị lấy cả món đã ngừng bán nên không lọc theo available
     @Query("""
             SELECT d FROM Dish d JOIN FETCH d.category c

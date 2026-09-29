@@ -70,12 +70,19 @@ export default function AssistantWidget() {
     const cau = (cauHoi ?? dangGo).trim();
     if (!cau || dangCho) return;
 
+    // Gửi kèm các lượt hỏi đáp trước để trợ lý hiểu câu hỏi nối tiếp. Bỏ lời chào mặc định
+    // vì đó không phải câu trợ lý đã trả lời khách.
+    const lichSu = tinNhan
+      .filter((tn) => tn !== LOI_CHAO)
+      .slice(-10)
+      .map((tn) => ({ role: tn.vaiTro === 'khach' ? 'user' : 'assistant', content: tn.noiDung }));
+
     setTinNhan((truoc) => [...truoc, { vaiTro: 'khach', noiDung: cau }]);
     setDangGo('');
     setDangCho(true);
 
     try {
-      const kq = await assistantApi.ask(cau);
+      const kq = await assistantApi.ask(cau, lichSu);
       setNguon(kq.source ?? null);
       setTinNhan((truoc) => [...truoc, {
         vaiTro: 'bot',
@@ -105,6 +112,7 @@ export default function AssistantWidget() {
         type="button"
         className="tro-ly-nut"
         aria-label="Mở trợ lý tư vấn"
+        data-test="assistant-open"
         onClick={() => setMoRong(true)}
       >
         💬
@@ -113,7 +121,7 @@ export default function AssistantWidget() {
   }
 
   return (
-    <div className="tro-ly" role="dialog" aria-label="Trợ lý tư vấn Vườn Sen">
+    <div className="tro-ly" role="dialog" aria-label="Trợ lý tư vấn Vườn Sen" data-test="assistant">
       <div className="tro-ly-dau">
         <div>
           <strong>Trợ lý Vườn Sen</strong>
@@ -121,14 +129,14 @@ export default function AssistantWidget() {
             {NHAN_NGUON[nguon] || 'Trả lời dựa trên dữ liệu của nhà hàng'}
           </div>
         </div>
-        <button type="button" aria-label="Đóng" onClick={() => setMoRong(false)}>
+        <button type="button" aria-label="Đóng" onClick={() => setMoRong(false)} data-test="assistant-close">
           ×
         </button>
       </div>
 
       <div className="tro-ly-than">
         {tinNhan.map((tn, i) => (
-          <div key={i} className={`tro-ly-tin ${tn.vaiTro}`}>
+          <div key={i} className={`tro-ly-tin ${tn.vaiTro}`} data-test={`assistant-msg-${tn.vaiTro}`}>
             <div className="bong">{tn.noiDung}</div>
 
             {tn.link && (
@@ -145,7 +153,7 @@ export default function AssistantWidget() {
             {tn.goiY?.length > 0 && (
               <div className="tro-ly-goi-y">
                 {tn.goiY.map((g) => (
-                  <button key={g} type="button" onClick={() => hoi(g)} disabled={dangCho}>
+                  <button key={g} type="button" onClick={() => hoi(g)} disabled={dangCho} data-test="assistant-suggestion">
                     {g}
                   </button>
                 ))}
@@ -177,8 +185,9 @@ export default function AssistantWidget() {
           placeholder="Nhập câu hỏi của bạn…"
           maxLength={500}
           aria-label="Câu hỏi"
+          data-test="assistant-input"
         />
-        <button type="submit" className="btn btn-dark btn-sm" disabled={dangCho || !dangGo.trim()}>
+        <button type="submit" className="btn btn-dark btn-sm" disabled={dangCho || !dangGo.trim()} data-test="assistant-send">
           Gửi
         </button>
       </form>

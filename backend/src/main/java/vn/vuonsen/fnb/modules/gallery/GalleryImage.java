@@ -38,6 +38,9 @@ public class GalleryImage {
     @Column(length = 255)
     private String caption;
 
+    @Column(name = "caption_en", length = 255)
+    private String captionEn;
+
     @Column(length = 60)
     private String category;
 

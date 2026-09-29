@@ -15,6 +15,8 @@ import vn.vuonsen.fnb.modules.dishorder.dto.DishOrderResponse;
 import vn.vuonsen.fnb.modules.menu.Dish;
 import vn.vuonsen.fnb.modules.menu.DishRepository;
 import vn.vuonsen.fnb.modules.user.User;
+import vn.vuonsen.fnb.config.props.MailProperties;
+import vn.vuonsen.fnb.modules.notification.EmailService;
 import vn.vuonsen.fnb.modules.user.UserRepository;
 
 import java.math.BigDecimal;
@@ -44,12 +46,14 @@ public class DishOrderService {
     private final DishOrderPricing pricing;
     private final DishOrderProperties props;
     private final UserRepository userRepository;
+    private final EmailService emailService;
+    private final MailProperties mailProperties;
 
     // ---------------- Tạm tính ----------------
 
     public DishOrderQuoteResponse quote(DishOrderQuoteRequest request) {
         List<DongMon> dong = dungDongMon(request.items());
-        return dungBangTamTinh(dong, request.fulfillmentType());
+        return dungBangTamTinh(dong, request.fulfillmentType(), request.serveAt());
     }
 
     // ---------------- Tạo đơn ----------------
@@ -65,7 +69,8 @@ public class DishOrderService {
         kiemTraThoiGian(request.serveAt(), dong);
 
         BigDecimal phiGiao = pricing.phiGiao(request.fulfillmentType(), tienMon);
-        BigDecimal thue = pricing.thue(tienMon);
+        DishOrderPricing.GiamGia giamGia = pricing.giamGiaNgayLe(tienMon, request.serveAt());
+        BigDecimal thue = pricing.thue(tienMon.subtract(giamGia.soTien()));
 
         DishOrder order = DishOrder.builder()
                 .code(nextOrderCode())
@@ -81,9 +86,10 @@ public class DishOrderService {
                 .serveAt(request.serveAt())
                 .note(request.note() == null || request.note().isBlank() ? null : request.note().trim())
                 .subtotal(tienMon)
+                .discountAmount(giamGia.soTien())
                 .deliveryFee(phiGiao)
                 .vatAmount(thue)
-                .total(pricing.tongCong(tienMon, phiGiao, thue))
+                .total(pricing.tongCong(tienMon, giamGia.soTien(), phiGiao, thue))
                 .status(DishOrderStatus.PENDING)
                 .user(user)
                 .build();
@@ -98,7 +104,41 @@ public class DishOrderService {
                     .build());
         }
 
-        return DishOrderResponse.from(orderRepository.save(order));
+        DishOrder daLuu = orderRepository.save(order);
+        guiThuXacNhan(daLuu);
+        return DishOrderResponse.from(daLuu);
+    }
+
+    /*
+     * Thư xác nhận đơn đặt món.
+     *
+     * Cũng như đơn đặt tiệc, khách không để lại email thì bỏ qua. Thư nhắc lại giờ nhận món
+     * vì đó là thứ khách hay quên nhất.
+     */
+    private void guiThuXacNhan(DishOrder o) {
+        if (o.getCustomerEmail() == null || o.getCustomerEmail().isBlank()) {
+            return;
+        }
+        emailService.gui(o.getCustomerEmail(),
+                "Vườn Sen đã nhận đơn đặt món " + o.getCode(),
+                """
+                Chào %s,
+
+                Vườn Sen đã nhận đơn đặt món của bạn.
+
+                Mã đơn: %s
+                Hình thức: %s
+                Thời điểm nhận: %s
+                Tổng tiền: %s đồng
+
+                Tra cứu đơn tại: %s/tra-cuu-mon?ma=%s
+
+                Vườn Sen
+                """.formatted(
+                        o.getCustomerName(), o.getCode(), o.getFulfillmentType().getLabel(),
+                        o.getServeAt(), o.getTotal().toPlainString(),
+                        mailProperties.baseUrl(), o.getCode()),
+                "XAC_NHAN_DON");
     }
 
     // ---------------- Tra cứu ----------------
@@ -176,10 +216,12 @@ public class DishOrderService {
                 .reduce(BigDecimal.ZERO, BigDecimal::add));
     }
 
-    private DishOrderQuoteResponse dungBangTamTinh(List<DongMon> dong, FulfillmentType hinhThuc) {
+    private DishOrderQuoteResponse dungBangTamTinh(List<DongMon> dong, FulfillmentType hinhThuc,
+                                                   LocalDateTime nhanLuc) {
         BigDecimal tienMon = tongTienMon(dong);
         BigDecimal phiGiao = pricing.phiGiao(hinhThuc, tienMon);
-        BigDecimal thue = pricing.thue(tienMon);
+        DishOrderPricing.GiamGia giamGia = pricing.giamGiaNgayLe(tienMon, nhanLuc);
+        BigDecimal thue = pricing.thue(tienMon.subtract(giamGia.soTien()));
 
         return new DishOrderQuoteResponse(
                 dong.stream()
@@ -188,11 +230,16 @@ public class DishOrderService {
                                 d.soLuong(), d.thanhTien()))
                         .toList(),
                 tienMon,
+                giamGia.soTien(),
+                giamGia.ghiChu(),
+                giamGia.ghiChuEn(),
                 phiGiao,
                 pricing.giaiThichPhiGiao(hinhThuc, tienMon),
+                pricing.giaiThichPhiGiaoEn(hinhThuc, tienMon),
                 thue,
-                pricing.tongCong(tienMon, phiGiao, thue),
-                ghiChuThoiGian(dong));
+                pricing.tongCong(tienMon, giamGia.soTien(), phiGiao, thue),
+                ghiChuThoiGian(dong),
+                ghiChuThoiGianEn(dong));
     }
 
     // ---------------- Kiểm tra nghiệp vụ ----------------
@@ -264,6 +311,12 @@ public class DishOrderService {
         int phut = phutLauNhat(dong);
         LocalDateTime somNhat = LocalDateTime.now().plusMinutes(phut);
         return "Sớm nhất nhận được lúc %s.".formatted(somNhat.format(GIO_PHUT));
+    }
+
+    private String ghiChuThoiGianEn(List<DongMon> dong) {
+        int phut = phutLauNhat(dong);
+        LocalDateTime somNhat = LocalDateTime.now().plusMinutes(phut);
+        return "The earliest we can have this ready is %s.".formatted(somNhat.format(GIO_PHUT));
     }
 
     // ---------------- Tiện ích ----------------

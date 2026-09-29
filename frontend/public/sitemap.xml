@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Danh sách trang công khai gửi cho công cụ tìm kiếm.
+
+  Chỉ liệt kê trang tĩnh. Trang chi tiết không gian và chi tiết món sinh theo dữ liệu nên
+  không ghi cứng ở đây, tránh cảnh xóa một món mà sitemap vẫn trỏ tới đường dẫn chết.
+-->
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url><loc>https://vuonsen.vn/</loc><changefreq>weekly</changefreq><priority>1.0</priority></url>
+  <url><loc>https://vuonsen.vn/khong-gian</loc><changefreq>weekly</changefreq><priority>0.9</priority></url>
+  <url><loc>https://vuonsen.vn/thuc-don</loc><changefreq>weekly</changefreq><priority>0.9</priority></url>
+  <url><loc>https://vuonsen.vn/goi-tiec</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://vuonsen.vn/dat-tiec</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://vuonsen.vn/dat-mon</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://vuonsen.vn/thu-vien</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://vuonsen.vn/danh-gia</loc><changefreq>weekly</changefreq><priority>0.6</priority></url>
+</urlset>

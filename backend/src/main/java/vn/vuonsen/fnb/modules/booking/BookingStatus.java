@@ -5,19 +5,25 @@ import java.util.Set;
 
 // Trạng thái đơn: chờ xác nhận -> đã xác nhận -> hoàn thành (hoặc bị hủy)
 public enum BookingStatus {
-    PENDING("Chờ xác nhận"),
-    CONFIRMED("Đã xác nhận"),
-    COMPLETED("Đã hoàn thành"),
-    CANCELLED("Đã hủy");
+    PENDING("Chờ xác nhận", "Awaiting confirmation"),
+    CONFIRMED("Đã xác nhận", "Confirmed"),
+    COMPLETED("Đã hoàn thành", "Completed"),
+    CANCELLED("Đã hủy", "Cancelled");
 
     private final String label;
+    private final String labelEn;
 
-    BookingStatus(String label) {
+    BookingStatus(String label, String labelEn) {
         this.label = label;
+        this.labelEn = labelEn;
     }
 
     public String getLabel() {
         return label;
+    }
+
+    public String getLabelEn() {
+        return labelEn;
     }
 
     // Từ trạng thái hiện tại được phép chuyển sang những trạng thái nào

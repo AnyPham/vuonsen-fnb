@@ -8,6 +8,6 @@ public class ResourceNotFoundException extends RuntimeException {
     }
 
     public static ResourceNotFoundException of(String resource, Object id) {
-        return new ResourceNotFoundException("Khong tim thay %s voi dinh danh '%s'".formatted(resource, id));
+        return new ResourceNotFoundException("Không tìm thấy %s với định danh '%s'".formatted(resource, id));
     }
 }

@@ -35,6 +35,20 @@
       <artifactId>spring-boot-starter-validation</artifactId>
     </dependency>
 
+    <!-- Gửi email xác nhận đơn và email đặt lại mật khẩu. Không khai báo máy chủ thư thì
+         hệ thống tự chuyển sang ghi nội dung thư ra nhật ký, vẫn chạy được mà không cần tài khoản. -->
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-mail</artifactId>
+    </dependency>
+
+    <!-- Trợ lý tư vấn gọi Claude qua SDK Java chính thức của Anthropic -->
+    <dependency>
+      <groupId>com.anthropic</groupId>
+      <artifactId>anthropic-java</artifactId>
+      <version>2.34.0</version>
+    </dependency>
+
     <!-- Persistence -->
     <dependency>
       <groupId>org.springframework.boot</groupId>

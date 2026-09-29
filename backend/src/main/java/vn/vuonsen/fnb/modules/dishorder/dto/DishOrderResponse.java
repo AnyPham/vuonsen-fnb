@@ -13,6 +13,7 @@ public record DishOrderResponse(
         String code,
         String fulfillmentType,
         String fulfillmentLabel,
+        String fulfillmentLabelEn,
 
         String customerName,
         String customerPhone,
@@ -25,15 +26,23 @@ public record DishOrderResponse(
 
         List<LineResponse> items,
         BigDecimal subtotal,
+        BigDecimal discountAmount,
         BigDecimal deliveryFee,
         BigDecimal vatAmount,
         BigDecimal total,
 
         String status,
         String statusLabel,
+        String statusLabelEn,
         LocalDateTime createdAt
 ) {
 
+    /*
+     * Tên món trên từng dòng đơn cố ý giữ nguyên tiếng Việt.
+     *
+     * Đây là bản sao chụp lại lúc khách đặt, không phải tham chiếu tới bảng món. Hóa đơn
+     * phải giữ đúng tên và giá tại thời điểm đặt, kể cả sau này nhà hàng đổi tên món.
+     */
     public record LineResponse(String dishName, BigDecimal unitPrice,
                                Integer quantity, BigDecimal lineTotal) {
         static LineResponse from(DishOrderItem i) {
@@ -45,12 +54,12 @@ public record DishOrderResponse(
     public static DishOrderResponse from(DishOrder o) {
         return new DishOrderResponse(
                 o.getId(), o.getCode(),
-                o.getFulfillmentType().name(), o.getFulfillmentType().getLabel(),
+                o.getFulfillmentType().name(), o.getFulfillmentType().getLabel(), o.getFulfillmentType().getLabelEn(),
                 o.getCustomerName(), o.getCustomerPhone(), o.getCustomerEmail(),
                 o.getDeliveryAddress(), o.getGuestCount(),
                 o.getServeAt(), o.getNote(),
                 o.getItems().stream().map(LineResponse::from).toList(),
-                o.getSubtotal(), o.getDeliveryFee(), o.getVatAmount(), o.getTotal(),
-                o.getStatus().name(), o.getStatus().getLabel(), o.getCreatedAt());
+                o.getSubtotal(), o.getDiscountAmount(), o.getDeliveryFee(), o.getVatAmount(), o.getTotal(),
+                o.getStatus().name(), o.getStatus().getLabel(), o.getStatus().getLabelEn(), o.getCreatedAt());
     }
 }

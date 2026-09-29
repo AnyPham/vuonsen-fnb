@@ -37,6 +37,9 @@ public class Dish extends BaseEntity {
     @Column(nullable = false, length = 160)
     private String name;
 
+    @Column(name = "name_en", length = 150)
+    private String nameEn;
+
     // Dùng làm đường dẫn trang chi tiết món, ví dụ /thuc-don/ga-ta-hap-la-chanh
     @Column(nullable = false, length = 180, unique = true)
     private String slug;
@@ -44,12 +47,18 @@ public class Dish extends BaseEntity {
     @Column(length = 500)
     private String description;
 
+    @Column(name = "description_en", columnDefinition = "TEXT")
+    private String descriptionEn;
+
     // Để null với món tính giá linh hoạt, khi đó hiện priceNote (ví dụ "Theo cân")
     @Column(precision = 15, scale = 2)
     private BigDecimal price;
 
     @Column(name = "price_note", length = 60)
     private String priceNote;
+
+    @Column(name = "price_note_en", length = 150)
+    private String priceNoteEn;
 
     @Column(name = "image_url", length = 500)
     private String imageUrl;
@@ -71,8 +80,14 @@ public class Dish extends BaseEntity {
     @Column(length = 1000)
     private String ingredients;
 
+    @Column(name = "ingredients_en", columnDefinition = "TEXT")
+    private String ingredientsEn;
+
     @Column(length = 1500)
     private String preparation;
+
+    @Column(name = "preparation_en", columnDefinition = "TEXT")
+    private String preparationEn;
 
     /*
      * Những điều khách nên biết trước khi đặt: món nào phải báo trước, món nào cay,
@@ -84,9 +99,15 @@ public class Dish extends BaseEntity {
     @Column(name = "order_note", length = 800)
     private String orderNote;
 
+    @Column(name = "order_note_en", columnDefinition = "TEXT")
+    private String orderNoteEn;
+
     // Khẩu phần, ví dụ "Phần 3-4 người" hoặc "Nồi 4-6 người"
     @Column(name = "portion_desc", length = 120)
     private String portionDesc;
+
+    @Column(name = "portion_desc_en", length = 150)
+    private String portionDescEn;
 
     // Thời gian bếp cần để làm xong, dùng để cảnh báo món đặt sát giờ
     @Column(name = "prep_minutes")

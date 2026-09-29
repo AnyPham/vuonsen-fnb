@@ -54,4 +54,11 @@ public class DishAdminController {
         menuAdminService.deactivate(id);
         return ResponseEntity.noContent().build();
     }
+
+    @DeleteMapping("/{id}/vinh-vien")
+    @Operation(summary = "Xóa hẳn một món ăn chưa từng được đặt")
+    public ResponseEntity<Void> deletePermanently(@PathVariable Long id) {
+        menuAdminService.deletePermanently(id);
+        return ResponseEntity.noContent().build();
+    }
 }

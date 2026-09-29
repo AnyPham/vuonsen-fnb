@@ -35,6 +35,7 @@ const emptyForm = {
   guestCount: '',
   spaceId: null,
   packageId: null,
+  noPackage: false, // true khi khách chọn chỉ thuê không gian, không kèm gói tiệc
   customerName: '',
   customerPhone: '',
   customerEmail: '',

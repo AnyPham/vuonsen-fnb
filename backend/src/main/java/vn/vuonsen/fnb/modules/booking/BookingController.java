@@ -6,6 +6,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -15,13 +16,17 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import vn.vuonsen.fnb.common.concurrency.ThuLaiKhiTrungMa;
 import vn.vuonsen.fnb.common.dto.PageResponse;
 import vn.vuonsen.fnb.config.props.BookingProperties;
 import vn.vuonsen.fnb.modules.booking.dto.BookingRequest;
 import vn.vuonsen.fnb.modules.booking.dto.BookingResponse;
 import vn.vuonsen.fnb.modules.booking.dto.QuoteRequest;
 import vn.vuonsen.fnb.modules.booking.dto.QuoteResponse;
+import vn.vuonsen.fnb.modules.booking.dto.TinhTrangTrongResponse;
 import vn.vuonsen.fnb.security.AppUserDetails;
+
+import java.time.LocalDate;
 
 import java.util.Arrays;
 import java.util.List;
@@ -36,6 +41,7 @@ public class BookingController {
 
     private final BookingService bookingService;
     private final BookingProperties properties;
+    private final ThuLaiKhiTrungMa thuLai;
 
     @PostMapping("/quote")
     @Operation(summary = "Báo giá tạm tính, không tạo đơn")
@@ -48,7 +54,17 @@ public class BookingController {
     public ResponseEntity<BookingResponse> create(@Valid @RequestBody BookingRequest request,
                                                   @AuthenticationPrincipal AppUserDetails principal) {
         Long userId = principal == null ? null : principal.getUserId();
-        return ResponseEntity.status(HttpStatus.CREATED).body(bookingService.create(request, userId));
+        // Hai khách gửi đơn cùng lúc có thể cùng tính ra một mã đơn. Database chặn đơn thứ
+        // hai; thử lại trong giao dịch mới thì đơn đó nhận mã kế tiếp.
+        BookingResponse don = thuLai.chay("uk_booking_code", () -> bookingService.create(request, userId));
+        return ResponseEntity.status(HttpStatus.CREATED).body(don);
+    }
+
+    @GetMapping("/availability")
+    @Operation(summary = "Buổi đã kín của từng không gian trong một ngày")
+    public ResponseEntity<TinhTrangTrongResponse> tinhTrangTrong(
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
+        return ResponseEntity.ok(bookingService.tinhTrangTrong(date));
     }
 
     @GetMapping("/track/{code}")
@@ -72,11 +88,12 @@ public class BookingController {
     public ResponseEntity<Map<String, Object>> options() {
         return ResponseEntity.ok(Map.of(
                 "eventTypes", Arrays.stream(EventType.values())
-                        .map(e -> Map.of("value", e.name(), "label", e.getLabel())).toList(),
+                        .map(e -> Map.of("value", e.name(), "label", e.getLabel(), "labelEn", e.getLabelEn())).toList(),
                 "timeSlots", Arrays.stream(TimeSlot.values())
                         .map(t -> Map.of(
                                 "value", t.name(),
                                 "label", t.getLabel(),
+                                "labelEn", t.getLabelEn(),
                                 "durationHours", t.getDurationHours())).toList(),
                 // Gửi kèm quy định để giao diện chặn sớm, khỏi để khách điền hết
                 // ba bước rồi mới báo lỗi ở bước cuối

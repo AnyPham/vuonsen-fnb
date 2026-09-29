@@ -1,11 +1,15 @@
 package vn.vuonsen.fnb.modules.assistant;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 import vn.vuonsen.fnb.config.props.AssistantProperties;
 import vn.vuonsen.fnb.modules.assistant.dto.AnswerResponse;
 import vn.vuonsen.fnb.modules.assistant.llm.LlmClient;
+import vn.vuonsen.fnb.modules.assistant.llm.LuotHoiThoai;
 
+import java.util.List;
 import java.util.Optional;
 
 /*
@@ -41,13 +45,30 @@ public class LlmAssistant {
         return cauHinh.dungDuoc();
     }
 
-    public Optional<AnswerResponse> traLoi(String cauHoi, AnswerResponse duPhong) {
+    /*
+     * Báo trạng thái trợ lý ngay khi website khởi động xong, nhìn nhật ký là biết đang trả lời
+     * bằng mô hình ngôn ngữ hay bằng cơ chế dự phòng, khỏi phải hỏi thử mới biết.
+     * Không ghi khóa API ra nhật ký.
+     */
+    @EventListener(ApplicationReadyEvent.class)
+    public void baoTrangThaiKhiKhoiDong() {
+        if (batDuoc()) {
+            log.info("Trợ lý tư vấn: đã bật AI, câu hỏi được trả lời bằng {}", client.tenDichVu());
+        } else if (!cauHinh.enabled()) {
+            log.info("Trợ lý tư vấn: AI đang tắt trong cấu hình, trả lời bằng cơ chế dự phòng");
+        } else {
+            log.info("Trợ lý tư vấn: chưa có khóa API nên trả lời bằng cơ chế dự phòng. "
+                    + "Dán khóa vào backend/tro-ly-ai.properties rồi khởi động lại để bật AI");
+        }
+    }
+
+    public Optional<AnswerResponse> traLoi(String cauHoi, List<LuotHoiThoai> lichSu, AnswerResponse duPhong) {
         if (!batDuoc()) {
             return Optional.empty();
         }
 
         try {
-            String loiVan = client.hoi(contextBuilder.dungChiDan(), cauHoi);
+            String loiVan = client.hoi(contextBuilder.dungChiDan(), lichSu, cauHoi);
             if (loiVan == null || loiVan.isBlank()) {
                 log.warn("Trợ lý: {} trả về câu rỗng, chuyển sang cơ chế dự phòng", client.tenDichVu());
                 return Optional.empty();

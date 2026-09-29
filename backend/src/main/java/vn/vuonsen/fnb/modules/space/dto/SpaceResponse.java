@@ -1,5 +1,6 @@
 package vn.vuonsen.fnb.modules.space.dto;
 
+import vn.vuonsen.fnb.common.i18n.NoiDungSongNgu;
 import vn.vuonsen.fnb.modules.space.Space;
 
 import java.math.BigDecimal;
@@ -9,11 +10,15 @@ public record SpaceResponse(
         Long id,
         String code,
         String name,
+        String nameEn,
         String slug,
         String type,
         String typeLabel,
+        String typeLabelEn,
         String shortDesc,
+        String shortDescEn,
         String description,
+        String descriptionEn,
         Integer capacityMin,
         Integer capacityMax,
         BigDecimal rentalFee,
@@ -23,6 +28,7 @@ public record SpaceResponse(
         BigDecimal latitude,
         BigDecimal longitude,
         List<String> amenities,
+        List<String> amenitiesEn,
         // Thư viện ảnh, chỉ trả về ở trang chi tiết
         List<ImageResponse> images
 ) {
@@ -50,13 +56,15 @@ public record SpaceResponse(
 
     private static SpaceResponse dung(Space s, List<ImageResponse> anh) {
         return new SpaceResponse(
-                s.getId(), s.getCode(), s.getName(), s.getSlug(),
-                s.getSpaceType().name(), s.getSpaceType().getLabel(),
-                s.getShortDesc(), s.getDescription(),
+                s.getId(), s.getCode(), s.getName(), s.getNameEn(), s.getSlug(),
+                s.getSpaceType().name(), s.getSpaceType().getLabel(), s.getSpaceType().getLabelEn(),
+                s.getShortDesc(), s.getShortDescEn(),
+                s.getDescription(), s.getDescriptionEn(),
                 s.getCapacityMin(), s.getCapacityMax(),
                 s.getRentalFee(), s.getFeeUnit(), s.getUnitCapacity(), s.getThumbnailUrl(),
                 s.getLatitude(), s.getLongitude(),
                 List.copyOf(s.getAmenities()),
+                NoiDungSongNgu.tienIch(s.getAmenities()),
                 anh);
     }
 }

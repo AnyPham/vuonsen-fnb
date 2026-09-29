@@ -10,19 +10,25 @@ import java.util.Set;
  * khác nhau cho hai loại đơn.
  */
 public enum DishOrderStatus {
-    PENDING("Chờ xác nhận"),
-    CONFIRMED("Đã xác nhận"),
-    COMPLETED("Đã hoàn thành"),
-    CANCELLED("Đã hủy");
+    PENDING("Chờ xác nhận", "Awaiting confirmation"),
+    CONFIRMED("Đã xác nhận", "Confirmed"),
+    COMPLETED("Đã hoàn thành", "Completed"),
+    CANCELLED("Đã hủy", "Cancelled");
 
     private final String label;
+    private final String labelEn;
 
-    DishOrderStatus(String label) {
+    DishOrderStatus(String label, String labelEn) {
         this.label = label;
+        this.labelEn = labelEn;
     }
 
     public String getLabel() {
         return label;
+    }
+
+    public String getLabelEn() {
+        return labelEn;
     }
 
     public Set<DishOrderStatus> allowedTransitions() {

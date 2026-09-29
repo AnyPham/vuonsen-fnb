@@ -1,6 +1,8 @@
 # --- Bien moi truong / bi mat ---
 .env
 *.env.local
+# Khoa API cua tro ly AI, doc tu dong khi khoi dong backend
+tro-ly-ai.properties
 
 # --- Java / Maven ---
 target/
@@ -43,6 +45,19 @@ doc/NhatKyCongViec_PhamTranTuanAnh.docx
 doc/21130004_PhamTranTuanAnh_KeHoachVaTienDo.docx
 doc/DANH-SACH-ANH.md
 doc/NGUON-ANH-BO-SUNG.md
+doc/TIEN-DO.md
+doc/PhamVi_DoiTuong_YeuCau_KiemThu.docx
+
+# Tai lieu nghien cuu cua chang kiem thu
+doc/TongQuan_KiemThuPhanMem.docx
+doc/NghienCuu_SeleniumWebDriver.docx
+doc/NghienCuu_PageObjectModel.docx
+doc/DacTa_TestCase.docx
+doc/BaoCao_KiemThuTuDong.docx
+doc/BaoCao_HoanThienWebsite_17-09-2026.docx
+doc/NghienCuu_Git_GitHubActions.docx
+doc/Testing Tóm tắt.docx
+doc/Jira_KTVS_danh-sach-cong-viec.csv
 
 # Anh goc tai ve, da dua len Cloudinary nen khong day vao kho ma nguon
 anh-tai-ve/

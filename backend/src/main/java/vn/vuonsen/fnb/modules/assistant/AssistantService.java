@@ -6,6 +6,8 @@ import org.springframework.transaction.annotation.Transactional;
 import vn.vuonsen.fnb.config.props.BookingProperties;
 import vn.vuonsen.fnb.config.props.ContactProperties;
 import vn.vuonsen.fnb.modules.assistant.dto.AnswerResponse;
+import vn.vuonsen.fnb.modules.holiday.HolidayDiscount;
+import vn.vuonsen.fnb.modules.holiday.HolidayDiscountService;
 import vn.vuonsen.fnb.modules.menu.Dish;
 import vn.vuonsen.fnb.modules.menu.DishCategoryRepository;
 import vn.vuonsen.fnb.modules.menu.DishRepository;
@@ -15,6 +17,8 @@ import vn.vuonsen.fnb.modules.space.Space;
 import vn.vuonsen.fnb.modules.space.SpaceRepository;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 /*
@@ -34,6 +38,8 @@ import java.util.List;
 public class AssistantService {
 
     private static final int SO_MON_GOI_Y = 3;
+    private static final int SO_DIP_LE_GOI_Y = 3;
+    private static final DateTimeFormatter NGAY = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
     private final IntentDetector detector;
     private final SpaceRepository spaceRepository;
@@ -42,6 +48,7 @@ public class AssistantService {
     private final DishCategoryRepository categoryRepository;
     private final BookingProperties booking;
     private final ContactProperties contact;
+    private final HolidayDiscountService holidayDiscounts;
 
     public AnswerResponse answer(String cauHoi) {
         Intent intent = detector.detect(cauHoi);
@@ -190,17 +197,35 @@ public class AssistantService {
                 "/dat-tiec", "Đặt tiệc");
     }
 
+    // "01/01/2027" cho dịp một ngày, "06/02/2027 - 08/02/2027" cho dịp nhiều ngày
+    private static String khoangNgay(HolidayDiscount dip) {
+        return dip.getStartDate().equals(dip.getEndDate())
+                ? dip.getStartDate().format(NGAY)
+                : dip.getStartDate().format(NGAY) + " - " + dip.getEndDate().format(NGAY);
+    }
+
     private AnswerResponse traLoiKhuyenMai() {
         String giam = booking.earlyBirdRate().multiply(BigDecimal.valueOf(100))
                 .stripTrailingZeros().toPlainString();
-        String s = """
-                Vườn Sen có hai mức ưu đãi:
+        StringBuilder s = new StringBuilder("""
+                Vườn Sen có ba mức ưu đãi:
 
                 • Đặt sớm: đặt trước từ %d ngày được giảm %s%% trên tiền ăn và phí thuê.
+                • Dịp lễ: tiệc tổ chức hoặc món nhận đúng dịp lễ được giảm theo mức của dịp đó. Ưu đãi dịp lễ không cộng dồn với ưu đãi đặt sớm, hệ thống tự lấy mức cao hơn.
                 • Miễn phí thuê không gian: tiền ăn đạt mức tối thiểu của sảnh thì miễn hoàn toàn phí thuê. Chưa đạt mức thì vẫn được giảm theo tỉ lệ chứ không mất trọn phí thuê."""
-                .formatted(booking.earlyBirdDays(), giam);
+                .formatted(booking.earlyBirdDays(), giam));
 
-        return new AnswerResponse(s, Intent.KHUYEN_MAI,
+        // Liệt kê dịp lễ lấy từ trang quản trị, quản trị thêm dịp mới là trợ lý báo được ngay
+        List<HolidayDiscount> sapToi = holidayDiscounts.sapToi(LocalDate.now(), SO_DIP_LE_GOI_Y);
+        if (!sapToi.isEmpty()) {
+            s.append("\n\nCác dịp lễ sắp tới:");
+            for (HolidayDiscount dip : sapToi) {
+                s.append("\n• %s (%s): giảm %s%%".formatted(dip.getName(), khoangNgay(dip),
+                        dip.getDiscountRate().multiply(BigDecimal.valueOf(100)).stripTrailingZeros().toPlainString()));
+            }
+        }
+
+        return new AnswerResponse(s.toString(), Intent.KHUYEN_MAI,
                 List.of("Chi phí một tiệc bao nhiêu?", "Đặt cọc bao nhiêu?", "Đặt tiệc như thế nào?"),
                 "/dat-tiec", "Xem báo giá");
     }

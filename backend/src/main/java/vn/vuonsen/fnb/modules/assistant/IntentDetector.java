@@ -33,7 +33,7 @@ public class IntentDetector {
                     "dat coc", "tien coc", "coc bao nhieu", "phai coc", "giu cho")),
 
             Map.entry(Intent.KHUYEN_MAI, List.of(
-                    "khuyen mai", "giam gia", "uu dai", "dat som", "mien phi thue")),
+                    "khuyen mai", "giam gia", "uu dai", "dat som", "mien phi thue", "dip le", "ngay le")),
 
             Map.entry(Intent.CHI_PHI, List.of(
                     "bao nhieu tien", "gia bao nhieu", "chi phi", "bao nhieu mot mam",

@@ -79,6 +79,11 @@ public class DishOrder extends BaseEntity {
     @Column(nullable = false, precision = 15, scale = 2)
     private BigDecimal subtotal;
 
+    // Tiền giảm dịp lễ trên tiền món
+    @Column(name = "discount_amount", nullable = false, precision = 15, scale = 2)
+    @Builder.Default
+    private BigDecimal discountAmount = BigDecimal.ZERO;
+
     @Column(name = "delivery_fee", nullable = false, precision = 15, scale = 2)
     @Builder.Default
     private BigDecimal deliveryFee = BigDecimal.ZERO;
@@ -93,6 +98,20 @@ public class DishOrder extends BaseEntity {
     @Column(nullable = false, length = 20)
     @Builder.Default
     private DishOrderStatus status = DishOrderStatus.PENDING;
+
+    /*
+     * Tiền đã thu của đơn này và cách khách chọn trả.
+     *
+     * Đơn trả khi nhận thì lúc đặt chưa thu đồng nào, tới lúc giao mới thu; đơn chuyển khoản
+     * thì thu trước. Giữ lại đã thu bao nhiêu để màn hình đơn trả lời được ngay, còn chi tiết
+     * từng lần thu nằm ở sổ thanh toán.
+     */
+    @Column(name = "paid_amount", nullable = false, precision = 15, scale = 2)
+    @Builder.Default
+    private BigDecimal paidAmount = BigDecimal.ZERO;
+
+    @Column(name = "payment_method", length = 20)
+    private String paymentMethod;
 
     // Khách không cần tài khoản vẫn đặt được, nên trường này để trống được
     @ManyToOne(fetch = FetchType.LAZY)

@@ -2,12 +2,14 @@ import { useEffect, useState } from 'react';
 import { galleryApi } from '@/api/endpoints';
 import { Empty, Loading } from '@/components/common/StateBlock';
 import Thumb from '@/components/common/Thumb';
+import { useI18n } from '@/i18n';
 
 // Thư viện ảnh dạng lưới, bấm vào ảnh để xem lớn
 export default function GalleryPage() {
   const [images, setImages] = useState([]);
   const [loading, setLoading] = useState(true);
   const [current, setCurrent] = useState(null); // vị trí ảnh đang mở
+  const { t, tDb } = useI18n();
 
   useEffect(() => {
     galleryApi
@@ -37,13 +39,13 @@ export default function GalleryPage() {
     <section className="section">
       <div className="wrap">
         <div className="section-head center">
-          <div className="eyebrow center">Thư viện ảnh</div>
-          <h2>Những buổi tiệc đã diễn ra tại Vườn Sen</h2>
-          <p className="muted">Nhấn vào ảnh để xem lớn.</p>
+          <div className="eyebrow center">{t('gallery.eyebrow')}</div>
+          <h2>{t('gallery.title')}</h2>
+          <p className="muted">{t('gallery.hint')}</p>
         </div>
 
         {loading && <Loading />}
-        {!loading && images.length === 0 && <Empty label="Chưa có ảnh nào." />}
+        {!loading && images.length === 0 && <Empty label={t('gallery.empty')} />}
 
         <div className="grid grid-3">
           {images.map((image, index) => (
@@ -58,8 +60,8 @@ export default function GalleryPage() {
                 url={image.url}
                 variant={index % 3 === 1 ? 'v2' : index % 3 === 2 ? 'v3' : ''}
                 icon="🖼️"
-                label={image.caption}
-                alt={image.caption}
+                label={tDb(image, 'caption')}
+                alt={tDb(image, 'caption')}
               />
             </button>
           ))}
@@ -70,7 +72,7 @@ export default function GalleryPage() {
         <div
           role="dialog"
           aria-modal="true"
-          aria-label={images[current].caption}
+          aria-label={tDb(images[current], 'caption')}
           onClick={() => setCurrent(null)}
           style={{
             position: 'fixed',
@@ -87,7 +89,7 @@ export default function GalleryPage() {
             className="btn btn-ghost"
             style={{ position: 'absolute', top: 16, right: 20, color: 'var(--cream)', fontSize: '1.6rem' }}
             onClick={() => setCurrent(null)}
-            aria-label="Đóng"
+            aria-label={t('gallery.close')}
           >
             ×
           </button>
@@ -97,8 +99,8 @@ export default function GalleryPage() {
               url={images[current].url}
               variant="v3"
               icon="🖼️"
-              label={images[current].caption}
-              alt={images[current].caption}
+              label={tDb(images[current], 'caption')}
+              alt={tDb(images[current], 'caption')}
               style={{ borderRadius: 'var(--r)' }}
             />
             <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 16 }}>
@@ -108,7 +110,7 @@ export default function GalleryPage() {
                 style={{ borderColor: 'var(--cream)', color: 'var(--cream)' }}
                 onClick={() => setCurrent((i) => (i - 1 + images.length) % images.length)}
               >
-                ‹ Trước
+                {t('gallery.prev')}
               </button>
               <span style={{ color: 'var(--cream)' }}>
                 {current + 1} / {images.length}
@@ -119,7 +121,7 @@ export default function GalleryPage() {
                 style={{ borderColor: 'var(--cream)', color: 'var(--cream)' }}
                 onClick={() => setCurrent((i) => (i + 1) % images.length)}
               >
-                Sau ›
+                {t('gallery.next')}
               </button>
             </div>
           </div>

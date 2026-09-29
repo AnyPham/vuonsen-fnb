@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import vn.vuonsen.fnb.common.concurrency.ThuLaiKhiTrungMa;
 import vn.vuonsen.fnb.common.dto.PageResponse;
 import vn.vuonsen.fnb.modules.dishorder.dto.DishOrderQuoteRequest;
 import vn.vuonsen.fnb.modules.dishorder.dto.DishOrderQuoteResponse;
@@ -30,6 +31,7 @@ import vn.vuonsen.fnb.security.AppUserDetails;
 public class DishOrderController {
 
     private final DishOrderService dishOrderService;
+    private final ThuLaiKhiTrungMa thuLai;
 
     @PostMapping("/quote")
     @Operation(summary = "Bảng tạm tính cho giỏ món, chưa cần thông tin liên hệ")
@@ -43,8 +45,9 @@ public class DishOrderController {
             @Valid @RequestBody DishOrderRequest request,
             @AuthenticationPrincipal AppUserDetails principal) {
         Long userId = principal == null ? null : principal.getUserId();
-        return ResponseEntity.status(HttpStatus.CREATED)
-                .body(dishOrderService.create(request, userId));
+        // Cùng lý do với đơn đặt tiệc: hai đơn gửi cùng lúc có thể trùng mã, thử lại
+        DishOrderResponse don = thuLai.chay("uk_dish_order_code", () -> dishOrderService.create(request, userId));
+        return ResponseEntity.status(HttpStatus.CREATED).body(don);
     }
 
     @GetMapping("/track/{code}")

@@ -17,9 +17,9 @@ import java.util.List;
 @Tag(name = "8. Thư viện ảnh")
 public class GalleryController {
 
-    public record GalleryResponse(Long id, String url, String caption, String category) {
+    public record GalleryResponse(Long id, String url, String caption, String captionEn, String category) {
         static GalleryResponse from(GalleryImage g) {
-            return new GalleryResponse(g.getId(), g.getUrl(), g.getCaption(), g.getCategory());
+            return new GalleryResponse(g.getId(), g.getUrl(), g.getCaption(), g.getCaptionEn(), g.getCategory());
         }
     }
 

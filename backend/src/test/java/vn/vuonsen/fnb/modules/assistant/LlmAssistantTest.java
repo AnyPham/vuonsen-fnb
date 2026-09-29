@@ -6,7 +6,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import vn.vuonsen.fnb.config.props.AssistantProperties;
 import vn.vuonsen.fnb.modules.assistant.dto.AnswerResponse;
+import vn.vuonsen.fnb.modules.assistant.dto.AskRequest;
 import vn.vuonsen.fnb.modules.assistant.llm.LlmClient;
+import vn.vuonsen.fnb.modules.assistant.llm.LuotHoiThoai;
+
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -32,7 +40,7 @@ class LlmAssistantTest {
 
     private record ClientGia(String traVe, RuntimeException loi) implements LlmClient {
         @Override
-        public String hoi(String chiDanHeThong, String cauHoi) {
+        public String hoi(String chiDanHeThong, List<LuotHoiThoai> lichSu, String cauHoi) {
             if (loi != null) {
                 throw loi;
             }
@@ -47,7 +55,7 @@ class LlmAssistantTest {
 
     private AssistantFacade dungTroLy(boolean bat, String khoa, LlmClient client) {
         var cauHinh = new AssistantProperties(
-                new AssistantProperties.Llm(bat, khoa, "http://khong-goi-toi", "model-thu", 500, 8));
+                new AssistantProperties.Llm(bat, khoa, "http://khong-goi-toi", "model-thu", "low", 500, 8));
         return new AssistantFacade(duPhong, new LlmAssistant(cauHinh, client, contextBuilder));
     }
 
@@ -135,7 +143,79 @@ class LlmAssistantTest {
         assertThat(troLy.answer(CAU_HOI).answer()).isEqualTo("Dạ vâng ạ.");
     }
 
+    // ---------------- Lịch sử hội thoại ----------------
+
+    @Test
+    @DisplayName("UT-AI-01 Các lượt hỏi đáp trước được chuyển cho mô hình, đúng vai và đúng thứ tự")
+    void passesConversationHistory() {
+        AtomicReference<List<LuotHoiThoai>> daNhan = new AtomicReference<>();
+        LlmClient ghiLai = new LlmClient() {
+            @Override
+            public String hoi(String chiDanHeThong, List<LuotHoiThoai> lichSu, String cauHoi) {
+                daNhan.set(lichSu);
+                return "Dạ gói Đồng Quê rẻ nhất ạ.";
+            }
+
+            @Override
+            public String tenDichVu() {
+                return "dich-vu-ghi-lai";
+            }
+        };
+        var troLy = dungTroLy(true, "khoa-that", ghiLai);
+
+        troLy.answer("Gói nào rẻ nhất?", List.of(
+                new AskRequest.LuotHoi("user", "Có những gói tiệc nào?"),
+                new AskRequest.LuotHoi("assistant", "Dạ có ba gói ạ."),
+                new AskRequest.LuotHoi("vai-la", "bị bỏ qua")));
+
+        assertThat(daNhan.get()).containsExactly(
+                new LuotHoiThoai(true, "Có những gói tiệc nào?"),
+                new LuotHoiThoai(false, "Dạ có ba gói ạ."));
+    }
+
+    @Test
+    @DisplayName("UT-AI-02 Lịch sử dài chỉ giữ 10 lượt gần nhất, lượt quá dài bị cắt bớt")
+    void trimsLongHistory() {
+        AtomicReference<List<LuotHoiThoai>> daNhan = new AtomicReference<>();
+        LlmClient ghiLai = new LlmClient() {
+            @Override
+            public String hoi(String chiDanHeThong, List<LuotHoiThoai> lichSu, String cauHoi) {
+                daNhan.set(lichSu);
+                return "Dạ vâng ạ.";
+            }
+
+            @Override
+            public String tenDichVu() {
+                return "dich-vu-ghi-lai";
+            }
+        };
+        List<AskRequest.LuotHoi> lichSu = new ArrayList<>();
+        for (int i = 1; i <= 16; i++) {
+            lichSu.add(new AskRequest.LuotHoi(i % 2 == 1 ? "user" : "assistant", "Lượt " + i));
+        }
+        lichSu.set(15, new AskRequest.LuotHoi("assistant", "x".repeat(5000)));
+
+        dungTroLy(true, "khoa-that", ghiLai).answer(CAU_HOI, lichSu);
+
+        assertThat(daNhan.get()).hasSize(10);
+        assertThat(daNhan.get().get(0).noiDung()).isEqualTo("Lượt 7");
+        assertThat(daNhan.get().get(9).noiDung()).hasSize(1500);
+    }
+
     // ---------------- Ngữ cảnh gửi cho mô hình ----------------
+
+    @Test
+    @DisplayName("UT-AI-03 Ngữ cảnh có đủ buổi tổ chức, đặt món lẻ, đánh giá, các trang website và ngày hôm nay")
+    void contextCarriesFullBusinessData() {
+        String chiDan = contextBuilder.dungChiDan();
+
+        assertThat(chiDan).contains("[Buổi tổ chức và loại tiệc]", "Buổi tối (17h30 - 22h30)", "Tiệc cưới");
+        assertThat(chiDan).contains("[Đặt món lẻ]", "/dat-mon", "/tra-cuu-mon");
+        assertThat(chiDan).contains("[Đánh giá của khách]");
+        assertThat(chiDan).contains("[Các trang trên website]", "/dat-tiec", "/khong-gian");
+        assertThat(chiDan).contains("[Ưu đãi dịp lễ]");
+        assertThat(chiDan).contains(LocalDate.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")));
+    }
 
     @Test
     @DisplayName("Ngữ cảnh chép dữ liệu thật từ cơ sở dữ liệu")

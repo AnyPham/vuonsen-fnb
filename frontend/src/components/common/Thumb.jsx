@@ -5,11 +5,12 @@
  * Nhờ vậy thay ảnh chỉ cần điền đường dẫn trong trang quản trị, không phải
  * sửa code, mà chỗ nào chưa có ảnh vẫn hiển thị tử tế chứ không vỡ khung.
  */
-export default function Thumb({ url, alt, variant = '', icon = '🌿', label, style }) {
+export default function Thumb({ url, alt, variant = '', icon = '🌿', label, style, test }) {
   if (url) {
     return (
       <img
         className="thumb"
+        data-test={test}
         src={url}
         alt={alt || label || ''}
         loading="lazy"
@@ -19,7 +20,7 @@ export default function Thumb({ url, alt, variant = '', icon = '🌿', label, st
   }
 
   return (
-    <div className={`ph ${variant}`.trim()} style={style}>
+    <div className={`ph ${variant}`.trim()} style={style} data-test={test}>
       <span>{icon}</span>
       {label && <span>{label}</span>}
     </div>

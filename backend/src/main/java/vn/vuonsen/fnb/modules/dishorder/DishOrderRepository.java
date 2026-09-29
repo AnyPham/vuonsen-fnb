@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 public interface DishOrderRepository extends JpaRepository<DishOrder, Long> {
@@ -41,4 +42,20 @@ public interface DishOrderRepository extends JpaRepository<DishOrder, Long> {
     Page<DishOrder> findByUserIdOrderByCreatedAtDesc(Long userId, Pageable pageable);
 
     long countByStatus(DishOrderStatus status);
+
+    /*
+     * Nạp đơn đặt món trong khoảng để dựng thống kê.
+     *
+     * Lọc theo serveAt là giờ khách nhận món, không phải createdAt là giờ đặt. Doanh thu
+     * phải ghi vào tháng phục vụ thì mới khớp với cách tính của đơn đặt tiệc, vốn dùng
+     * ngày tổ chức. Không cần JOIN FETCH vì thống kê chỉ đọc tiền, hình thức nhận và
+     * trạng thái, đều là trường nằm sẵn trên đơn.
+     */
+    @Query("""
+            SELECT o FROM DishOrder o
+            WHERE o.serveAt BETWEEN :from AND :to
+            ORDER BY o.serveAt
+            """)
+    List<DishOrder> thongKeTheoKhoang(@Param("from") LocalDateTime from,
+                                      @Param("to") LocalDateTime to);
 }

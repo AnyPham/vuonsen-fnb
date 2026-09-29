@@ -27,6 +27,21 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
     List<Booking> findBySpaceIdAndEventDateAndTimeSlotAndStatus(
             Long spaceId, LocalDate eventDate, TimeSlot timeSlot, BookingStatus status);
 
+    /*
+     * Toàn bộ tiệc đã xác nhận trong một ngày, không phân biệt không gian.
+     *
+     * Dùng để dựng bảng tình trạng trống cho khách xem: lấy một lần rồi gom theo không gian,
+     * thay vì hỏi cơ sở dữ liệu một lần cho mỗi không gian.
+     */
+    @Query("""
+            SELECT b FROM Booking b
+            JOIN FETCH b.space
+            LEFT JOIN FETCH b.partyPackage
+            WHERE b.eventDate = :ngay AND b.status = :trangThai
+            """)
+    List<Booking> findTrongNgay(@Param("ngay") LocalDate ngay,
+                                @Param("trangThai") BookingStatus trangThai);
+
     // Đếm số đơn trong ngày để đánh số thứ tự cho mã đơn
     @Query("SELECT COUNT(b) FROM Booking b WHERE b.createdAt >= :from AND b.createdAt < :to")
     long countCreatedBetween(@Param("from") LocalDateTime from, @Param("to") LocalDateTime to);
@@ -50,4 +65,23 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
                          Pageable pageable);
 
     long countByStatus(BookingStatus status);
+
+    /*
+     * Nạp đơn trong khoảng ngày để dựng thống kê.
+     *
+     * Dùng JOIN FETCH cho không gian và gói tiệc vì hai quan hệ này khai là LAZY, mà
+     * open-in-view đang tắt. Không nạp sẵn thì mỗi đơn lại sinh thêm một truy vấn khi
+     * phần thống kê đọc tên không gian và tên gói.
+     *
+     * Gói tiệc phải LEFT JOIN: đơn chỉ thuê không gian không có gói, JOIN thường sẽ
+     * âm thầm loại các đơn đó ra khỏi thống kê.
+     */
+    @Query("""
+            SELECT b FROM Booking b
+            JOIN FETCH b.space
+            LEFT JOIN FETCH b.partyPackage
+            WHERE b.eventDate BETWEEN :from AND :to
+            ORDER BY b.eventDate
+            """)
+    List<Booking> thongKeTheoKhoang(@Param("from") LocalDate from, @Param("to") LocalDate to);
 }

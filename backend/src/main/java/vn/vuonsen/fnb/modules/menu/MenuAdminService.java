@@ -50,6 +50,29 @@ public class MenuAdminService {
         dishRepository.save(dish);
     }
 
+    /*
+     * Xóa hẳn khỏi cơ sở dữ liệu, khác với ngừng bán.
+     *
+     * Dùng cho hai việc: quản trị tạo nhầm một món rồi muốn dọn sạch, và bộ kiểm thử tự
+     * động tự dọn những món nó tạo ra. Trước khi có hàm này, mỗi lần chạy kiểm thử lại đẻ
+     * thêm vài món tên kiểu "Món thử giá 317610324460300" nằm lẫn trong thực đơn thật,
+     * khách vào web cũng đọc thấy.
+     *
+     * Chặn khi món đã từng nằm trong một đơn: hóa đơn cũ vẫn phải tra ra được tên món,
+     * xóa đi thì đơn cũ mất thông tin. Trường hợp đó dùng ngừng bán.
+     */
+    @Transactional
+    public void deletePermanently(Long id) {
+        Dish dish = getEntity(id);
+        long soLanDat = dishRepository.demLanDuocDat(id);
+        if (soLanDat > 0) {
+            throw new BusinessException(
+                    "Món \"%s\" đã nằm trong %d đơn nên không xóa hẳn được. Hãy dùng chức năng ngừng bán."
+                            .formatted(dish.getName(), soLanDat));
+        }
+        dishRepository.delete(dish);
+    }
+
     private Dish getEntity(Long id) {
         return dishRepository.findById(id)
                 .orElseThrow(() -> ResourceNotFoundException.of("món ăn", id));

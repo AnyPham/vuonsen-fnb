@@ -35,8 +35,14 @@ public class PartyPackage extends BaseEntity {
     @Column(nullable = false, length = 120)
     private String name;
 
+    @Column(name = "name_en", length = 150)
+    private String nameEn;
+
     @Column(length = 255)
     private String tagline;
+
+    @Column(name = "tagline_en", length = 255)
+    private String taglineEn;
 
     @Column(name = "price_per_table", nullable = false, precision = 15, scale = 2)
     private BigDecimal pricePerTable;

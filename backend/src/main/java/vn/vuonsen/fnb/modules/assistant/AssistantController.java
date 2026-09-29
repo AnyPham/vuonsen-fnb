@@ -24,6 +24,6 @@ public class AssistantController {
     @PostMapping("/ask")
     @Operation(summary = "Hỏi trợ lý về dịch vụ, trả lời dựa trên dữ liệu của hệ thống")
     public ResponseEntity<AnswerResponse> ask(@Valid @RequestBody AskRequest request) {
-        return ResponseEntity.ok(assistantFacade.answer(request.question()));
+        return ResponseEntity.ok(assistantFacade.answer(request.question(), request.history()));
     }
 }

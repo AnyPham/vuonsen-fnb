@@ -55,12 +55,28 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/api/v1/bookings", "/api/v1/bookings/quote",
                                 "/api/v1/recommendations", "/api/v1/assistant/ask").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/v1/bookings/options",
-                                "/api/v1/bookings/track/**").permitAll()
+                                "/api/v1/bookings/track/**",
+                                // Xem buổi nào còn trống và có ưu đãi gì, không cần đăng nhập
+                                "/api/v1/bookings/availability",
+                                "/api/v1/holidays").permitAll()
+
+                        // Gửi đánh giá không bắt đăng nhập: đã phải nhập mã đơn có thật, và
+                        // đánh giá còn phải qua bước quản trị duyệt mới hiện công khai
+                        .requestMatchers(HttpMethod.POST, "/api/v1/reviews").permitAll()
 
                         // Đặt món lẻ cũng không bắt đăng nhập, giống đặt tiệc
                         .requestMatchers(HttpMethod.POST, "/api/v1/dish-orders",
                                 "/api/v1/dish-orders/quote").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/v1/dish-orders/track/**").permitAll()
+
+                        // Thanh toán không bắt đăng nhập, giống tra cứu đơn: có mã đơn là đủ.
+                        // Hai đường dẫn này chỉ đọc tình hình và tạo phiếu chờ đối soát,
+                        // không tự cộng tiền vào đơn nên biết mã đơn cũng không gian lận được.
+                        .requestMatchers(HttpMethod.GET, "/api/v1/payments/order/**").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/v1/payments").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/v1/payments/sandbox/**").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/v1/payments/vnpay", "/api/v1/payments/vnpay/verify").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/v1/payments/vnpay/trang-thai").permitAll()
 
                         // Khu vực quản trị
                         .requestMatchers("/api/v1/admin/**")

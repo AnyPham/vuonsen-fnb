@@ -32,6 +32,9 @@ public class DishCategory {
     @Column(nullable = false, length = 100)
     private String name;
 
+    @Column(name = "name_en", length = 100)
+    private String nameEn;
+
     @Column(name = "sort_order", nullable = false)
     @Builder.Default
     private Integer sortOrder = 0;

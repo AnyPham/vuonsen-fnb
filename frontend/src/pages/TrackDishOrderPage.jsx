@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { dishOrderApi } from '@/api/endpoints';
-import { formatCurrency, formatDateTime } from '@/utils/format';
 import { ErrorBlock, Loading } from '@/components/common/StateBlock';
+import { useI18n } from '@/i18n';
+import { useDinhDang } from '@/i18n/dinhDang';
 
 /*
  * Tra cứu đơn đặt món bằng mã đơn.
@@ -21,6 +22,11 @@ export default function TrackDishOrderPage() {
   const [don, setDon] = useState(null);
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
+  const { t, lang } = useI18n();
+  const dd = useDinhDang();
+
+  // Nhãn enum do backend gửi kèm cả hai thứ tiếng
+  const nhan = (viet, anh) => (lang === 'en' && anh ? anh : viet);
 
   const traCuu = (maCanTim) => {
     if (!maCanTim.trim()) return;
@@ -46,8 +52,8 @@ export default function TrackDishOrderPage() {
     <section className="section">
       <div className="wrap" style={{ maxWidth: 720 }}>
         <div className="section-head" style={{ marginBottom: 18 }}>
-          <div className="eyebrow">Tra cứu</div>
-          <h2>Đơn đặt món</h2>
+          <div className="eyebrow">{t('track.eyebrow')}</div>
+          <h2>{t('trackDish.title')}</h2>
         </div>
 
         <form
@@ -61,15 +67,16 @@ export default function TrackDishOrderPage() {
           <input
             value={ma}
             onChange={(e) => setMa(e.target.value)}
-            placeholder="Nhập mã đơn, ví dụ DM-20260905-0001"
+            placeholder={t('trackDish.placeholder')}
+            data-test="track-code"
             style={{ flex: 1 }}
           />
-          <button type="submit" className="btn btn-dark" disabled={loading}>
-            Tra cứu
+          <button type="submit" className="btn btn-dark" disabled={loading} data-test="track-submit">
+            {t('track.submit')}
           </button>
         </form>
 
-        {loading && <Loading label="Đang tìm đơn…" />}
+        {loading && <Loading label={t('trackDish.searching')} />}
         {error && <ErrorBlock message={error} />}
 
         {don && (
@@ -77,93 +84,98 @@ export default function TrackDishOrderPage() {
             <div className="card-body">
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <div>
-                  <strong style={{ fontSize: '1.05rem' }}>{don.code}</strong>
+                  <strong style={{ fontSize: '1.05rem' }} data-test="result-code">{don.code}</strong>
                   <div className="muted" style={{ fontSize: '0.86rem' }}>
-                    Đặt lúc {formatDateTime(don.createdAt)}
+                    {t('trackDish.placedAt', { luc: dd.ngayGio(don.createdAt) })}
                   </div>
                 </div>
-                <span className={`tag tag-${don.status}`}>{don.statusLabel}</span>
+                <span className={`tag tag-${don.status}`}>{nhan(don.statusLabel, don.statusLabelEn)}</span>
               </div>
 
               <table className="bang-thong-so" style={{ marginTop: 16 }}>
                 <tbody>
                   <tr>
-                    <th>Hình thức</th>
-                    <td>{don.fulfillmentLabel}</td>
+                    <th>{t('trackDish.fulfillment')}</th>
+                    <td data-test="result-fulfillment">{nhan(don.fulfillmentLabel, don.fulfillmentLabelEn)}</td>
                   </tr>
                   <tr>
-                    <th>Người đặt</th>
+                    <th>{t('trackDish.customer')}</th>
                     <td>{don.customerName} — {don.customerPhone}</td>
                   </tr>
                   {don.deliveryAddress && (
                     <tr>
-                      <th>Địa chỉ giao</th>
+                      <th>{t('trackDish.deliveryAddress')}</th>
                       <td>{don.deliveryAddress}</td>
                     </tr>
                   )}
                   {don.guestCount != null && (
                     <tr>
-                      <th>Số khách</th>
-                      <td>{don.guestCount} người</td>
+                      <th>{t('track.guests')}</th>
+                      <td>{t('trackDish.people', { n: don.guestCount })}</td>
                     </tr>
                   )}
                   <tr>
-                    <th>Thời điểm nhận</th>
-                    <td>{formatDateTime(don.serveAt)}</td>
+                    <th>{t('trackDish.serveAt')}</th>
+                    <td>{dd.ngayGio(don.serveAt)}</td>
                   </tr>
                   {don.note && (
                     <tr>
-                      <th>Ghi chú</th>
+                      <th>{t('trackDish.note')}</th>
                       <td>{don.note}</td>
                     </tr>
                   )}
                 </tbody>
               </table>
 
-              <h3 style={{ marginTop: 20, marginBottom: 8 }}>Món đã đặt</h3>
+              <h3 style={{ marginTop: 20, marginBottom: 8 }}>{t('trackDish.itemsTitle')}</h3>
               <table className="bang-thong-so">
                 <tbody>
                   {don.items.map((d, i) => (
-                    <tr key={i}>
+                    <tr key={i} data-test="result-item">
                       <th style={{ fontWeight: 400 }}>
                         {d.dishName} × {d.quantity}
                       </th>
-                      <td style={{ textAlign: 'right' }}>{formatCurrency(d.lineTotal)}</td>
+                      <td style={{ textAlign: 'right' }}>{dd.tien(d.lineTotal)}</td>
                     </tr>
                   ))}
                   <tr>
-                    <th>Tiền món</th>
-                    <td style={{ textAlign: 'right' }}>{formatCurrency(don.subtotal)}</td>
+                    <th>{t('trackDish.subtotal')}</th>
+                    <td style={{ textAlign: 'right' }}>{dd.tien(don.subtotal)}</td>
                   </tr>
+                  {Number(don.discountAmount) > 0 && (
+                    <tr>
+                      <th>{t('trackDish.holidayDiscount')}</th>
+                      <td style={{ textAlign: 'right' }} data-test="result-discount">− {dd.tien(don.discountAmount)}</td>
+                    </tr>
+                  )}
                   <tr>
-                    <th>Phí giao</th>
+                    <th>{t('trackDish.deliveryFee')}</th>
                     <td style={{ textAlign: 'right' }}>
-                      {Number(don.deliveryFee) === 0 ? 'Miễn phí' : formatCurrency(don.deliveryFee)}
+                      {Number(don.deliveryFee) === 0 ? t('track.free') : dd.tien(don.deliveryFee)}
                     </td>
                   </tr>
                   <tr>
-                    <th>Thuế giá trị gia tăng</th>
-                    <td style={{ textAlign: 'right' }}>{formatCurrency(don.vatAmount)}</td>
+                    <th>{t('trackDish.vat')}</th>
+                    <td style={{ textAlign: 'right' }}>{dd.tien(don.vatAmount)}</td>
                   </tr>
                   <tr>
-                    <th style={{ fontWeight: 600 }}>Tổng cộng</th>
-                    <td style={{ textAlign: 'right', fontWeight: 600 }}>
-                      {formatCurrency(don.total)}
+                    <th style={{ fontWeight: 600 }}>{t('track.total')}</th>
+                    <td style={{ textAlign: 'right', fontWeight: 600 }} data-test="result-total">
+                      {dd.tien(don.total)}
                     </td>
                   </tr>
                 </tbody>
               </table>
 
               <p className="muted" style={{ fontSize: '0.84rem', marginTop: 14 }}>
-                Số tiền trên là con số đã chốt lúc đặt. Bảng giá đổi về sau không làm
-                thay đổi đơn này.
+                {t('trackDish.priceLocked')}
               </p>
             </div>
           </div>
         )}
 
         <p style={{ marginTop: 18 }}>
-          <Link to="/thuc-don">← Về thực đơn</Link>
+          <Link to="/thuc-don">{t('dish.backToMenu')}</Link>
         </p>
       </div>
     </section>

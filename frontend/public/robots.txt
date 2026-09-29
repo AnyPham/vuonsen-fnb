@@ -1,0 +1,14 @@
+# Cho phép mọi công cụ tìm kiếm đọc trang công khai.
+# Khu quản trị và các trang tra cứu theo mã đơn thì chặn, vì nội dung riêng của từng khách
+# và không có giá trị tìm kiếm.
+User-agent: *
+Allow: /
+Disallow: /quan-tri/
+Disallow: /tra-cuu
+Disallow: /tra-cuu-mon
+Disallow: /ho-so
+Disallow: /don-cua-toi
+Disallow: /dang-nhap
+Disallow: /dang-ky
+
+Sitemap: https://vuonsen.vn/sitemap.xml

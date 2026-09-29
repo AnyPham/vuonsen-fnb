@@ -3,13 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { selectUser, updateProfile } from '@/features/auth/authSlice';
 import { ErrorBlock, Loading } from '@/components/common/StateBlock';
-
-// Nhãn tiếng Việt cho quyền, tránh hiện ADMIN hay CUSTOMER ra ngoài giao diện
-const ROLE_LABELS = {
-  CUSTOMER: 'Khách hàng',
-  STAFF: 'Nhân viên',
-  ADMIN: 'Quản trị viên',
-};
+import { useI18n } from '@/i18n';
 
 // Trang hồ sơ cá nhân, chỉ vào được khi đã đăng nhập
 export default function ProfilePage() {
@@ -20,6 +14,7 @@ export default function ProfilePage() {
   const [status, setStatus] = useState('idle');
   const [error, setError] = useState(null);
   const [fieldErrors, setFieldErrors] = useState({});
+  const { t } = useI18n();
 
   // Đổ dữ liệu tài khoản vào form khi mở trang
   useEffect(() => {
@@ -32,7 +27,7 @@ export default function ProfilePage() {
     }
   }, [user]);
 
-  if (!user) return <Loading label="Đang tải hồ sơ…" />;
+  if (!user) return <Loading label={t('profile.loading')} />;
 
   const set = (patch) => {
     setForm((prev) => ({ ...prev, ...patch }));
@@ -71,10 +66,10 @@ export default function ProfilePage() {
     <section className="section">
       <div className="wrap" style={{ maxWidth: 720 }}>
         <div className="section-head">
-          <div className="eyebrow">Tài khoản</div>
-          <h2>Hồ sơ cá nhân</h2>
+          <div className="eyebrow">{t('account.eyebrow')}</div>
+          <h2>{t('profile.title')}</h2>
           <p className="muted">
-            Thông tin này được điền sẵn khi bạn đặt tiệc, đỡ phải nhập lại mỗi lần.
+            {t('profile.desc')}
           </p>
         </div>
 
@@ -82,12 +77,12 @@ export default function ProfilePage() {
           <div className="card-body">
             {error && <ErrorBlock message={error} />}
             {status === 'saved' && (
-              <div className="alert alert-success">Đã lưu thay đổi.</div>
+              <div className="alert alert-success">{t('profile.saved')}</div>
             )}
 
             <form onSubmit={handleSubmit}>
               <div className="fgroup">
-                <label htmlFor="fullName">Họ và tên *</label>
+                <label htmlFor="fullName">{t('profile.fullName')}</label>
                 <input
                   id="fullName"
                   value={form.fullName}
@@ -98,7 +93,7 @@ export default function ProfilePage() {
 
               <div className="form-row">
                 <div className="fgroup">
-                  <label htmlFor="phone">Số điện thoại</label>
+                  <label htmlFor="phone">{t('profile.phone')}</label>
                   <input
                     id="phone"
                     type="tel"
@@ -110,19 +105,19 @@ export default function ProfilePage() {
                 </div>
 
                 <div className="fgroup">
-                  <label htmlFor="email">Email</label>
+                  <label htmlFor="email">{t('common.email')}</label>
                   <input id="email" value={user.email} disabled />
                   <div className="muted" style={{ fontSize: '0.82rem', marginTop: 6 }}>
-                    Email dùng để đăng nhập nên không đổi được
+                    {t('profile.emailNote')}
                   </div>
                 </div>
               </div>
 
               <div className="fgroup">
-                <label htmlFor="address">Địa chỉ</label>
+                <label htmlFor="address">{t('profile.address')}</label>
                 <input
                   id="address"
-                  placeholder="Số nhà, đường, phường, quận"
+                  placeholder={t('profile.addressPlaceholder')}
                   value={form.address}
                   onChange={(e) => set({ address: e.target.value })}
                 />
@@ -130,22 +125,22 @@ export default function ProfilePage() {
               </div>
 
               <div className="fgroup">
-                <label>Quyền tài khoản</label>
+                <label>{t('profile.role')}</label>
                 <div>
-                  <span className="chip">{ROLE_LABELS[user.role] || user.role}</span>
+                  <span className="chip">{t('role.' + user.role)}</span>
                 </div>
               </div>
 
               <div className="fnav">
                 <Link to="/don-cua-toi" className="btn btn-ghost">
-                  Xem đơn của tôi
+                  {t('profile.myOrders')}
                 </Link>
                 <button
                   type="submit"
                   className="btn btn-dark"
                   disabled={status === 'saving' || !changed}
                 >
-                  {status === 'saving' ? 'Đang lưu…' : 'Lưu thay đổi'}
+                  {status === 'saving' ? t('profile.saving') : t('profile.save')}
                 </button>
               </div>
             </form>

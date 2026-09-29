@@ -18,7 +18,7 @@ public record AssistantProperties(Llm llm) {
     // Thiếu hẳn khối cấu hình thì coi như tắt, đỡ phải kiểm tra null ở nơi dùng
     public AssistantProperties {
         if (llm == null) {
-            llm = new Llm(false, null, null, null, 0, 0);
+            llm = new Llm(false, null, null, null, null, 0, 0);
         }
     }
 
@@ -27,6 +27,8 @@ public record AssistantProperties(Llm llm) {
             String apiKey,
             String baseUrl,
             String model,
+            // Mức công sức suy luận: low, medium, high. Câu tư vấn ngắn chỉ cần low.
+            String effort,
             int maxTokens,
             int timeoutSeconds
     ) {

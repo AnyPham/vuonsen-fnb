@@ -15,20 +15,28 @@ import java.util.List;
 public record DishDetailResponse(
         Long id,
         String name,
+        String nameEn,
         String slug,
         String description,
+        String descriptionEn,
         BigDecimal price,
         String priceNote,
+        String priceNoteEn,
         String imageUrl,
         boolean bestSeller,
         String categoryCode,
         String categoryName,
+        String categoryNameEn,
 
         String ingredients,
+        String ingredientsEn,
         String preparation,
+        String preparationEn,
         // Những điều khách nên biết trước khi đặt món này
         String orderNote,
+        String orderNoteEn,
         String portionDesc,
+        String portionDescEn,
         Integer prepMinutes,
         List<ImageResponse> images
 ) {
@@ -38,11 +46,15 @@ public record DishDetailResponse(
 
     public static DishDetailResponse from(Dish d) {
         return new DishDetailResponse(
-                d.getId(), d.getName(), d.getSlug(), d.getDescription(),
-                d.getPrice(), d.getPriceNote(), d.getImageUrl(), d.isBestSeller(),
-                d.getCategory().getCode(), d.getCategory().getName(),
-                d.getIngredients(), d.getPreparation(), d.getOrderNote(),
-                d.getPortionDesc(), d.getPrepMinutes(),
+                d.getId(), d.getName(), d.getNameEn(), d.getSlug(),
+                d.getDescription(), d.getDescriptionEn(),
+                d.getPrice(), d.getPriceNote(), d.getPriceNoteEn(),
+                d.getImageUrl(), d.isBestSeller(),
+                d.getCategory().getCode(), d.getCategory().getName(), d.getCategory().getNameEn(),
+                d.getIngredients(), d.getIngredientsEn(),
+                d.getPreparation(), d.getPreparationEn(),
+                d.getOrderNote(), d.getOrderNoteEn(),
+                d.getPortionDesc(), d.getPortionDescEn(), d.getPrepMinutes(),
                 d.getImages().stream()
                         .map(a -> new ImageResponse(a.getUrl(), a.getCaption()))
                         .toList());

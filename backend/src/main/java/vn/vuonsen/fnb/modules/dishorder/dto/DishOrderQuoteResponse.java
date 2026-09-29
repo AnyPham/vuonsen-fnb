@@ -12,14 +12,23 @@ import java.util.List;
 public record DishOrderQuoteResponse(
         List<LineResponse> lines,
         BigDecimal subtotal,
+
+        // Tiền giảm dịp lễ trên tiền món, 0 nếu ngày nhận là ngày thường
+        BigDecimal discountAmount,
+        // Ví dụ "Giảm 20% dịp Tết Nguyên Đán.", null nếu không được giảm
+        String discountNote,
+        String discountNoteEn,
+
         BigDecimal deliveryFee,
         // Lý do của khoản phí giao, ví dụ "Đơn đủ 500.000đ nên được miễn phí giao"
         String deliveryNote,
+        String deliveryNoteEn,
         BigDecimal vatAmount,
         BigDecimal total,
 
         // Thời điểm sớm nhất có thể nhận món, tính theo món lâu nhất trong đơn
-        String leadTimeNote
+        String leadTimeNote,
+        String leadTimeNoteEn
 ) {
 
     public record LineResponse(Long dishId, String dishName, BigDecimal unitPrice,

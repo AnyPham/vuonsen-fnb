@@ -12,7 +12,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import vn.vuonsen.fnb.modules.auth.dto.AuthResponse;
+import vn.vuonsen.fnb.modules.auth.dto.DatLaiMatKhauRequest;
 import vn.vuonsen.fnb.modules.auth.dto.LoginRequest;
+import vn.vuonsen.fnb.modules.auth.dto.QuenMatKhauRequest;
 import vn.vuonsen.fnb.modules.auth.dto.RefreshRequest;
 import vn.vuonsen.fnb.modules.auth.dto.RegisterRequest;
 import vn.vuonsen.fnb.security.AppUserDetails;
@@ -24,6 +26,7 @@ import vn.vuonsen.fnb.security.AppUserDetails;
 public class AuthController {
 
     private final AuthService authService;
+    private final PasswordResetService passwordResetService;
 
     @PostMapping("/register")
     @Operation(summary = "Đăng ký tài khoản khách hàng")
@@ -41,6 +44,26 @@ public class AuthController {
     @Operation(summary = "Đổi refresh token lấy access token mới")
     public ResponseEntity<AuthResponse> refresh(@Valid @RequestBody RefreshRequest request) {
         return ResponseEntity.ok(authService.refresh(request.refreshToken()));
+    }
+
+    /*
+     * Xin liên kết đặt lại mật khẩu.
+     *
+     * Luôn trả về không nội dung, kể cả khi email chưa đăng ký. Báo khác nhau giữa hai trường
+     * hợp thì người ngoài dò được email nào đã có tài khoản trên hệ thống.
+     */
+    @PostMapping("/forgot-password")
+    @Operation(summary = "Gửi liên kết đặt lại mật khẩu vào email")
+    public ResponseEntity<Void> quenMatKhau(@Valid @RequestBody QuenMatKhauRequest request) {
+        passwordResetService.xinDatLai(request.email());
+        return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/reset-password")
+    @Operation(summary = "Đặt mật khẩu mới bằng mã trong liên kết đã gửi qua email")
+    public ResponseEntity<Void> datLaiMatKhau(@Valid @RequestBody DatLaiMatKhauRequest request) {
+        passwordResetService.datLai(request.token(), request.newPassword());
+        return ResponseEntity.noContent().build();
     }
 
     @PostMapping("/logout")

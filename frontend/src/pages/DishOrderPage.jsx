@@ -2,7 +2,8 @@ import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { dishOrderApi } from '@/api/endpoints';
-import { formatCurrency } from '@/utils/format';
+import { useI18n } from '@/i18n';
+import { useDinhDang } from '@/i18n/dinhDang';
 import { ErrorBlock } from '@/components/common/StateBlock';
 import Thumb from '@/components/common/Thumb';
 import {
@@ -28,6 +29,8 @@ export default function DishOrderPage() {
   const gio = useSelector(chonGioMon);
   const hinhThuc = useSelector(chonHinhThuc);
   const dispatch = useDispatch();
+  const { t, tDb } = useI18n();
+  const dd = useDinhDang();
   const navigate = useNavigate();
 
   const [tamTinh, setTamTinh] = useState(null);
@@ -41,27 +44,46 @@ export default function DishOrderPage() {
   const [dangGui, setDangGui] = useState(false);
   const [loiGui, setLoiGui] = useState(null);
 
-  // Hỏi lại máy chủ mỗi khi giỏ hoặc hình thức nhận thay đổi
+  // Hỏi lại máy chủ mỗi khi giỏ, hình thức nhận hoặc giờ nhận thay đổi
   useEffect(() => {
     if (gio.length === 0) {
       setTamTinh(null);
       setLoiTamTinh(null);
+      // Yêu cầu đang bay (nếu có) đã bị bỏ qua nên không tự tắt trạng thái đang tính được
+      setDangTinh(false);
       return;
     }
+    /*
+     * Khách đổi lựa chọn liên tiếp thì có nhiều yêu cầu cùng bay, phản hồi không chắc về đúng
+     * thứ tự gửi. Phản hồi cũ về sau mà vẫn được ghi thì đè mất kết quả của lựa chọn mới nhất,
+     * ví dụ đã chọn ngày lễ mà bảng lại hiện giá không giảm. Lựa chọn đổi thì effect cũ bị dọn,
+     * cờ conHieuLuc tắt, phản hồi của nó về lúc nào cũng bị bỏ qua.
+     */
+    let conHieuLuc = true;
     setDangTinh(true);
     setLoiTamTinh(null);
     dishOrderApi
       .quote({
         fulfillmentType: hinhThuc,
+        // Gửi kèm giờ nhận để máy chủ biết ngày đó có được giảm giá dịp lễ không
+        serveAt: form.serveAt || null,
         items: gio.map((m) => ({ dishId: m.dishId, quantity: m.quantity })),
       })
-      .then(setTamTinh)
+      .then((kq) => {
+        if (conHieuLuc) setTamTinh(kq);
+      })
       .catch((err) => {
+        if (!conHieuLuc) return;
         setTamTinh(null);
         setLoiTamTinh(err.message);
       })
-      .finally(() => setDangTinh(false));
-  }, [gio, hinhThuc]);
+      .finally(() => {
+        if (conHieuLuc) setDangTinh(false);
+      });
+    return () => {
+      conHieuLuc = false;
+    };
+  }, [gio, hinhThuc, form.serveAt]);
 
   const set = (patch) => {
     setForm((p) => ({ ...p, ...patch }));
@@ -97,13 +119,12 @@ export default function DishOrderPage() {
     return (
       <section className="section">
         <div className="wrap" style={{ maxWidth: 640, textAlign: 'center' }}>
-          <h2>Giỏ món đang trống</h2>
+          <h2 data-test="cart-empty">{t('order.cartEmpty')}</h2>
           <p className="muted">
-            Bạn vào thực đơn chọn món, hoặc mở trang chi tiết từng món để xem nguyên
-            liệu và lưu ý trước khi đặt.
+            {t('order.cartEmptyDesc')}
           </p>
           <Link className="btn btn-dark" to="/thuc-don" style={{ marginTop: 12 }}>
-            Xem thực đơn
+            {t('order.viewMenu')}
           </Link>
         </div>
       </section>
@@ -114,37 +135,39 @@ export default function DishOrderPage() {
     <section className="section">
       <div className="wrap">
         <div className="section-head" style={{ marginBottom: 20 }}>
-          <div className="eyebrow">Đặt món</div>
-          <h2>Giỏ món của bạn</h2>
+          <div className="eyebrow">{t('order.eyebrow')}</div>
+          <h2>{t('order.cartTitle')}</h2>
         </div>
 
         <div className="grid grid-2" style={{ alignItems: 'start' }}>
           {/* ---------- Cột trái: giỏ và thông tin ---------- */}
           <div>
             {gio.map((m) => (
-              <div key={m.dishId} className="dong-gio">
+              <div key={m.dishId} className="dong-gio" data-test="cart-row">
                 <Thumb url={m.imageUrl} icon="🍲" alt={m.name} />
                 <div style={{ flex: 1 }}>
                   <strong>
                     <Link to={`/thuc-don/${m.slug}`}>{m.name}</Link>
                   </strong>
                   <div className="muted" style={{ fontSize: '0.86rem' }}>
-                    {formatCurrency(m.price)} / phần
+                    {dd.tien(m.price)} / {t('order.perPortion')}
                   </div>
                 </div>
                 <div className="dieu-chinh-so">
                   <button
                     type="button"
                     onClick={() => dispatch(doiSoLuong({ dishId: m.dishId, quantity: m.quantity - 1 }))}
-                    aria-label={`Bớt một phần ${m.name}`}
+                    data-test="cart-minus"
+                    aria-label={t('order.decreaseOf', { mon: m.name })}
                   >
                     −
                   </button>
-                  <span>{m.quantity}</span>
+                  <span data-test="cart-qty">{m.quantity}</span>
                   <button
                     type="button"
                     onClick={() => dispatch(doiSoLuong({ dishId: m.dishId, quantity: m.quantity + 1 }))}
-                    aria-label={`Thêm một phần ${m.name}`}
+                    data-test="cart-plus"
+                    aria-label={t('order.increaseOf', { mon: m.name })}
                   >
                     +
                   </button>
@@ -153,7 +176,8 @@ export default function DishOrderPage() {
                   type="button"
                   className="bo-mon"
                   onClick={() => dispatch(boMon(m.dishId))}
-                  aria-label={`Bỏ ${m.name} khỏi giỏ`}
+                  data-test="cart-remove"
+                  aria-label={t('order.removeFromCart', { mon: m.name })}
                 >
                   ×
                 </button>
@@ -161,17 +185,18 @@ export default function DishOrderPage() {
             ))}
 
             <form onSubmit={gui} style={{ marginTop: 24 }}>
-              <h3>Hình thức nhận món</h3>
+              <h3>{t('order.fulfillmentTitle')}</h3>
               <div className="chon-hinh-thuc">
                 {[
-                  ['DELIVERY', '🛵 Giao tận nhà', 'Bên mình mang tới địa chỉ bạn cho'],
-                  ['DINE_IN', '🍽️ Tới ăn tại chỗ', 'Đặt trước để bếp chuẩn bị, tới là có ngay'],
+                  ['DELIVERY', t('order.delivery'), t('order.deliveryDesc')],
+                  ['DINE_IN', t('order.dineIn'), t('order.dineInDesc')],
                 ].map(([ma, nhan, mo]) => (
                   <button
                     type="button"
                     key={ma}
                     className={hinhThuc === ma ? 'dang-chon' : ''}
                     onClick={() => dispatch(doiHinhThuc(ma))}
+                    data-test={`fulfillment-${ma}`}
                   >
                     <strong>{nhan}</strong>
                     <span className="muted">{mo}</span>
@@ -181,9 +206,10 @@ export default function DishOrderPage() {
 
               <div className="form-row" style={{ marginTop: 16 }}>
                 <div className="fgroup">
-                  <label htmlFor="ten">Tên người đặt *</label>
+                  <label htmlFor="ten">{t('order.name')}</label>
                   <input
                     id="ten"
+                    data-test="order-name"
                     value={form.customerName}
                     onChange={(e) => set({ customerName: e.target.value })}
                     required
@@ -191,9 +217,10 @@ export default function DishOrderPage() {
                   />
                 </div>
                 <div className="fgroup">
-                  <label htmlFor="dienThoai">Số điện thoại *</label>
+                  <label htmlFor="dienThoai">{t('order.phone')}</label>
                   <input
                     id="dienThoai"
+                    data-test="order-phone"
                     value={form.customerPhone}
                     onChange={(e) => set({ customerPhone: e.target.value })}
                     required
@@ -203,9 +230,10 @@ export default function DishOrderPage() {
               </div>
 
               <div className="fgroup">
-                <label htmlFor="email">Email (không bắt buộc)</label>
+                <label htmlFor="email">{t('order.email')}</label>
                 <input
                   id="email"
+                  data-test="order-email"
                   type="email"
                   value={form.customerEmail}
                   onChange={(e) => set({ customerEmail: e.target.value })}
@@ -216,21 +244,23 @@ export default function DishOrderPage() {
               <div className="form-row">
                 {hinhThuc === 'DELIVERY' ? (
                   <div className="fgroup">
-                    <label htmlFor="diaChi">Địa chỉ giao *</label>
+                    <label htmlFor="diaChi">{t('order.address')}</label>
                     <input
                       id="diaChi"
+                      data-test="order-address"
                       value={form.deliveryAddress}
                       onChange={(e) => set({ deliveryAddress: e.target.value })}
                       required
                       maxLength={400}
-                      placeholder="Số nhà, đường, phường, quận"
+                      placeholder={t('order.addressPlaceholder')}
                     />
                   </div>
                 ) : (
                   <div className="fgroup">
-                    <label htmlFor="soKhach">Số khách *</label>
+                    <label htmlFor="soKhach">{t('order.guests')}</label>
                     <input
                       id="soKhach"
+                      data-test="order-guests"
                       type="number"
                       min={1}
                       max={40}
@@ -243,10 +273,11 @@ export default function DishOrderPage() {
 
                 <div className="fgroup">
                   <label htmlFor="thoiDiem">
-                    {hinhThuc === 'DELIVERY' ? 'Thời điểm muốn nhận *' : 'Thời điểm tới ăn *'}
+                    {hinhThuc === 'DELIVERY' ? t('order.wantAt') : t('order.arriveAt')}
                   </label>
                   <input
                     id="thoiDiem"
+                    data-test="order-serve-at"
                     type="datetime-local"
                     value={form.serveAt}
                     onChange={(e) => set({ serveAt: e.target.value })}
@@ -256,14 +287,14 @@ export default function DishOrderPage() {
               </div>
 
               <div className="fgroup">
-                <label htmlFor="ghiChu">Ghi chú cho bếp</label>
+                <label htmlFor="ghiChu">{t('order.kitchenNote')}</label>
                 <textarea
                   id="ghiChu"
                   rows={3}
                   value={form.note}
                   onChange={(e) => set({ note: e.target.value })}
                   maxLength={600}
-                  placeholder="Ví dụ: không cay, ít mặn, có trẻ nhỏ…"
+                  placeholder={t('order.kitchenNotePlaceholder')}
                 />
               </div>
 
@@ -274,12 +305,12 @@ export default function DishOrderPage() {
                 className="btn btn-dark"
                 style={{ width: '100%', marginTop: 8 }}
                 disabled={dangGui || !tamTinh}
+                data-test="submit-order"
               >
-                {dangGui ? 'Đang gửi…' : 'Gửi đơn đặt món'}
+                {dangGui ? t('order.sending') : t('order.submit')}
               </button>
               <p className="muted" style={{ fontSize: '0.82rem', marginTop: 8 }}>
-                Gửi đơn xong bạn nhận mã đơn để tra cứu. Bên mình sẽ gọi xác nhận, chưa
-                thu tiền trên website.
+                {t('order.afterSubmit')}
               </p>
             </form>
           </div>
@@ -288,11 +319,11 @@ export default function DishOrderPage() {
           <div>
             <div className="card" style={{ position: 'sticky', top: 90 }}>
               <div className="card-body">
-                <h3 style={{ marginTop: 0 }}>Tạm tính</h3>
+                <h3 style={{ marginTop: 0 }}>{t('order.estimateTitle')}</h3>
 
                 {loiTamTinh && <ErrorBlock message={loiTamTinh} />}
 
-                {dangTinh && <p className="muted">Đang tính lại…</p>}
+                {dangTinh && <p className="muted">{t('order.recalculating')}</p>}
 
                 {tamTinh && (
                   <>
@@ -303,37 +334,50 @@ export default function DishOrderPage() {
                             <th style={{ fontWeight: 400 }}>
                               {d.dishName} × {d.quantity}
                             </th>
-                            <td style={{ textAlign: 'right' }}>{formatCurrency(d.lineTotal)}</td>
+                            <td style={{ textAlign: 'right' }}>{dd.tien(d.lineTotal)}</td>
                           </tr>
                         ))}
                         <tr>
-                          <th>Tiền món</th>
-                          <td style={{ textAlign: 'right' }}>{formatCurrency(tamTinh.subtotal)}</td>
+                          <th>{t('trackDish.subtotal')}</th>
+                          <td style={{ textAlign: 'right' }} data-test="order-subtotal">{dd.tien(tamTinh.subtotal)}</td>
                         </tr>
+                        {Number(tamTinh.discountAmount) > 0 && (
+                          <tr>
+                            <th>{t('trackDish.holidayDiscount')}</th>
+                            <td style={{ textAlign: 'right' }} data-test="order-discount">
+                              − {dd.tien(tamTinh.discountAmount)}
+                            </td>
+                          </tr>
+                        )}
                         <tr>
-                          <th>Phí giao</th>
-                          <td style={{ textAlign: 'right' }}>
-                            {Number(tamTinh.deliveryFee) === 0 ? 'Miễn phí' : formatCurrency(tamTinh.deliveryFee)}
+                          <th>{t('trackDish.deliveryFee')}</th>
+                          <td style={{ textAlign: 'right' }} data-test="order-delivery-fee">
+                            {Number(tamTinh.deliveryFee) === 0 ? t('track.free') : dd.tien(tamTinh.deliveryFee)}
                           </td>
                         </tr>
                         <tr>
-                          <th>Thuế giá trị gia tăng</th>
-                          <td style={{ textAlign: 'right' }}>{formatCurrency(tamTinh.vatAmount)}</td>
+                          <th>{t('trackDish.vat')}</th>
+                          <td style={{ textAlign: 'right' }} data-test="order-vat">{dd.tien(tamTinh.vatAmount)}</td>
                         </tr>
                         <tr>
-                          <th style={{ fontWeight: 600 }}>Tổng cộng</th>
-                          <td style={{ textAlign: 'right', fontWeight: 600 }}>
-                            {formatCurrency(tamTinh.total)}
+                          <th style={{ fontWeight: 600 }}>{t('track.total')}</th>
+                          <td style={{ textAlign: 'right', fontWeight: 600 }} data-test="order-total">
+                            {dd.tien(tamTinh.total)}
                           </td>
                         </tr>
                       </tbody>
                     </table>
 
-                    <p className="muted" style={{ fontSize: '0.84rem', marginTop: 12 }}>
-                      {tamTinh.deliveryNote}
+                    {tamTinh.discountNote && (
+                      <p className="muted" style={{ fontSize: '0.84rem', marginTop: 12 }} data-test="discount-note">
+                        {tDb(tamTinh, 'discountNote')}
+                      </p>
+                    )}
+                    <p className="muted" style={{ fontSize: '0.84rem', marginTop: 12 }} data-test="delivery-note">
+                      {tDb(tamTinh, 'deliveryNote')}
                     </p>
                     <p className="muted" style={{ fontSize: '0.84rem' }}>
-                      {tamTinh.leadTimeNote}
+                      {tDb(tamTinh, 'leadTimeNote')}
                     </p>
                   </>
                 )}
@@ -344,7 +388,7 @@ export default function DishOrderPage() {
                   style={{ width: '100%', marginTop: 10 }}
                   onClick={() => dispatch(xoaGio())}
                 >
-                  Xóa hết giỏ
+                  {t('order.clearCart')}
                 </button>
               </div>
             </div>

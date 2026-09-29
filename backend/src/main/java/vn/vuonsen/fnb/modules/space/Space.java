@@ -37,6 +37,10 @@ public class Space extends BaseEntity {
     @Column(nullable = false, length = 120)
     private String name;
 
+    // Để trống thì giao diện tự dùng bản tiếng Việt, xem NoiDungSongNgu
+    @Column(name = "name_en", length = 120)
+    private String nameEn;
+
     @Column(nullable = false, unique = true, length = 140)
     private String slug;
 
@@ -47,8 +51,14 @@ public class Space extends BaseEntity {
     @Column(name = "short_desc", length = 500)
     private String shortDesc;
 
+    @Column(name = "short_desc_en", length = 500)
+    private String shortDescEn;
+
     @Column(columnDefinition = "TEXT")
     private String description;
+
+    @Column(name = "description_en", columnDefinition = "TEXT")
+    private String descriptionEn;
 
     @Column(name = "capacity_min", nullable = false)
     private Integer capacityMin;
