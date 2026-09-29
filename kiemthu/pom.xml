@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <!--
+      Hệ thống kiểm thử giao diện tự động cho website Vườn Sen.
+
+      Selenium WebDriver điều khiển trình duyệt thật, mã kiểm thử tổ chức theo mô hình
+      Page Object Model. Tách thành dự án riêng, không nằm trong backend, vì đây là kiểm
+      thử hộp đen: nó chỉ biết địa chỉ trang web, không phụ thuộc mã nguồn máy chủ.
+
+      Cách chạy (giao diện phải đang chạy sẵn):
+        mvn test                                   chạy toàn bộ, mở trình duyệt thấy được
+        mvn test -Dheadless=true                   chạy ẩn, dùng trên máy chủ không màn hình
+        mvn test -Dtest=KiemThuXacThuc             chỉ chạy một nhóm kịch bản
+        mvn test -Dbase.url=http://localhost:5173  đổi địa chỉ trang cần kiểm thử
+    -->
+    <groupId>vn.vuonsen</groupId>
+    <artifactId>kiemthu-giao-dien</artifactId>
+    <version>1.0.0</version>
+    <name>Kiem thu giao dien Vuon Sen</name>
+
+    <properties>
+        <maven.compiler.release>17</maven.compiler.release>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+
+        <selenium.version>4.40.0</selenium.version>
+        <junit.version>5.12.2</junit.version>
+        <assertj.version>3.27.3</assertj.version>
+        <surefire.version>3.5.4</surefire.version>
+    </properties>
+
+    <dependencies>
+        <!-- Điều khiển trình duyệt. Từ bản 4.6 có Selenium Manager tự tải driver khớp phiên bản trình duyệt. -->
+        <dependency>
+            <groupId>org.seleniumhq.selenium</groupId>
+            <artifactId>selenium-java</artifactId>
+            <version>${selenium.version}</version>
+            <scope>test</scope>
+        </dependency>
+
+        <!-- Khung chạy kịch bản -->
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter</artifactId>
+            <version>${junit.version}</version>
+            <scope>test</scope>
+        </dependency>
+
+        <!-- Câu khẳng định đọc gần như tiếng tự nhiên, báo lỗi rõ ràng khi trượt -->
+        <dependency>
+            <groupId>org.assertj</groupId>
+            <artifactId>assertj-core</artifactId>
+            <version>${assertj.version}</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>${surefire.version}</version>
+                <configuration>
+                    <!--
+                      Surefire mặc định chỉ nhận lớp tên kiểu *Test, Test*, *Tests, *TestCase. Lớp kịch bản của
+                      dự án đặt tên KiemThu... nên phải khai báo, nếu không Surefire bỏ qua âm thầm và vẫn báo
+                      BUILD SUCCESS dù không chạy test nào. Lớp nền KiemThuCoSo là lớp trừu tượng nên tự bị bỏ qua.
+                    -->
+                    <includes>
+                        <include>**/KiemThu*.java</include>
+                        <include>**/*Test.java</include>
+                    </includes>
+                    <!-- Báo cáo in theo @DisplayName, tức mã và tên test case, thay vì tên phương thức Java -->
+                    <statelessTestsetReporter implementation="org.apache.maven.plugin.surefire.extensions.junit5.JUnit5Xml30StatelessReporter">
+                        <usePhrasedFileName>false</usePhrasedFileName>
+                        <usePhrasedTestSuiteClassName>true</usePhrasedTestSuiteClassName>
+                        <usePhrasedTestCaseClassName>true</usePhrasedTestCaseClassName>
+                        <usePhrasedTestCaseMethodName>true</usePhrasedTestCaseMethodName>
+                    </statelessTestsetReporter>
+                    <consoleOutputReporter implementation="org.apache.maven.plugin.surefire.extensions.junit5.JUnit5ConsoleOutputReporter">
+                        <usePhrasedFileName>false</usePhrasedFileName>
+                    </consoleOutputReporter>
+                    <statelessTestsetInfoReporter implementation="org.apache.maven.plugin.surefire.extensions.junit5.JUnit5StatelessTestsetInfoReporter">
+                        <usePhrasedFileName>false</usePhrasedFileName>
+                        <usePhrasedClassNameInRunning>true</usePhrasedClassNameInRunning>
+                        <usePhrasedClassNameInTestCaseSummary>true</usePhrasedClassNameInTestCaseSummary>
+                    </statelessTestsetInfoReporter>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+</project>
