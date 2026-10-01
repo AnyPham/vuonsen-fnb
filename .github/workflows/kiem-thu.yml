@@ -1,0 +1,243 @@
+# Chạy tự động hai bộ kiểm thử của đề tài trên máy chủ của GitHub.
+#
+# Hai bộ kiểm thử khác hẳn nhau nên tách thành hai công việc riêng:
+#
+#   kiem-thu-don-vi     181 kiểm thử đơn vị JUnit của backend. Chạy trên H2 trong bộ nhớ,
+#                       không cần cài thêm gì, xong trong vài phút.
+#
+#   kiem-thu-giao-dien  130 test case Selenium theo mô hình Page Object Model. Phải dựng
+#                       đủ MySQL, backend và giao diện rồi mới chạy được.
+#
+# Cố ý không cho công việc thứ hai phụ thuộc công việc thứ nhất. Đây là hai kết quả thực
+# nghiệm riêng của đề tài; kiểm thử đơn vị trượt mà chặn luôn kiểm thử giao diện thì mất
+# số liệu của lần chạy đó, trong khi hai bộ không kiểm cùng một thứ.
+
+name: Kiểm thử tự động
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  # Bấm chạy tay, dùng khi cần số liệu cho buổi báo cáo thực nghiệm
+  workflow_dispatch:
+
+# Đẩy liên tiếp nhiều lần thì chỉ giữ lần mới nhất, khỏi xếp hàng chờ vô ích
+concurrency:
+  group: kiem-thu-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # ===========================================================================
+  #  Kiểm thử đơn vị: backend, JUnit, cơ sở dữ liệu H2 trong bộ nhớ
+  # ===========================================================================
+  kiem-thu-don-vi:
+    name: Kiểm thử đơn vị (JUnit)
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Lấy mã nguồn
+        uses: actions/checkout@v4
+
+      - name: Cài JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: temurin
+          cache: maven
+
+      - name: Chạy 181 kiểm thử đơn vị
+        working-directory: backend
+        run: mvn -B test
+
+      - name: Lưu báo cáo kiểm thử
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: bao-cao-kiem-thu-don-vi
+          path: backend/target/surefire-reports/
+          if-no-files-found: warn
+
+  # ===========================================================================
+  #  Kiểm thử giao diện: Selenium WebDriver, Page Object Model, MySQL thật
+  # ===========================================================================
+  kiem-thu-giao-dien:
+    name: Kiểm thử giao diện (Selenium)
+    runs-on: ubuntu-latest
+    timeout-minutes: 75
+
+    env:
+      # Múi giờ phải đặt cho cả công việc chứ không riêng backend.
+      #
+      # Nhiều kịch bản tự tính "ngày mai" hoặc "sau 3 ngày" ở phía mã kiểm thử rồi đối
+      # chiếu với quy tắc báo trước mà backend kiểm. Máy chủ GitHub chạy giờ UTC, lệch
+      # 7 tiếng so với giờ Việt Nam, nên từ 17 giờ UTC trở đi hai bên sẽ hiểu "hôm nay"
+      # là hai ngày khác nhau và kịch bản trượt vì lý do không liên quan đến lỗi thật.
+      TZ: Asia/Ho_Chi_Minh
+
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          # Bỏ trống mật khẩu root cho khớp profile local, tức đúng môi trường XAMPP
+          # vẫn dùng khi chạy bộ kiểm thử trên máy cá nhân. Chạy ở đây hay chạy ở nhà
+          # đều cùng một cấu hình thì kết quả mới so sánh được với nhau.
+          MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
+          MYSQL_DATABASE: vuonsen_fnb
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping -h 127.0.0.1 -u root"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=15
+
+    steps:
+      - name: Lấy mã nguồn
+        uses: actions/checkout@v4
+
+      - name: Cài JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: temurin
+          cache: maven
+
+      - name: Cài Node 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      # Ghi lại phiên bản trình duyệt và trình điều khiển để đưa vào phần mô tả môi
+      # trường thực nghiệm của báo cáo. Máy chủ GitHub cài sẵn Google Chrome, còn
+      # ChromeDriver thì Selenium Manager của Selenium 4.40 tự tải khớp phiên bản.
+      - name: Ghi nhận môi trường thực nghiệm
+        run: |
+          {
+            echo "### Môi trường thực nghiệm"
+            echo ""
+            echo "| Thành phần | Phiên bản |"
+            echo "| --- | --- |"
+            echo "| Hệ điều hành | $(lsb_release -ds 2>/dev/null || uname -sr) |"
+            echo "| Java | $(java -version 2>&1 | head -1 | tr -d '"') |"
+            echo "| Node | $(node --version) |"
+            echo "| Trình duyệt | $(google-chrome --version 2>/dev/null || echo 'không có Google Chrome') |"
+            echo "| MySQL | 8.0 (dịch vụ của GitHub Actions) |"
+            echo "| Múi giờ | $TZ |"
+            echo ""
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Dịch backend
+        working-directory: backend
+        run: mvn -B -DskipTests package
+
+      - name: Khởi động backend
+        working-directory: backend
+        env:
+          # Profile local: MySQL ở localhost:3306, tài khoản root, mật khẩu để trống.
+          # Dùng local chứ không dùng prod vì prod chặn không cho lộ thông điệp lỗi ra
+          # ngoài, mà một số kịch bản lại kiểm đúng thông điệp lỗi hiện trên giao diện.
+          SPRING_PROFILES_ACTIVE: local
+          # Hai dòng này chỉ hạ bớt lượng log. Profile local vốn in mọi câu lệnh SQL,
+          # chạy 130 kịch bản thì tệp log phình lên hàng trăm megabyte.
+          SPRING_JPA_SHOW_SQL: 'false'
+          LOGGING_LEVEL_VN_VUONSEN_FNB: INFO
+          # Giao diện chạy ở cổng 4173 và gọi thẳng sang cổng 8080, tức khác nguồn,
+          # nên phải khai cổng này vào danh sách CORS được phép.
+          CORS_ORIGINS: http://localhost:4173
+        run: |
+          JAR=$(find target -maxdepth 1 -name '*.jar' ! -name '*.original' | head -1)
+          if [ -z "$JAR" ]; then
+            echo "Không tìm thấy tệp jar trong backend/target"
+            exit 1
+          fi
+          echo "Chạy $JAR"
+          nohup java -jar "$JAR" > "$GITHUB_WORKSPACE/backend.log" 2>&1 &
+          echo $! > "$GITHUB_WORKSPACE/backend.pid"
+
+      - name: Chờ backend sẵn sàng
+        run: |
+          # Thăm dò một đường dẫn công khai thật. Dự án không có Spring Boot Actuator
+          # nên /actuator/health trả 404 dù SecurityConfig có cho phép đường dẫn đó.
+          for i in $(seq 1 90); do
+            if curl -fsS http://localhost:8080/api/v1/spaces > /dev/null 2>&1; then
+              echo "Backend sẵn sàng sau khoảng $((i * 2)) giây"
+              exit 0
+            fi
+            sleep 2
+          done
+          echo "Backend không khởi động được trong 180 giây. Nhật ký:"
+          tail -100 "$GITHUB_WORKSPACE/backend.log" || true
+          exit 1
+
+      - name: Cài thư viện giao diện
+        working-directory: frontend
+        run: npm ci
+
+      - name: Dịch giao diện
+        working-directory: frontend
+        env:
+          # Bản dịch tĩnh không có proxy của Vite nên phải ghi thẳng địa chỉ backend
+          # vào lúc dịch. Để trống như khi chạy npm run dev thì mọi lệnh gọi API sẽ
+          # trỏ về chính cổng 4173 và nhận 404.
+          VITE_API_BASE_URL: http://localhost:8080
+        run: npm run build
+
+      - name: Khởi động giao diện
+        working-directory: frontend
+        run: |
+          nohup npm run preview -- --port 4173 --strictPort > "$GITHUB_WORKSPACE/frontend.log" 2>&1 &
+          echo $! > "$GITHUB_WORKSPACE/frontend.pid"
+
+      - name: Chờ giao diện sẵn sàng
+        run: |
+          for i in $(seq 1 60); do
+            if curl -fsS http://localhost:4173 > /dev/null 2>&1; then
+              echo "Giao diện sẵn sàng sau khoảng $((i * 2)) giây"
+              exit 0
+            fi
+            sleep 2
+          done
+          echo "Giao diện không khởi động được trong 120 giây. Nhật ký:"
+          tail -50 "$GITHUB_WORKSPACE/frontend.log" || true
+          exit 1
+
+      - name: Chạy 130 test case Selenium
+        working-directory: kiemthu
+        run: |
+          mvn -B test \
+            -Dbase.url=http://localhost:4173 \
+            -Dapi.url=http://localhost:8080 \
+            -Dheadless=true
+
+      # Bảng kết quả hiện ngay ở trang tóm tắt của lần chạy, lấy số liệu cho mục
+      # "bảng thống kê kết quả kiểm thử" của báo cáo mà không phải tải tệp về đọc.
+      # Chạy kể cả khi bước trên trượt, vì lúc trượt mới càng cần biết trượt ở đâu.
+      - name: Tổng hợp kết quả
+        if: always()
+        run: node cong-cu/kiem-tra/tom-tat-ket-qua.js >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Lưu báo cáo và ảnh chụp lỗi
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: bao-cao-kiem-thu-giao-dien
+          path: |
+            kiemthu/target/surefire-reports/
+            kiemthu/target/anh-loi/
+            backend.log
+            frontend.log
+          if-no-files-found: warn
+
+      - name: Dừng backend và giao diện
+        if: always()
+        run: |
+          for ten in backend frontend; do
+            tep="$GITHUB_WORKSPACE/$ten.pid"
+            if [ -f "$tep" ]; then
+              kill "$(cat "$tep")" 2>/dev/null || true
+            fi
+          done
