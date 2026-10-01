@@ -81,6 +81,17 @@
     "featured": "Most chosen",
     "perTable": "table",
     "choose": "Choose this package",
+    "filterMaxPrice": "Maximum price per table",
+    "pricePlaceholder": "e.g. 5000000",
+    "filterMinDishes": "Minimum number of dishes",
+    "dishesPlaceholder": "e.g. 8",
+    "filterHours": "Time in the space",
+    "hoursAll": "Any",
+    "hoursHalfDay": "4 hours or more",
+    "hoursFullDay": "Full day, 8 hours or more",
+    "clear": "Clear filters",
+    "count": "{{n}} matching packages",
+    "empty": "No package matches your choices. Try raising the price or lowering the number of dishes.",
     "footnote": "Meet a venue’s minimum food spend and the hire fee is waived · Book 60 days ahead for a further 5% off"
   },
   "promotions": {

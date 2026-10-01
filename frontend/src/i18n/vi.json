@@ -81,6 +81,17 @@
     "featured": "Được chọn nhiều nhất",
     "perTable": "mâm",
     "choose": "Chọn gói này",
+    "filterMaxPrice": "Giá tối đa mỗi mâm",
+    "pricePlaceholder": "Ví dụ: 5000000",
+    "filterMinDishes": "Số món tối thiểu",
+    "dishesPlaceholder": "Ví dụ: 8",
+    "filterHours": "Thời gian dùng không gian",
+    "hoursAll": "Tất cả",
+    "hoursHalfDay": "Từ 4 giờ trở lên",
+    "hoursFullDay": "Trọn ngày, từ 8 giờ",
+    "clear": "Bỏ lọc",
+    "count": "{{n}} gói phù hợp",
+    "empty": "Không có gói nào khớp với lựa chọn. Thử nâng mức giá hoặc giảm số món tối thiểu.",
     "footnote": "Tiền ăn đạt mức tối thiểu của từng không gian thì miễn phí tiền thuê · Đặt trước 60 ngày giảm thêm 5%"
   },
   "promotions": {

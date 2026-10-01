@@ -34,7 +34,7 @@ export const dishOrderApi = {
 };
 
 export const packageApi = {
-  list: () => axiosClient.get('/api/v1/packages'),
+  list: (params) => axiosClient.get('/api/v1/packages', { params }),
 };
 
 export const recommendationApi = {
