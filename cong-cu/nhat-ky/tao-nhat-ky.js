@@ -1074,8 +1074,8 @@ const doc = new Document({
       ]),
       p('Thêm script tom-tat-ket-qua.js đọc báo cáo XML của Surefire rồi in bảng Pass/Fail kèm thời gian từng luồng thẳng lên trang tóm tắt của lần chạy. Đây chính là số liệu cần cho mục bảng thống kê kết quả kiểm thử, khỏi phải tải tệp về mở từng tệp một.', { size: 23 }),
       p('Kiểm chứng trước khi đẩy lên, bằng cách dựng lại đúng môi trường đó ngay trên máy: bản dịch production phục vụ qua vite preview ở cổng 4173, gọi API khác nguồn sang 8080, Chrome chạy ẩn. Preflight từ nguồn 4173 trả 200 đủ header, nguồn lạ 9999 bị chặn 403, đường dẫn sâu /thuc-don trả 200 nên SPA fallback đúng. Chạy thật hai nhóm kịch bản trên cấu hình đó: 18/18 đạt.', { italic: true, size: 21 }),
-      p('Workflow chưa chạy lần nào trên GitHub: nó chỉ kích hoạt khi mã nằm trên nhánh main, mà nhánh hiện tại chưa hợp nhất. Ghi rõ ở đây để không nhầm "đã viết xong" thành "đã chạy được".', { size: 23 }),
-      khongAnh('việc này; kết quả chạy sẽ nằm ở trang tóm tắt của GitHub Actions sau khi hợp nhất.'),
+      p('Đã chạy thật trên GitHub, hai lần đều đạt. Lần một ngày 01/10 kích hoạt khi mở Pull Request #15, chạy hết 7 phút 25 giây. Lần hai kích hoạt khi hợp nhất vào nhánh main ở commit 60e83a3, chạy hết 6 phút 59 giây: công việc kiểm thử đơn vị 1 phút 1 giây, công việc kiểm thử giao diện 6 phút 56 giây, cả hai đều Success và sinh ra hai tệp báo cáo đính kèm. Hai lần này chạy bộ 130 test case vì chúng diễn ra trước khi thêm Luồng 16.', { size: 23 }),
+      khongAnh('việc này; kết quả hai lần chạy nằm ở tab Actions của kho mã nguồn, kèm tệp báo cáo tải về được.'),
 
       h2('Việc 59 — Bộ lọc gói tiệc, mở rộng danh sách gói và Luồng 16 kiểm thử'),
       p('Ngày 01/10 – 02/10/2026, commit 2974198 và 440b750.', { italic: true, size: 21 }),
@@ -1119,7 +1119,7 @@ const doc = new Document({
           new TableRow({ children: [cell("7", 520), cell("01/10 – 07/10", 1500), cell("Viết test case tự động bằng Selenium", 3200), cell("Xong sớm. 140 test case trên 16 luồng nghiệp vụ", 3806)] }),
           new TableRow({ children: [cell("8", 520), cell("08/10 – 15/10", 1500), cell("Hoàn thiện bộ test, assertion, xử lý chờ và trường hợp không đạt", 3200), cell("Xong sớm ngày 20/09. Sửa ba chỗ chập chờn trong kịch bản và sáu lỗi website, kết quả 130/130; sau khi thêm Luồng 16 ngày 01/10 thì đạt 140/140", 3806)] }),
           new TableRow({ children: [cell("9", 520), cell("16/10 – 22/10", 1500), cell("Nghiên cứu Git, GitHub và GitHub Actions", 3200), cell("Xong sớm ngày 20/09. NghienCuu_Git_GitHubActions.docx, kèm khung workflow dự kiến", 3806)] }),
-          new TableRow({ children: [cell("10", 520), cell("23/10 – 30/10", 1500), cell("Viết và cấu hình workflow GitHub Actions", 3200), cell("Đã viết xong ngày 01/10 và đẩy lên GitHub, sớm 22 ngày. Chưa chạy lần nào vì workflow chỉ kích hoạt khi mã nằm trên nhánh main", 3806)] }),
+          new TableRow({ children: [cell("10", 520), cell("23/10 – 30/10", 1500), cell("Viết và cấu hình workflow GitHub Actions", 3200), cell("Xong sớm 22 ngày. Viết ngày 01/10, đã chạy thật trên GitHub hai lần, cả hai đều Success; lần trên nhánh main hết 6 phút 59 giây", 3806)] }),
           new TableRow({ children: [cell("11", 520), cell("31/10 – 07/11", 1500), cell("Hoàn thiện tích hợp Selenium, POM và Actions", 3200), cell("Chưa làm", 3806)] }),
           new TableRow({ children: [cell("12", 520), cell("08/11 – 15/11", 1500), cell("Thực nghiệm: chạy toàn bộ test case, ghi Pass/Fail, thời gian, lỗi", 3200), cell("Làm trước một phần. Đã có 8 lần chạy ghi trong BaoCao_KiemThuTuDong.docx; đợt thực nghiệm chính thức sẽ chạy lại sau khi có Actions", 3806)] }),
           new TableRow({ children: [cell("13", 520), cell("16/11 – 23/11", 1500), cell("Phân tích kết quả thực nghiệm", 3200), cell("Một phần. Đã phân tích 10 lỗi phát hiện được; phần đánh giá GitHub Actions chưa có", 3806)] }),
@@ -1149,7 +1149,7 @@ const doc = new Document({
       bullet('Nhánh gọi mô hình ngôn ngữ mới kiểm chứng bằng bản giả và bằng một khóa sai; đường gọi thành công chưa chạy lần nào.'),
       h2('Chặng hai — hệ thống kiểm thử tự động'),
       bullet('Quay bản video demo đầy đủ 5 test case bằng công cụ QuayManHinh và GhepVideo, lệnh đã soạn sẵn.'),
-      bullet('Hợp nhất nhánh vào main để workflow GitHub Actions chạy lần đầu. Phần viết và cấu hình đã xong ở Việc 58.'),
+      
       bullet('Mười một mốc còn lại từ 08/10 đến 16/12: hoàn thiện bộ test, GitHub Actions, thực nghiệm chính thức, phân tích kết quả và viết tiểu luận.'),
       bullet('Rút ngắn thời gian chạy, hiện khoảng 8 phút cho 140 test case; thử chạy song song các lớp kịch bản và chạy thêm trên Edge.'),
       h2('Mã nguồn'),
