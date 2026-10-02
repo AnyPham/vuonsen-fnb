@@ -26,9 +26,27 @@ class ApplicationSmokeTest {
     @Test
     @DisplayName("Ứng dụng khởi động được và nạp đủ dữ liệu mẫu")
     void contextLoadsWithSeedData() {
+        // Sáu không gian là con số cố định của đề tài, nhà hàng không thể tự mọc thêm sảnh
         assertThat(spaceRepository.findByActiveTrueOrderBySortOrderAsc()).hasSize(6);
-        assertThat(packageRepository.findByActiveTrueOrderBySortOrderAsc()).hasSize(3);
         assertThat(dishRepository.search(null, null)).hasSizeGreaterThan(20);
+
+        /*
+         * Gói tiệc thì ngược lại: đây là danh mục kinh doanh, quản trị thêm gói là chuyện
+         * bình thường. Dòng này từng đòi đúng ba gói và trượt ngay khi V23 thêm năm gói
+         * nữa, dù không có gì hỏng. Kiểm thứ thật sự cần: có gói để bán, và mỗi gói đều
+         * đủ ba con số mà trang bảng giá lẫn bộ lọc đều dùng đến.
+         *
+         * Không đụng tới features ở đây: quan hệ đó tải chậm, mà kiểm thử này chạy ngoài
+         * giao dịch nên đọc vào là ném LazyInitializationException.
+         */
+        var goiDangBan = packageRepository.findByActiveTrueOrderBySortOrderAsc();
+        assertThat(goiDangBan).hasSizeGreaterThanOrEqualTo(3);
+        assertThat(goiDangBan).allSatisfy(goi -> {
+            assertThat(goi.getName()).isNotBlank();
+            assertThat(goi.getPricePerTable()).isPositive();
+            assertThat(goi.getDishCount()).isPositive();
+            assertThat(goi.getHoursIncluded()).isPositive();
+        });
 
         /*
          * Lọc theo danh mục: kiểm tính chất chứ không kiểm số lượng.

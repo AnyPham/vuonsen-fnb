@@ -17,9 +17,25 @@ public class ThanhDieuHuong extends TrangCoSo {
     private static final By NUT_DANG_XUAT = dt("nav-logout");
     private static final By NUT_QUAN_TRI = dt("nav-admin");
     private static final By MUC_DON_CUA_TOI = dt("nav-my-orders");
+    private static final By NUT_NGON_NGU = dt("lang-switch");
 
     public ThanhDieuHuong(WebDriver driver) {
         super(driver);
+    }
+
+    /*
+     * Đổi ngôn ngữ hiển thị, mã là "vi" hoặc "en".
+     *
+     * Ô chọn ngôn ngữ nằm trong thanh điều hướng nên đặt ở đây, dùng chung cho mọi trang.
+     * Phải bấm nút mở danh sách trước rồi mới bấm được mục bên trong: danh sách chỉ được
+     * dựng ra khi mở, lúc đóng thì không có trong trang chứ không phải bị ẩn.
+     */
+    public ThanhDieuHuong doiNgonNgu(String ma) {
+        bam(NUT_NGON_NGU);
+        bam(dt("lang-option-" + ma));
+        // Thuộc tính lang của thẻ html đổi theo ngôn ngữ, chờ nó đổi là chắc đã áp dụng xong
+        cho.until(d -> ma.equals(d.findElement(By.tagName("html")).getAttribute("lang")));
+        return this;
     }
 
     /*

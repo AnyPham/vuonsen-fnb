@@ -13,7 +13,14 @@
  * test case thi bang tong hop tu dong dung theo.
  *
  * Cap nhat 17/09/2026: doi chieu voi ma kiem thu kiemthu/.../kichban, them Luong 14, 15,
- * sua ket qua mong doi cho dung cach giao dien chan loi. Chay:
+ * sua ket qua mong doi cho dung cach giao dien chan loi.
+ *
+ * Cap nhat 01/10/2026: them Luong 16 cho trang goi tiec. Truoc do ca bo kiem thu khong co
+ * kich ban nao di qua trang bang gia, du day la mot trong nam trang khach xem nhieu nhat
+ * truoc khi quyet dinh dat tiec. Du lieu mong doi lay theo migration V23, ban mo rong danh
+ * sach goi tiec tu 3 len 8.
+ *
+ * Chay:
  *   node tao-dac-ta.js [duong dan ra]
  */
 const {
@@ -115,6 +122,7 @@ const LOP = {
   BOOK: 'KiemThuDatTiec', BOOKV: 'KiemThuRangBuocDatTiec', TRACK: 'KiemThuTraCuuTiec', DISH: 'KiemThuDatMon',
   DISHV: 'KiemThuRangBuocDatMon', REV: 'KiemThuDanhGia', BOT: 'KiemThuTroLy', PERM: 'KiemThuPhanQuyen',
   ADMIN: 'KiemThuQuanTri', HOL: 'KiemThuGiamGiaNgayLe', HADM: 'KiemThuQuanTriNgayLe',
+  PKG: 'KiemThuGoiTiec',
 };
 const luong = (ma, ten, url, tienDieuKien, ds) => {
   LUONG.push({ ma, ten, url, tienDieuKien, ds, lop: LOP[ma] });
@@ -583,6 +591,45 @@ luong('HADM', 'Quản trị ngày lễ', '/quan-tri/ngay-le',
   { ma: 'TC-HADM-12', mucTieu: "Khách chưa đăng nhập bị chuyển sang trang đăng nhập",
     buoc: ["1. Chưa đăng nhập", "2. Mở /quan-tri/ngay-le"],
     ketQua: "Bị chuyển về trang đăng nhập.", loai: N, uuTien: C },
+]);
+
+// ---------- 16 ----------
+luong('PKG', 'Xem và lọc gói tiệc', '/goi-tiec',
+  'Dữ liệu mẫu sau migration V23 có 8 gói tiệc đang bán, xếp theo giá mỗi mâm tăng dần: '
+  + 'Họp Mặt 1.800.000đ/5 món/2 giờ, Đồng Quê 2.900.000đ/7 món/3 giờ, Sen Trắng 3.600.000đ/7 món/4 giờ, '
+  + 'Tất Niên 3.900.000đ/9 món/4 giờ, Sen Vàng 4.500.000đ/8 món/5 giờ, Hội Nghị 5.200.000đ/8 món/8 giờ, '
+  + 'Thượng Uyển 6.800.000đ/10 món/12 giờ, Cưới Trọn Gói 8.500.000đ/12 món/10 giờ. '
+  + 'Kịch bản đối chiếu bằng mã gói ở thuộc tính data-code, không bằng tên, vì tên đổi theo ngôn ngữ.', [
+  { ma: 'TC-PKG-01', mucTieu: 'Danh sách hiện đủ tám gói, xếp theo giá tăng dần',
+    buoc: ['1. Mở /goi-tiec'],
+    ketQua: 'Hiện đúng 8 thẻ theo thứ tự: Họp Mặt, Đồng Quê, Sen Trắng, Tất Niên, Sen Vàng, Hội Nghị, Thượng Uyển, Cưới Trọn Gói', loai: T, uuTien: C },
+  { ma: 'TC-PKG-02', mucTieu: 'Lọc theo ngân sách tối đa 4.000.000đ mỗi mâm',
+    buoc: ['1. Mở /goi-tiec', '2. Nhập 4000000 vào ô giá tối đa mỗi mâm'],
+    ketQua: 'Còn 4 gói: Họp Mặt, Đồng Quê, Sen Trắng, Tất Niên. Sen Vàng 4.500.000đ trở lên đều bị loại.', loai: T, uuTien: C },
+  { ma: 'TC-PKG-03', mucTieu: 'Lọc theo số món tối thiểu là 9 món',
+    buoc: ['1. Mở /goi-tiec', '2. Nhập 9 vào ô số món tối thiểu'],
+    ketQua: 'Còn 3 gói: Tất Niên (9 món), Thượng Uyển (10 món), Cưới Trọn Gói (12 món). Sen Vàng 8 món bị loại dù chỉ thiếu một món.', loai: T, uuTien: C },
+  { ma: 'TC-PKG-04', mucTieu: 'Lọc trọn ngày chỉ giữ gói dùng không gian từ 8 giờ',
+    buoc: ['1. Mở /goi-tiec', '2. Chọn "Trọn ngày, từ 8 giờ" ở ô thời gian'],
+    ketQua: 'Còn 3 gói: Hội Nghị (8 giờ), Thượng Uyển (12 giờ), Cưới Trọn Gói (10 giờ). Mốc 8 giờ lấy theo app.booking.full-day-package-hours, điều kiện là từ 8 giờ trở lên chứ không phải bằng đúng một con số.', loai: T, uuTien: C },
+  { ma: 'TC-PKG-05', mucTieu: 'Lọc nửa ngày giữ gói từ 4 giờ trở lên',
+    buoc: ['1. Mở /goi-tiec', '2. Chọn "Từ 4 giờ trở lên" ở ô thời gian'],
+    ketQua: 'Còn 6 gói, loại Họp Mặt (2 giờ) và Đồng Quê (3 giờ)', loai: T, uuTien: TB },
+  { ma: 'TC-PKG-06', mucTieu: 'Kết hợp ba tiêu chí lọc cùng lúc',
+    buoc: ['1. Mở /goi-tiec', '2. Giá tối đa 4.000.000', '3. Số món tối thiểu 9', '4. Chọn từ 4 giờ trở lên'],
+    ketQua: 'Chỉ còn Tất Niên, gói duy nhất thỏa cả ba: 3.900.000đ, 9 món, 4 giờ', loai: T, uuTien: C },
+  { ma: 'TC-PKG-07', mucTieu: 'Lọc không ra kết quả thì hiện khối thông báo rỗng',
+    buoc: ['1. Mở /goi-tiec', '2. Nhập 20 vào ô số món tối thiểu'],
+    ketQua: 'Danh sách rỗng, hiện câu "Không có gói nào khớp với lựa chọn. Thử nâng mức giá hoặc giảm số món tối thiểu.", không hiện lỗi kỹ thuật', loai: N, uuTien: C },
+  { ma: 'TC-PKG-08', mucTieu: 'Bấm Bỏ lọc thì danh sách quay lại đủ tám gói',
+    buoc: ['1. Mở /goi-tiec, nhập giá tối đa 2.000.000 để còn 1 kết quả', '2. Bấm nút Bỏ lọc'],
+    ketQua: 'Danh sách quay lại đủ 8 gói, các ô lọc trống, nút Bỏ lọc biến mất. Khác trang không gian: trang này có nút bỏ lọc thật, không phải xóa tay từng ô.', loai: T, uuTien: TB },
+  { ma: 'TC-PKG-09', mucTieu: 'Dòng đếm chỉ hiện khi đang lọc và đếm đúng số gói',
+    buoc: ['1. Mở /goi-tiec, chưa lọc gì', '2. Nhập giá tối đa 4.000.000'],
+    ketQua: 'Lúc chưa lọc không có dòng đếm; sau khi lọc hiện "4 gói phù hợp". Cố ý giấu lúc chưa lọc vì câu đếm không nói thêm gì ngoài danh sách bày ngay bên dưới.', loai: T, uuTien: Th },
+  { ma: 'TC-PKG-10', mucTieu: 'Chuyển sang tiếng Anh thì đổi cả nhãn bộ lọc lẫn tên gói',
+    buoc: ['1. Mở /goi-tiec, xác nhận đang hiện tên tiếng Việt', '2. Bấm ô chọn ngôn ngữ, chọn English'],
+    ketQua: 'Nhãn ô lọc giá thành "Maximum price per table", tên gói thành "Get-together Package" và "Full Wedding Package", danh sách vẫn đủ 8 gói. Đây là kịch bản duy nhất canh chức năng song ngữ: trang này có cả chữ cố định lấy từ tệp ngôn ngữ lẫn chữ lấy từ cơ sở dữ liệu nên kiểm được cả hai đường dịch.', loai: T, uuTien: C },
 ]);
 
 // ============================================================

@@ -127,8 +127,14 @@ export default function PackagesPage() {
               style={pkg.featured ? { borderColor: 'var(--gold)', borderWidth: 2 } : undefined}
             >
               <div className="card-body">
-                {pkg.featured && <span className="tag tag-CONFIRMED">{t('packages.featured')}</span>}
-                <h3 style={{ marginTop: 10 }}>{tDb(pkg, 'name')}</h3>
+                {pkg.featured && (
+                  <span className="tag tag-CONFIRMED" data-test="package-featured">
+                    {t('packages.featured')}
+                  </span>
+                )}
+                <h3 data-test="package-name" style={{ marginTop: 10 }}>
+                  {tDb(pkg, 'name')}
+                </h3>
                 <p className="muted" style={{ fontSize: '0.9rem' }}>
                   {tDb(pkg, 'tagline')}
                 </p>

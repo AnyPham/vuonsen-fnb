@@ -10,6 +10,7 @@ import vn.vuonsen.fnb.modules.recommendation.dto.Suggestion;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.Comparator;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -109,16 +110,45 @@ class RecommendationServiceTest {
                 .isGreaterThan(giaDinh.get(0).partyPackage().getPricePerTable());
     }
 
+    /*
+     * Bản cũ của kiểm thử này đòi cả ba phương án xếp theo điểm giảm dần. Điều đó chưa
+     * bao giờ là hợp đồng của hàm: khi không đủ sảnh khác nhau, nhóm nới giới hạn được
+     * nối vào cuối và có thể hơn điểm phương án của sảnh thứ hai. Hồi còn ba gói tiệc
+     * thì số tổ hợp ít nên nó tình cờ vẫn đúng; lên tám gói là trượt ngay, dù không có
+     * gì hỏng. Đổi hàm cho khớp kiểm thử thì mất tính đa dạng sảnh, mà đó mới là thứ
+     * khách nhìn thấy, nên sửa kiểm thử cho đúng hợp đồng thật.
+     *
+     * Hai điều thật sự phải giữ: trả đủ số phương án, và phương án đầu bảng là phương
+     * án điểm cao nhất, tức khách không bao giờ bị giấu lựa chọn hợp nhất xuống dưới.
+     */
     @Test
-    @DisplayName("Trả về đúng ba gợi ý, xếp theo điểm giảm dần")
-    void returnsTopThreeSortedByScore() {
+    @DisplayName("Trả về đúng ba gợi ý, phương án đầu bảng là phương án điểm cao nhất")
+    void returnsTopThreeWithBestFirst() {
         var result = recommendationService.suggest(new RecommendationRequest(
                 300, EventType.WEDDING, null, LocalDate.now().plusDays(30)));
 
         assertThat(result).hasSize(3);
+        assertThat(result.get(0).score())
+                .as("phương án đầu bảng phải là phương án điểm cao nhất")
+                .isEqualTo(result.stream().map(Suggestion::score)
+                        .max(Comparator.naturalOrder()).orElseThrow());
+    }
+
+    /*
+     * Khi có đủ sảnh khác nhau thì không có nhóm nới giới hạn, lúc đó cả danh sách phải
+     * xếp theo điểm giảm dần. Giữ phép kiểm này để đường đi thường gặp vẫn được canh.
+     */
+    @Test
+    @DisplayName("Đủ sảnh khác nhau thì cả ba phương án xếp theo điểm giảm dần")
+    void duSanhThiXepTheoDiemGiamDan() {
+        // 40 khách thì sảnh nào cũng chứa được, nên mỗi phương án một sảnh riêng
+        var result = recommendationService.suggest(new RecommendationRequest(
+                40, EventType.FAMILY, null, LocalDate.now().plusDays(30)));
+
+        assertThat(result).hasSize(3);
+        assertThat(result).extracting(s -> s.space().getId()).doesNotHaveDuplicates();
         for (int i = 1; i < result.size(); i++) {
-            assertThat(result.get(i - 1).score())
-                    .isGreaterThanOrEqualTo(result.get(i).score());
+            assertThat(result.get(i - 1).score()).isGreaterThanOrEqualTo(result.get(i).score());
         }
     }
 
