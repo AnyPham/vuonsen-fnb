@@ -53,23 +53,71 @@ class LlmAssistantTest {
         }
     }
 
+    /*
+     * Bản giả của một nhà cung cấp đòi khóa API.
+     *
+     * Cần riêng lớp này vì LlmAssistant nay hỏi chính client xem đã đủ điều kiện chưa,
+     * thay vì tự kiểm tra khóa. Không có nó thì không dựng lại được tình huống
+     * "bật nhưng chưa có khóa".
+     */
+    private record ClientDoiKhoa(String khoa) implements LlmClient {
+        @Override
+        public String hoi(String chiDanHeThong, List<LuotHoiThoai> lichSu, String cauHoi) {
+            return "khong bao gio goi toi";
+        }
+
+        @Override
+        public String tenDichVu() {
+            return "dich-vu-doi-khoa";
+        }
+
+        @Override
+        public boolean sanSang() {
+            return khoa != null && !khoa.isBlank();
+        }
+    }
+
     private AssistantFacade dungTroLy(boolean bat, String khoa, LlmClient client) {
         var cauHinh = new AssistantProperties(
-                new AssistantProperties.Llm(bat, khoa, "http://khong-goi-toi", "model-thu", "low", 500, 8));
+                new AssistantProperties.Llm(bat, AssistantProperties.Llm.ANTHROPIC,
+                        khoa, "http://khong-goi-toi", "model-thu", "low", 500, 8));
         return new AssistantFacade(duPhong, new LlmAssistant(cauHinh, client, contextBuilder));
     }
 
     // ---------------- Cơ chế dự phòng ----------------
 
+    /*
+     * Dùng bản giả đòi khóa chứ không dùng ClientGia.
+     *
+     * Việc quyết định "đã đủ điều kiện gọi chưa" nằm ở chính client, vì mỗi nhà cung cấp
+     * một yêu cầu khác nhau — Gemini và Anthropic đòi khóa, Ollama chạy trên máy nên không
+     * có khóa nào. ClientGia không đòi gì nên nó luôn sẵn sàng, không dựng lại được tình
+     * huống thiếu khóa.
+     */
     @Test
     @DisplayName("Chưa cấu hình khóa API thì trả lời bằng cơ chế dự phòng")
     void fallsBackWhenApiKeyMissing() {
-        var troLy = dungTroLy(true, "", new ClientGia("lẽ ra không được gọi", null));
+        var troLy = dungTroLy(true, "", new ClientDoiKhoa(""));
 
         AnswerResponse kq = troLy.answer(CAU_HOI);
 
         assertThat(kq.source()).isEqualTo(AnswerSource.DU_PHONG);
         assertThat(kq.answer()).contains("Sảnh Ven Sông");
+    }
+
+    /*
+     * Ollama chạy ngay trên máy nên không có khóa API nào. Trước đây điều kiện bật nằm ở
+     * cấu hình và bắt buộc phải có khóa, nghĩa là đường Ollama không bao giờ bật lên được.
+     */
+    @Test
+    @DisplayName("Nhà cung cấp không cần khóa, như Ollama, thì bật được dù khóa để trống")
+    void batDuocKhiNhaCungCapKhongCanKhoa() {
+        var troLy = dungTroLy(true, "", new ClientGia("Sảnh Sen Vàng chứa 200 đến 500 khách.", null));
+
+        AnswerResponse kq = troLy.answer(CAU_HOI);
+
+        assertThat(kq.source()).isEqualTo(AnswerSource.MO_HINH_NGON_NGU);
+        assertThat(kq.answer()).isEqualTo("Sảnh Sen Vàng chứa 200 đến 500 khách.");
     }
 
     @Test

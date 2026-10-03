@@ -41,8 +41,15 @@ public class LlmAssistant {
         this.contextBuilder = contextBuilder;
     }
 
+    /*
+     * Bật được khi cấu hình cho phép và chính client báo đã đủ điều kiện.
+     *
+     * Hỏi client thay vì tự kiểm tra khóa API, vì mỗi nhà cung cấp một yêu cầu khác nhau:
+     * Gemini và Anthropic đòi khóa, còn Ollama chạy ngay trên máy nên không có khóa nào.
+     * Kiểm tra khóa ở đây thì đường Ollama không bao giờ bật lên được.
+     */
     public boolean batDuoc() {
-        return cauHinh.dungDuoc();
+        return cauHinh.enabled() && client.sanSang();
     }
 
     /*
@@ -57,8 +64,8 @@ public class LlmAssistant {
         } else if (!cauHinh.enabled()) {
             log.info("Trợ lý tư vấn: AI đang tắt trong cấu hình, trả lời bằng cơ chế dự phòng");
         } else {
-            log.info("Trợ lý tư vấn: chưa có khóa API nên trả lời bằng cơ chế dự phòng. "
-                    + "Dán khóa vào backend/tro-ly-ai.properties rồi khởi động lại để bật AI");
+            log.info("Trợ lý tư vấn: {} — đang trả lời bằng cơ chế dự phòng. "
+                    + "Xong thì khởi động lại backend", client.huongDanBat());
         }
     }
 
