@@ -335,7 +335,7 @@ const khoi = (ten) => d.push('', `-- ================= ${ten} =================`
 d.push('/*');
 d.push(' * Dữ liệu quy mô lớn cho website Vườn Sen.');
 d.push(' *');
-d.push(` * Sinh ngày ${ngayISO(HOM_NAY)} bằng cong-cu/du-lieu-mau/tao-du-lieu-lon.js.`);
+d.push(' * Sinh bằng cong-cu/du-lieu-mau/tao-du-lieu-lon.js.');
 d.push(' * KHÔNG phải migration của Flyway: đây là dữ liệu để xem cho giống hệ thống chạy thật,');
 d.push(' * không phải một phần cấu trúc cơ sở dữ liệu. Nạp bằng tay khi cần.');
 d.push(' *');

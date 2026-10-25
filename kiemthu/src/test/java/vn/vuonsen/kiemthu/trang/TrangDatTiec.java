@@ -249,4 +249,73 @@ public class TrangDatTiec extends TrangCoSo {
     public BangTamTinh bangTamTinh() {
         return new BangTamTinh(driver);
     }
+
+    // ================= Thực đơn tự chọn cho tiệc nhỏ =================
+
+    private static final By NUT_TU_CHON = dt("custom-menu-pick");
+    private static final By KHOI_TU_CHON = dt("custom-menu");
+    private static final By DONG_MON = dt("custom-menu-row");
+    private static final By TONG_MON = dt("custom-menu-total");
+    private static final By TIEN_AN = dt("food-total");
+    private static final By SO_MAM = dt("table-count");
+
+    /*
+     * Bấm Tiếp tục nhưng không chờ sang bước sau.
+     *
+     * Dùng cho các ca đúng ra phải bị chặn lại: tiepTuc() bình thường chờ bước ba hiện
+     * ra nên gặp lỗi hết giờ thay vì đọc được câu báo lỗi.
+     */
+    public TrangDatTiec thuTiepTuc() {
+        bam(NUT_TIEP_TUC);
+        return this;
+    }
+
+    /** Chờ bảng tạm tính tính xong rồi mới trả lời, dùng cho các ca đúng ra phải có tiền ăn. */
+    public boolean choBangTamTinhCoTienAn() {
+        choHien(TIEN_AN);
+        return true;
+    }
+
+    /** Lựa chọn tự chọn món chỉ hiện với nhóm nhỏ, nên đây là phép kiểm nhanh không chờ. */
+    public boolean coLuaChonTuChonMon() {
+        return dangCo(NUT_TU_CHON);
+    }
+
+    public TrangDatTiec chonTuChonMon() {
+        bam(NUT_TU_CHON);
+        choHien(KHOI_TU_CHON);
+        return this;
+    }
+
+    public int soDongMon() {
+        choHien(KHOI_TU_CHON);
+        return driver.findElements(DONG_MON).size();
+    }
+
+    /** Bấm dấu cộng ở dòng thứ viTri, soLan lần liên tiếp không nghỉ giữa các lần. */
+    public TrangDatTiec themPhan(int viTri, int soLan) {
+        WebElement nut = driver.findElements(DONG_MON).get(viTri)
+                .findElement(dt("custom-menu-plus"));
+        for (int i = 0; i < soLan; i++) {
+            nut.click();
+        }
+        return this;
+    }
+
+    public TrangDatTiec botPhan(int viTri) {
+        driver.findElements(DONG_MON).get(viTri).findElement(dt("custom-menu-minus")).click();
+        return this;
+    }
+
+    public String tongMonDaChon() {
+        return choHien(TONG_MON).getText().trim();
+    }
+
+    public boolean bangTamTinhCoTienAn() {
+        return dangCo(TIEN_AN);
+    }
+
+    public boolean bangTamTinhCoSoMam() {
+        return dangCo(SO_MAM);
+    }
 }

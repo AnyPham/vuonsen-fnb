@@ -87,7 +87,9 @@ public class HopThoaiTroLy extends TrangCoSo {
     }
 
     private String choCauTraLoiMoi(int soTraLoiTruoc) {
-        cho.until(d -> d.findElements(BONG_TRO_LY).size() > soTraLoiTruoc);
+        /* Chờ rộng tay hơn các thao tác khác: câu trả lời phải đi qua dịch vụ ngoài. */
+        new org.openqa.selenium.support.ui.WebDriverWait(driver, vn.vuonsen.kiemthu.coso.CauHinh.CHO_TRO_LY)
+                .until(d -> d.findElements(BONG_TRO_LY).size() > soTraLoiTruoc);
         List<WebElement> cacCau = driver.findElements(BONG_TRO_LY);
         return cacCau.get(cacCau.size() - 1).getText().trim();
     }

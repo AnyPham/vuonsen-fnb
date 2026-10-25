@@ -1,0 +1,1372 @@
+[
+ {
+  "slug": "goi-cuon-tom-thit",
+  "ten": "Gỏi cuốn tôm thịt",
+  "dm": "khaivi",
+  "nguyenLieu": "Bánh tráng, tôm sú luộc, thịt ba chỉ, bún tươi, hẹ, xà lách, rau thơm, tương đậu phộng.",
+  "nguon": "V22",
+  "chay": false,
+  "lyDo": [
+   "thịt",
+   "hải sản"
+  ]
+ },
+ {
+  "slug": "banh-khot-vung-tau",
+  "ten": "Bánh khọt Vũng Tàu",
+  "dm": "khaivi",
+  "nguyenLieu": "Bột gạo pha nước cốt dừa, tôm tươi, mỡ hành, tôm cháy, rau sống, nước mắm chua ngọt.",
+  "nguon": "V22",
+  "chay": false,
+  "lyDo": [
+   "hải sản",
+   "nước mắm"
+  ]
+ },
+ {
+  "slug": "nem-nuong-nha-trang",
+  "ten": "Nem nướng Nha Trang",
+  "dm": "khaivi",
+  "nguyenLieu": "Thịt heo quết tay, tỏi, tiêu, bánh tráng, bánh hỏi, rau sống, tương nếp Nha Trang.",
+  "nguon": "V22",
+  "chay": false,
+  "lyDo": [
+   "thịt",
+   "thịt khác"
+  ]
+ },
+ {
+  "slug": "banh-beo-chen-hue",
+  "ten": "Bánh bèo chén Huế",
+  "dm": "khaivi",
+  "nguyenLieu": "Bột gạo, tôm cháy, mỡ hành, bánh mì chiên giòn, nước mắm pha loãng.",
+  "nguon": "V22",
+  "chay": false,
+  "lyDo": [
+   "hải sản",
+   "nước mắm"
+  ]
+ },
+ {
+  "slug": "banh-bot-loc-la-chuoi",
+  "ten": "Bánh bột lọc lá chuối",
+  "dm": "khaivi",
+  "nguyenLieu": "Bột năng, tôm đất, thịt ba chỉ, lá chuối, hành phi, nước mắm ớt.",
+  "nguon": "V22",
+  "chay": false,
+  "lyDo": [
+   "thịt",
+   "hải sản",
+   "nước mắm"
+  ]
+ },
+ {
+  "slug": "sup-mang-cua-ga-xe",
+  "ten": "Súp măng cua gà xé",
+  "dm": "khaivi",
+  "nguyenLieu": "Măng tây tươi, thịt cua, ức gà xé, trứng gà, nước hầm gà, tiêu, ngò rí.",
+  "nguon": "V22",
+  "chay": false,
+  "lyDo": [
+   "thịt",
+   "gia cầm",
+   "hải sản",
+   "trứng"
+  ]
+ },
+ {
+  "slug": "goi-ngo-sen-tom-thit",
+  "ten": "Gỏi ngó sen tôm thịt",
+  "dm": "khaivi",
+  "nguyenLieu": "Ngó sen Đồng Tháp, tôm sú, thịt ba chỉ, cà rốt, rau răm, đậu phộng rang, nước mắm chua ngọt.",
+  "nguon": "V22",
+  "chay": false,
+  "lyDo": [
+   "thịt",
+   "hải sản",
+   "nước mắm"
+  ]
+ },
+ {
+  "slug": "cha-ca-la-vong",
+  "ten": "Chả cá Lã Vọng",
+  "dm": "khaivi",
+  "nguyenLieu": "Cá lăng phi lê, nghệ tươi, riềng, mẻ, thì là, hành lá, bún tươi, mắm tôm.",
+  "nguon": "V22",
+  "chay": false,
+  "lyDo": [
+   "hải sản",
+   "nước mắm"
+  ]
+ },
+ {
+  "slug": "hoanh-thanh-chien-gion",
+  "ten": "Hoành thánh chiên giòn",
+  "dm": "khaivi",
+  "nguyenLieu": "Vỏ hoành thánh, tôm, thịt nạc dăm, nấm mèo, hành tím, sốt chua ngọt.",
+  "nguon": "V22",
+  "chay": false,
+  "lyDo": [
+   "thịt",
+   "hải sản"
+  ]
+ },
+ {
+  "slug": "goi-xoai-kho-ca-sac",
+  "ten": "Gỏi xoài khô cá sặc",
+  "dm": "khaivi",
+  "nguyenLieu": "Xoài xanh, khô cá sặc, hành tím, rau răm, ớt, đậu phộng rang, nước mắm chua ngọt.",
+  "nguon": "V22",
+  "chay": false,
+  "lyDo": [
+   "hải sản",
+   "nước mắm"
+  ]
+ },
+ {
+  "slug": "chao-tom-boc-mia",
+  "ten": "Chạo tôm bọc mía",
+  "dm": "khaivi",
+  "nguyenLieu": "Tôm sú quết, mỡ heo, mía tươi, bánh tráng, rau sống, nước chấm đậu phộng.",
+  "nguon": "V22",
+  "chay": false,
+  "lyDo": [
+   "hải sản",
+   "thịt khác",
+   "mỡ động vật"
+  ]
+ },
+ {
+  "slug": "banh-uot-thit-nuong",
+  "ten": "Bánh ướt thịt nướng",
+  "dm": "khaivi",
+  "nguyenLieu": "Bánh ướt, thịt nạc vai nướng, xà lách, dưa leo, rau thơm, nước chấm đậu phộng.",
+  "nguon": "V22",
+  "chay": false,
+  "lyDo": [
+   "thịt"
+  ]
+ },
+ {
+  "slug": "tai-heo-cuon-ngu-sac",
+  "ten": "Tai heo cuốn ngũ sắc",
+  "dm": "khaivi",
+  "nguyenLieu": "Tai heo, cà rốt, dưa leo, ớt chuông, hẹ, bánh tráng, nước mắm gừng.",
+  "nguon": "V22",
+  "chay": false,
+  "lyDo": [
+   "thịt khác",
+   "nước mắm"
+  ]
+ },
+ {
+  "slug": "muc-chien-nuoc-mam",
+  "ten": "Mực chiên nước mắm",
+  "dm": "khaivi",
+  "nguyenLieu": "Mực ống tươi, tỏi, ớt, nước mắm, đường thốt nốt, tiêu, hành lá.",
+  "nguon": "V22",
+  "chay": false,
+  "lyDo": [
+   "hải sản",
+   "nước mắm"
+  ]
+ },
+ {
+  "slug": "so-diep-nuong-mo-hanh",
+  "ten": "Sò điệp nướng mỡ hành",
+  "dm": "khaivi",
+  "nguyenLieu": "Sò điệp tươi nguyên vỏ, mỡ hành, đậu phộng rang giã, muối tiêu chanh.",
+  "nguon": "V22",
+  "chay": false,
+  "lyDo": [
+   "hải sản"
+  ]
+ },
+ {
+  "slug": "ca-tim-nuong-mo-hanh",
+  "ten": "Cà tím nướng mỡ hành",
+  "dm": "khaivi",
+  "nguyenLieu": "Cà tím, hành lá, dầu ăn, đậu phộng rang, nước mắm chay hoặc nước tương.",
+  "nguon": "V22",
+  "chay": true,
+  "lyDo": []
+ },
+ {
+  "slug": "dau-hu-chien-sa-ot",
+  "ten": "Đậu hũ chiên sả ớt",
+  "dm": "khaivi",
+  "nguyenLieu": "Đậu hũ non, sả băm, ớt, nước tương, đường, tiêu, hành lá.",
+  "nguon": "V22",
+  "chay": true,
+  "lyDo": []
+ },
+ {
+  "slug": "nom-hoa-chuoi",
+  "ten": "Nộm hoa chuối",
+  "dm": "khaivi",
+  "nguyenLieu": "Hoa chuối, cà rốt, rau kinh giới, lạc rang, hành phi, nước mắm chua ngọt.",
+  "nguon": "V22",
+  "chay": false,
+  "lyDo": [
+   "nước mắm"
+  ]
+ },
+ {
+  "slug": "ngheu-hap-sa",
+  "ten": "Nghêu hấp sả",
+  "dm": "khaivi",
+  "nguyenLieu": "Nghêu Cần Giờ, sả đập dập, lá chanh, ớt, rau răm, muối tiêu chanh.",
+  "nguon": "V22",
+  "chay": false,
+  "lyDo": [
+   "hải sản"
+  ]
+ },
+ {
+  "slug": "khoai-lang-ken-chien",
+  "ten": "Khoai lang kén chiên",
+  "dm": "khaivi",
+  "nguyenLieu": "Khoai lang mật, bột năng, nước cốt dừa, đường, mè trắng.",
+  "nguon": "V22",
+  "chay": true,
+  "lyDo": []
+ },
+ {
+  "slug": "ca-tai-tuong-chien-xu",
+  "ten": "Cá tai tượng chiên xù",
+  "dm": "chinh",
+  "nguyenLieu": "Cá tai tượng nguyên con, bánh tráng, bún tươi, xoài xanh, chuối chát, rau sống, nước mắm me.",
+  "nguon": "V22",
+  "chay": false,
+  "lyDo": [
+   "hải sản",
+   "nước mắm"
+  ]
+ },
+ {
+  "slug": "ca-kho-to-mien-tay",
+  "ten": "Cá kho tộ miền Tây",
+  "dm": "chinh",
+  "nguyenLieu": "Cá basa cắt khúc, nước dừa xiêm, nước màu dừa, tiêu xanh, hành tím, ớt, hành lá.",
+  "nguon": "V22",
+  "chay": false,
+  "lyDo": [
+   "hải sản"
+  ]
+ },
+ {
+  "slug": "canh-chua-ca-loc",
+  "ten": "Canh chua cá lóc",
+  "dm": "chinh",
+  "nguyenLieu": "Cá lóc đồng, me chín, bạc hà, đậu bắp, cà chua, thơm, giá đỗ, ngò om, tỏi phi.",
+  "nguon": "V22",
+  "chay": false,
+  "lyDo": [
+   "hải sản"
+  ]
+ },
+ {
+  "slug": "thit-kho-trung-nuoc-dua",
+  "ten": "Thịt kho trứng nước dừa",
+  "dm": "chinh",
+  "nguyenLieu": "Thịt ba chỉ, trứng vịt luộc, nước dừa xiêm, nước màu, hành tím, tiêu, dưa giá ăn kèm.",
+  "nguon": "V22",
+  "chay": false,
+  "lyDo": [
+   "thịt",
+   "gia cầm",
+   "trứng"
+  ]
+ },
+ {
+  "slug": "suon-ram-man",
+  "ten": "Sườn ram mặn",
+  "dm": "chinh",
+  "nguyenLieu": "Sườn cốt lết, đường thốt nốt, nước mắm, tỏi, hành tím, tiêu, hành lá.",
+  "nguon": "V22",
+  "chay": false,
+  "lyDo": [
+   "thịt",
+   "nước mắm"
+  ]
+ },
+ {
+  "slug": "ga-kho-gung",
+  "ten": "Gà kho gừng",
+  "dm": "chinh",
+  "nguyenLieu": "Gà ta, gừng non, nước mắm, đường, tiêu, hành tím, ớt.",
+  "nguon": "V22",
+  "chay": false,
+  "lyDo": [
+   "gia cầm",
+   "nước mắm"
+  ]
+ },
+ {
+  "slug": "vit-quay-la-mac-mat",
+  "ten": "Vịt quay lá mắc mật",
+  "dm": "chinh",
+  "nguyenLieu": "Vịt cỏ nguyên con, lá mắc mật, mật ong, hoa hồi, quế, xì dầu, nước chấm mắc mật.",
+  "nguon": "V22",
+  "chay": false,
+  "lyDo": [
+   "gia cầm"
+  ]
+ },
+ {
+  "slug": "bo-luc-lac-khoai-tay",
+  "ten": "Bò lúc lắc khoai tây",
+  "dm": "chinh",
+  "nguyenLieu": "Thăn bò, khoai tây chiên, hành tây, ớt chuông, xà lách xoong, nước sốt tiêu đen.",
+  "nguon": "V22",
+  "chay": false,
+  "lyDo": [
+   "thịt",
+   "thịt khác"
+  ]
+ },
+ {
+  "slug": "com-chien-hai-san-trai-thom",
+  "ten": "Cơm chiên hải sản trái thơm",
+  "dm": "chinh",
+  "nguyenLieu": "Cơm nguội, tôm, mực, chả cá, trứng, thơm, đậu Hà Lan, hành lá, nước mắm.",
+  "nguon": "V22",
+  "chay": false,
+  "lyDo": [
+   "hải sản",
+   "nước mắm",
+   "trứng"
+  ]
+ },
+ {
+  "slug": "com-nieu-dap-nieu",
+  "ten": "Cơm niêu đập niêu",
+  "dm": "chinh",
+  "nguyenLieu": "Gạo thơm, niêu đất, mỡ hành, nước mắm kho quẹt, cá khô ăn kèm.",
+  "nguon": "V22",
+  "chay": false,
+  "lyDo": [
+   "hải sản",
+   "nước mắm"
+  ]
+ },
+ {
+  "slug": "bun-thit-nuong-cha-gio",
+  "ten": "Bún thịt nướng chả giò",
+  "dm": "chinh",
+  "nguyenLieu": "Bún tươi, thịt nạc vai nướng, chả giò, xà lách, giá, dưa leo, đậu phộng, nước mắm chua ngọt.",
+  "nguon": "V22",
+  "chay": false,
+  "lyDo": [
+   "thịt",
+   "nước mắm"
+  ]
+ },
+ {
+  "slug": "mi-quang-ga",
+  "ten": "Mì Quảng gà",
+  "dm": "chinh",
+  "nguyenLieu": "Mì Quảng sợi vàng, gà ta, nghệ tươi, đậu phộng rang, bánh tráng mè, rau sống, hành phi.",
+  "nguon": "V22",
+  "chay": false,
+  "lyDo": [
+   "gia cầm"
+  ]
+ },
+ {
+  "slug": "hu-tieu-nam-vang",
+  "ten": "Hủ tiếu Nam Vang",
+  "dm": "chinh",
+  "nguyenLieu": "Hủ tiếu dai, tôm, thịt bằm, gan heo, trứng cút, tỏi phi, hẹ, nước hầm xương.",
+  "nguon": "V22",
+  "chay": false,
+  "lyDo": [
+   "thịt",
+   "hải sản",
+   "thịt khác",
+   "trứng",
+   "nước dùng thịt"
+  ]
+ },
+ {
+  "slug": "banh-canh-cua",
+  "ten": "Bánh canh cua",
+  "dm": "chinh",
+  "nguyenLieu": "Bánh canh bột gạo, thịt cua, chả cua, huyết, trứng cút, hành lá, tiêu, nước hầm xương.",
+  "nguon": "V22",
+  "chay": false,
+  "lyDo": [
+   "thịt",
+   "hải sản",
+   "trứng",
+   "nước dùng thịt"
+  ]
+ },
+ {
+  "slug": "bo-kho-banh-mi",
+  "ten": "Bò kho bánh mì",
+  "dm": "chinh",
+  "nguyenLieu": "Bắp bò, cà rốt, sả, quế, hoa hồi, cà chua, nước dừa, bánh mì nóng, rau quế.",
+  "nguon": "V22",
+  "chay": false,
+  "lyDo": [
+   "thịt",
+   "thịt khác"
+  ]
+ },
+ {
+  "slug": "tom-su-hap-nuoc-dua",
+  "ten": "Tôm sú hấp nước dừa",
+  "dm": "chinh",
+  "nguyenLieu": "Tôm sú, nước dừa xiêm, sả, lá chanh, muối tiêu chanh, rau răm.",
+  "nguon": "V22",
+  "chay": false,
+  "lyDo": [
+   "hải sản"
+  ]
+ },
+ {
+  "slug": "cua-rang-me",
+  "ten": "Cua rang me",
+  "dm": "chinh",
+  "nguyenLieu": "Cua thịt Cà Mau, me chín, đường thốt nốt, tỏi, ớt, hành tây, bánh mì ăn kèm.",
+  "nguon": "V22",
+  "chay": false,
+  "lyDo": [
+   "thịt",
+   "hải sản"
+  ]
+ },
+ {
+  "slug": "ca-hap-hong-kong",
+  "ten": "Cá chẽm hấp Hồng Kông",
+  "dm": "chinh",
+  "nguyenLieu": "Cá chẽm nguyên con, gừng, hành lá, xì dầu, dầu mè, nấm đông cô, cải bẹ xanh.",
+  "nguon": "V22",
+  "chay": false,
+  "lyDo": [
+   "hải sản"
+  ]
+ },
+ {
+  "slug": "muc-nhoi-thit-hap",
+  "ten": "Mực nhồi thịt hấp",
+  "dm": "chinh",
+  "nguyenLieu": "Mực ống, thịt bằm, nấm mèo, miến, hành tím, tiêu, nước mắm gừng.",
+  "nguon": "V22",
+  "chay": false,
+  "lyDo": [
+   "thịt",
+   "hải sản",
+   "nước mắm"
+  ]
+ },
+ {
+  "slug": "ech-xao-lan",
+  "ten": "Ếch xào lăn",
+  "dm": "chinh",
+  "nguyenLieu": "Ếch đồng, nước cốt dừa, bột cà ri, sả băm, đậu phộng rang, rau răm, bánh mì.",
+  "nguon": "V22",
+  "chay": false,
+  "lyDo": [
+   "thịt khác"
+  ]
+ },
+ {
+  "slug": "luon-um-nuoc-dua",
+  "ten": "Lươn um nước dừa",
+  "dm": "chinh",
+  "nguyenLieu": "Lươn đồng, nước cốt dừa, rau ngổ, sả, nghệ, đậu phộng, bún tươi.",
+  "nguon": "V22",
+  "chay": false,
+  "lyDo": [
+   "hải sản"
+  ]
+ },
+ {
+  "slug": "ga-nuong-muoi-ot",
+  "ten": "Gà nướng muối ớt",
+  "dm": "chinh",
+  "nguyenLieu": "Gà ta nguyên con, muối hột, ớt hiểm, sả, mật ong, lá chanh, muối tiêu chanh.",
+  "nguon": "V22",
+  "chay": false,
+  "lyDo": [
+   "gia cầm"
+  ]
+ },
+ {
+  "slug": "ga-hap-la-sen",
+  "ten": "Gà hấp lá sen",
+  "dm": "chinh",
+  "nguyenLieu": "Gà ta, lá sen tươi, hạt sen, nấm đông cô, gừng, rượu trắng, muối tiêu chanh.",
+  "nguon": "V22",
+  "chay": false,
+  "lyDo": [
+   "gia cầm"
+  ]
+ },
+ {
+  "slug": "bo-nuong-la-cach",
+  "ten": "Bò nướng lá cách",
+  "dm": "chinh",
+  "nguyenLieu": "Bò tơ, lá cách, sả, tỏi, mỡ chài, đậu phộng, mắm nêm.",
+  "nguon": "V22",
+  "chay": false,
+  "lyDo": [
+   "thịt khác",
+   "nước mắm"
+  ]
+ },
+ {
+  "slug": "heo-rung-xao-sa-ot",
+  "ten": "Heo rừng xào sả ớt",
+  "dm": "chinh",
+  "nguyenLieu": "Thịt heo rừng nuôi, sả băm, ớt hiểm, lá chanh, hành tây, nước mắm, tiêu.",
+  "nguon": "V22",
+  "chay": false,
+  "lyDo": [
+   "thịt",
+   "thịt khác",
+   "nước mắm"
+  ]
+ },
+ {
+  "slug": "rau-muong-xao-toi",
+  "ten": "Rau muống xào tỏi",
+  "dm": "chinh",
+  "nguyenLieu": "Rau muống, tỏi, dầu ăn, nước mắm chay hoặc nước tương, tiêu.",
+  "nguon": "V22",
+  "chay": true,
+  "lyDo": []
+ },
+ {
+  "slug": "dau-hu-sot-ca-chua",
+  "ten": "Đậu hũ sốt cà chua",
+  "dm": "chinh",
+  "nguyenLieu": "Đậu hũ chiên, cà chua chín, hành lá, thì là, nước tương, đường, tiêu.",
+  "nguon": "V22",
+  "chay": true,
+  "lyDo": []
+ },
+ {
+  "slug": "nam-kho-tieu-chay",
+  "ten": "Nấm kho tiêu chay",
+  "dm": "chinh",
+  "nguyenLieu": "Nấm đùi gà, nấm rơm, tiêu xanh, nước tương, đường thốt nốt, hành boa rô.",
+  "nguon": "V22",
+  "chay": true,
+  "lyDo": []
+ },
+ {
+  "slug": "canh-kho-qua-nhoi-thit",
+  "ten": "Canh khổ qua nhồi thịt",
+  "dm": "chinh",
+  "nguyenLieu": "Khổ qua, thịt bằm, mộc nhĩ, miến, hành lá, nước hầm xương, tiêu.",
+  "nguon": "V22",
+  "chay": false,
+  "lyDo": [
+   "thịt",
+   "nước dùng thịt"
+  ]
+ },
+ {
+  "slug": "chim-cut-roti",
+  "ten": "Chim cút rô ti",
+  "dm": "chinh",
+  "nguyenLieu": "Chim cút, ngũ vị hương, mật ong, nước tương, tỏi, gừng, xôi trắng ăn kèm.",
+  "nguon": "V22",
+  "chay": false,
+  "lyDo": [
+   "gia cầm"
+  ]
+ },
+ {
+  "slug": "lau-thai-hai-san",
+  "ten": "Lẩu Thái hải sản",
+  "dm": "lau",
+  "nguyenLieu": "Tôm, mực, nghêu, nấm rơm, sả, riềng, lá chanh, ớt, cà chua, bún tươi.",
+  "nguon": "V22",
+  "chay": false,
+  "lyDo": [
+   "hải sản"
+  ]
+ },
+ {
+  "slug": "lau-bo-nhung-dam",
+  "ten": "Lẩu bò nhúng dấm",
+  "dm": "lau",
+  "nguyenLieu": "Bò tơ thái mỏng, dấm dừa, nước dừa, hành tây, sả, bánh tráng, rau sống, mắm nêm.",
+  "nguon": "V22",
+  "chay": false,
+  "lyDo": [
+   "thịt khác",
+   "nước mắm"
+  ]
+ },
+ {
+  "slug": "lau-ca-bop-la-giang",
+  "ten": "Lẩu cá bớp lá giang",
+  "dm": "lau",
+  "nguyenLieu": "Cá bớp, lá giang, măng chua, cà chua, ớt, rau muống, bún tươi.",
+  "nguon": "V22",
+  "chay": false,
+  "lyDo": [
+   "hải sản"
+  ]
+ },
+ {
+  "slug": "lau-riu-rieu-cua-dong",
+  "ten": "Lẩu riêu cua đồng",
+  "dm": "lau",
+  "nguyenLieu": "Cua đồng giã lọc, đậu phụ rán, cà chua, dấm bỗng, hành lá, rau sống, bún tươi.",
+  "nguon": "V22",
+  "chay": false,
+  "lyDo": [
+   "hải sản"
+  ]
+ },
+ {
+  "slug": "lau-de-tiem-thuoc-bac",
+  "ten": "Lẩu dê tiềm thuốc bắc",
+  "dm": "lau",
+  "nguyenLieu": "Thịt dê, thuốc bắc, khoai môn, tàu hũ ky, chao, rau tần ô, mì tươi.",
+  "nguon": "V22",
+  "chay": false,
+  "lyDo": [
+   "thịt",
+   "thịt khác"
+  ]
+ },
+ {
+  "slug": "lau-nam-chay",
+  "ten": "Lẩu nấm chay",
+  "dm": "lau",
+  "nguyenLieu": "Nấm đùi gà, nấm kim châm, nấm đông cô, nấm bào ngư, nấm rơm, củ sen, bắp non, tàu hũ non, mì tươi.",
+  "nguon": "V22",
+  "chay": true,
+  "lyDo": []
+ },
+ {
+  "slug": "lau-hai-san-chua-cay",
+  "ten": "Lẩu hải sản chua cay",
+  "dm": "lau",
+  "nguyenLieu": "Tôm, mực, cá phi lê, nghêu, me chín, dứa, cà chua, ớt, rau muống, bún tươi.",
+  "nguon": "V22",
+  "chay": false,
+  "lyDo": [
+   "hải sản"
+  ]
+ },
+ {
+  "slug": "lau-vit-nau-chao",
+  "ten": "Lẩu vịt nấu chao",
+  "dm": "lau",
+  "nguyenLieu": "Vịt xiêm, chao đỏ, khoai môn, nước dừa, sả, rau muống, bún tươi.",
+  "nguon": "V22",
+  "chay": false,
+  "lyDo": [
+   "gia cầm"
+  ]
+ },
+ {
+  "slug": "lau-ca-hoi-mang-chua",
+  "ten": "Lẩu cá hồi măng chua",
+  "dm": "lau",
+  "nguyenLieu": "Đầu và xương cá hồi, phi lê cá hồi, măng chua, cà chua, thì là, hành lá, bún tươi.",
+  "nguon": "V22",
+  "chay": false,
+  "lyDo": [
+   "thịt",
+   "hải sản"
+  ]
+ },
+ {
+  "slug": "lau-ech-mang-cay",
+  "ten": "Lẩu ếch măng cay",
+  "dm": "lau",
+  "nguyenLieu": "Ếch đồng, măng tươi, ớt hiểm, sa tế, rau muống, tía tô, bún tươi.",
+  "nguon": "V22",
+  "chay": false,
+  "lyDo": [
+   "thịt khác"
+  ]
+ },
+ {
+  "slug": "suon-nuong-bbq",
+  "ten": "Sườn nướng BBQ mật ong",
+  "dm": "lau",
+  "nguyenLieu": "Sườn cây heo, mật ong, xì dầu, tỏi, ớt bột, tiêu, khoai tây chiên.",
+  "nguon": "V22",
+  "chay": false,
+  "lyDo": [
+   "thịt",
+   "thịt khác"
+  ]
+ },
+ {
+  "slug": "ba-chi-nuong-sa",
+  "ten": "Ba chỉ nướng sả",
+  "dm": "lau",
+  "nguyenLieu": "Ba chỉ heo, sả băm, tỏi, mật ong, nước mắm, rau sống, bánh tráng, mắm nêm.",
+  "nguon": "V22",
+  "chay": false,
+  "lyDo": [
+   "thịt",
+   "thịt khác",
+   "nước mắm"
+  ]
+ },
+ {
+  "slug": "muc-nuong-sa-te",
+  "ten": "Mực nướng sa tế",
+  "dm": "lau",
+  "nguyenLieu": "Mực ống tươi, sa tế, sả, tỏi, muối tiêu chanh, rau răm.",
+  "nguon": "V22",
+  "chay": false,
+  "lyDo": [
+   "hải sản"
+  ]
+ },
+ {
+  "slug": "ca-nuc-nuong-giay-bac",
+  "ten": "Cá nục nướng giấy bạc",
+  "dm": "lau",
+  "nguyenLieu": "Cá nục tươi, hành tây, ớt chuông, sả, nghệ, bơ, chanh.",
+  "nguon": "V22",
+  "chay": false,
+  "lyDo": [
+   "hải sản"
+  ]
+ },
+ {
+  "slug": "ga-nuong-lu",
+  "ten": "Gà nướng lu",
+  "dm": "lau",
+  "nguyenLieu": "Gà ta nguyên con, ngũ vị hương, mật ong, sả, muối hột, lá chanh.",
+  "nguon": "V22",
+  "chay": false,
+  "lyDo": [
+   "gia cầm"
+  ]
+ },
+ {
+  "slug": "bo-bit-tet-tieu-den",
+  "ten": "Bò bít tết tiêu đen",
+  "dm": "lau",
+  "nguyenLieu": "Thăn ngoại bò, tiêu đen xay thô, bơ, tỏi, khoai tây nghiền, rau củ áp chảo.",
+  "nguon": "V22",
+  "chay": false,
+  "lyDo": [
+   "thịt",
+   "thịt khác"
+  ]
+ },
+ {
+  "slug": "tom-hum-nuong-pho-mai",
+  "ten": "Tôm hùm nướng phô mai",
+  "dm": "lau",
+  "nguyenLieu": "Tôm hùm xanh, phô mai mozzarella, bơ tỏi, tiêu, chanh, rau củ nướng.",
+  "nguon": "V22",
+  "chay": false,
+  "lyDo": [
+   "hải sản"
+  ]
+ },
+ {
+  "slug": "hau-nuong-mo-hanh",
+  "ten": "Hàu nướng mỡ hành",
+  "dm": "lau",
+  "nguyenLieu": "Hàu sữa, mỡ hành, đậu phộng rang giã, hành phi, muối tiêu chanh.",
+  "nguon": "V22",
+  "chay": false,
+  "lyDo": [
+   "hải sản"
+  ]
+ },
+ {
+  "slug": "nam-nuong-sa-te",
+  "ten": "Nấm nướng sa tế",
+  "dm": "lau",
+  "nguyenLieu": "Nấm đùi gà, nấm bào ngư, sa tế chay, sả, dầu ăn, muối tiêu chanh.",
+  "nguon": "V22",
+  "chay": true,
+  "lyDo": []
+ },
+ {
+  "slug": "combo-lau-nuong-gia-dinh",
+  "ten": "Combo lẩu nướng gia đình",
+  "dm": "lau",
+  "nguyenLieu": "Nồi lẩu chua cay, bò, ba chỉ, tôm, mực, nấm, bắp, rau nhúng, bún tươi.",
+  "nguon": "V22",
+  "chay": false,
+  "lyDo": [
+   "thịt",
+   "hải sản",
+   "thịt khác"
+  ]
+ },
+ {
+  "slug": "che-ba-mau",
+  "ten": "Chè ba màu",
+  "dm": "trangmieng",
+  "nguyenLieu": "Đậu đỏ, đậu xanh đánh nhuyễn, thạch lá dứa, nước cốt dừa, đá bào, đường.",
+  "nguon": "V22",
+  "chay": true,
+  "lyDo": []
+ },
+ {
+  "slug": "che-troi-nuoc",
+  "ten": "Chè trôi nước",
+  "dm": "trangmieng",
+  "nguyenLieu": "Bột nếp, đậu xanh, gừng tươi, đường thốt nốt, nước cốt dừa, mè rang.",
+  "nguon": "V22",
+  "chay": true,
+  "lyDo": []
+ },
+ {
+  "slug": "che-hat-sen-nhan-nhuc",
+  "ten": "Chè hạt sen nhãn nhục",
+  "dm": "trangmieng",
+  "nguyenLieu": "Hạt sen tươi, nhãn nhục, đường phèn, lá dứa.",
+  "nguon": "V22",
+  "chay": true,
+  "lyDo": []
+ },
+ {
+  "slug": "che-khoai-deo",
+  "ten": "Chè khoai dẻo",
+  "dm": "trangmieng",
+  "nguyenLieu": "Khoai lang tím, khoai lang vàng, khoai môn, bột năng, nước cốt dừa, đường thốt nốt.",
+  "nguon": "V22",
+  "chay": true,
+  "lyDo": []
+ },
+ {
+  "slug": "suong-sa-hat-luu",
+  "ten": "Sương sa hạt lựu",
+  "dm": "trangmieng",
+  "nguyenLieu": "Củ năng bọc bột năng, sương sa, đậu xanh, nước cốt dừa, đá bào, lá dứa.",
+  "nguon": "V22",
+  "chay": true,
+  "lyDo": []
+ },
+ {
+  "slug": "banh-flan-ca-phe",
+  "ten": "Bánh flan cà phê",
+  "dm": "trangmieng",
+  "nguyenLieu": "Trứng gà, sữa tươi, sữa đặc, đường caramel, cà phê phin, đá bào.",
+  "nguon": "V22",
+  "chay": false,
+  "lyDo": [
+   "gia cầm",
+   "trứng"
+  ]
+ },
+ {
+  "slug": "banh-chuoi-hap-nuoc-cot-dua",
+  "ten": "Bánh chuối hấp nước cốt dừa",
+  "dm": "trangmieng",
+  "nguyenLieu": "Chuối sứ chín, bột năng, nước cốt dừa, đường, mè rang, muối.",
+  "nguon": "V22",
+  "chay": true,
+  "lyDo": []
+ },
+ {
+  "slug": "kem-dua-trai-dua",
+  "ten": "Kem dừa trái dừa",
+  "dm": "trangmieng",
+  "nguyenLieu": "Kem dừa, cơm dừa nạo, đậu phộng rang, mứt dừa, trái dừa tươi.",
+  "nguon": "V22",
+  "chay": true,
+  "lyDo": []
+ },
+ {
+  "slug": "sinh-to-bo-kem",
+  "ten": "Sinh tố bơ kem",
+  "dm": "trangmieng",
+  "nguyenLieu": "Bơ sáp Đắk Lắk, sữa đặc, sữa tươi, kem tươi, đá.",
+  "nguon": "V22",
+  "chay": true,
+  "lyDo": []
+ },
+ {
+  "slug": "tau-hu-nuoc-duong",
+  "ten": "Tàu hũ nước đường",
+  "dm": "trangmieng",
+  "nguyenLieu": "Tàu hũ non, gừng tươi, đường thốt nốt, lá dứa, nước cốt dừa.",
+  "nguon": "V22",
+  "chay": true,
+  "lyDo": []
+ },
+ {
+  "slug": "xoi-xoai-nuoc-cot-dua",
+  "ten": "Xôi xoài nước cốt dừa",
+  "dm": "trangmieng",
+  "nguyenLieu": "Nếp cái hoa vàng, xoài cát Hòa Lộc, nước cốt dừa, đường, muối, đậu xanh rang.",
+  "nguon": "V22",
+  "chay": true,
+  "lyDo": []
+ },
+ {
+  "slug": "banh-tet-la-cam",
+  "ten": "Bánh tét lá cẩm",
+  "dm": "trangmieng",
+  "nguyenLieu": "Nếp, lá cẩm, đậu xanh, thịt ba chỉ, lá chuối, dưa món ăn kèm.",
+  "nguon": "V22",
+  "chay": false,
+  "lyDo": [
+   "thịt"
+  ]
+ },
+ {
+  "slug": "che-thai-sau-rieng",
+  "ten": "Chè Thái sầu riêng",
+  "dm": "trangmieng",
+  "nguyenLieu": "Sầu riêng Ri6, mít, thạch rau câu, hạt é, nước cốt dừa, sữa đặc, đá bào.",
+  "nguon": "V22",
+  "chay": true,
+  "lyDo": []
+ },
+ {
+  "slug": "banh-cam-nhan-dau-xanh",
+  "ten": "Bánh cam nhân đậu xanh",
+  "dm": "trangmieng",
+  "nguyenLieu": "Bột nếp, đậu xanh, mè trắng, đường, dầu ăn.",
+  "nguon": "V22",
+  "chay": true,
+  "lyDo": []
+ },
+ {
+  "slug": "suu-chua-nep-cam",
+  "ten": "Sữa chua nếp cẩm",
+  "dm": "trangmieng",
+  "nguyenLieu": "Sữa chua nhà làm, nếp cẩm ủ men, nước cốt dừa, đường.",
+  "nguon": "V22",
+  "chay": true,
+  "lyDo": []
+ },
+ {
+  "slug": "ca-phe-sua-da",
+  "ten": "Cà phê sữa đá",
+  "dm": "douong",
+  "nguyenLieu": "Cà phê Robusta Đắk Lắk, sữa đặc, đá viên.",
+  "nguon": "V22",
+  "chay": true,
+  "lyDo": []
+ },
+ {
+  "slug": "ca-phe-den-da",
+  "ten": "Cà phê đen đá",
+  "dm": "douong",
+  "nguyenLieu": "Cà phê Robusta Đắk Lắk, đường (tùy chọn), đá viên.",
+  "nguon": "V22",
+  "chay": true,
+  "lyDo": []
+ },
+ {
+  "slug": "ca-phe-muoi",
+  "ten": "Cà phê muối",
+  "dm": "douong",
+  "nguyenLieu": "Cà phê phin, kem tươi, sữa đặc, muối biển, đá viên.",
+  "nguon": "V22",
+  "chay": true,
+  "lyDo": []
+ },
+ {
+  "slug": "tra-sen-vang",
+  "ten": "Trà sen vàng",
+  "dm": "douong",
+  "nguyenLieu": "Trà xanh ướp hoa sen, hạt sen, củ năng, sữa tươi, đường, đá.",
+  "nguon": "V22",
+  "chay": true,
+  "lyDo": []
+ },
+ {
+  "slug": "tra-dao-cam-sa",
+  "ten": "Trà đào cam sả",
+  "dm": "douong",
+  "nguyenLieu": "Trà đen, đào ngâm, cam tươi, sả, mật ong, đá.",
+  "nguon": "V22",
+  "chay": true,
+  "lyDo": []
+ },
+ {
+  "slug": "tra-tac-mat-ong",
+  "ten": "Trà tắc mật ong",
+  "dm": "douong",
+  "nguyenLieu": "Trà xanh, tắc tươi, mật ong rừng, đá viên.",
+  "nguon": "V22",
+  "chay": true,
+  "lyDo": []
+ },
+ {
+  "slug": "nuoc-mia-tac",
+  "ten": "Nước mía tắc",
+  "dm": "douong",
+  "nguyenLieu": "Mía tươi, tắc, đá viên.",
+  "nguon": "V22",
+  "chay": true,
+  "lyDo": []
+ },
+ {
+  "slug": "nuoc-chanh-day",
+  "ten": "Nước chanh dây",
+  "dm": "douong",
+  "nguyenLieu": "Chanh dây tươi, đường, nước lọc, đá viên.",
+  "nguon": "V22",
+  "chay": true,
+  "lyDo": []
+ },
+ {
+  "slug": "sinh-to-xoai",
+  "ten": "Sinh tố xoài",
+  "dm": "douong",
+  "nguyenLieu": "Xoài cát chín, sữa tươi, sữa đặc, đá.",
+  "nguon": "V22",
+  "chay": true,
+  "lyDo": []
+ },
+ {
+  "slug": "nuoc-ep-dua-hau",
+  "ten": "Nước ép dưa hấu",
+  "dm": "douong",
+  "nguyenLieu": "Dưa hấu ruột đỏ, chanh, đá viên.",
+  "nguon": "V22",
+  "chay": true,
+  "lyDo": []
+ },
+ {
+  "slug": "nuoc-rau-ma-dau-xanh",
+  "ten": "Nước rau má đậu xanh",
+  "dm": "douong",
+  "nguyenLieu": "Rau má tươi, đậu xanh nấu nhuyễn, nước cốt dừa, đường, đá.",
+  "nguon": "V22",
+  "chay": true,
+  "lyDo": []
+ },
+ {
+  "slug": "tra-atiso-da-lat",
+  "ten": "Trà atiso Đà Lạt",
+  "dm": "douong",
+  "nguyenLieu": "Hoa atiso khô Đà Lạt, đường phèn (tùy chọn), nước lọc.",
+  "nguon": "V22",
+  "chay": true,
+  "lyDo": []
+ },
+ {
+  "slug": "soda-chanh-bac-ha",
+  "ten": "Soda chanh bạc hà",
+  "dm": "douong",
+  "nguyenLieu": "Soda, chanh tươi, lá bạc hà, si rô đường, đá viên.",
+  "nguon": "V22",
+  "chay": true,
+  "lyDo": []
+ },
+ {
+  "slug": "nuoc-dua-tac-nong",
+  "ten": "Nước gừng mật ong nóng",
+  "dm": "douong",
+  "nguyenLieu": "Gừng tươi, mật ong rừng, chanh, nước nóng.",
+  "nguon": "V22",
+  "chay": true,
+  "lyDo": []
+ },
+ {
+  "slug": "vang-do-ly",
+  "ten": "Vang đỏ ly",
+  "dm": "douong",
+  "nguyenLieu": "Vang đỏ Chile, nhãn thay đổi theo lô nhập.",
+  "nguon": "V22",
+  "chay": true,
+  "lyDo": []
+ },
+ {
+  "slug": "goi-cu-hu-dua-tom-thit",
+  "ten": "Gỏi củ hũ dừa tôm thịt",
+  "dm": "?",
+  "nguyenLieu": "Củ hũ dừa Bến Tre, tôm sú, thịt ba chỉ, hành tây, rau răm, đậu phộng rang, nước mắm chua ngọt.",
+  "nguon": "V9",
+  "chay": false,
+  "lyDo": [
+   "thịt",
+   "hải sản",
+   "nước mắm"
+  ]
+ },
+ {
+  "slug": "cha-gio-re-hai-san",
+  "ten": "Chả giò rế hải sản",
+  "dm": "?",
+  "nguyenLieu": "Bánh rế, tôm, mực, thịt xay, khoai môn, nấm mèo, miến, cà rốt.",
+  "nguon": "V9",
+  "chay": false,
+  "lyDo": [
+   "thịt",
+   "hải sản"
+  ]
+ },
+ {
+  "slug": "banh-xeo-mien-tay",
+  "ten": "Bánh xèo miền Tây",
+  "dm": "?",
+  "nguyenLieu": "Bột gạo pha nước cốt dừa và nghệ, tôm, thịt ba chỉ, giá đỗ, đậu xanh, rau sống các loại.",
+  "nguon": "V9",
+  "chay": false,
+  "lyDo": [
+   "thịt",
+   "hải sản"
+  ]
+ },
+ {
+  "slug": "bo-la-lot-nuong-than",
+  "ten": "Bò lá lốt nướng than",
+  "dm": "?",
+  "nguyenLieu": "Thịt bò xay, lá lốt tươi, sả, tỏi, hành tím, mỡ chài.",
+  "nguon": "V9",
+  "chay": false,
+  "lyDo": [
+   "thịt",
+   "thịt khác"
+  ]
+ },
+ {
+  "slug": "sup-cua-trung-bac-thao",
+  "ten": "Súp cua trứng bắc thảo",
+  "dm": "?",
+  "nguyenLieu": "Thịt cua, trứng bắc thảo, trứng cút, nấm đông cô, bắp non, trứng gà đánh tan.",
+  "nguon": "V9",
+  "chay": false,
+  "lyDo": [
+   "thịt",
+   "gia cầm",
+   "hải sản",
+   "trứng"
+  ]
+ },
+ {
+  "slug": "nham-bap-cai-tom-kho",
+  "ten": "Nham bắp cải tôm khô",
+  "dm": "?",
+  "nguyenLieu": "Bắp cải bào sợi, tôm khô, thịt ba chỉ, rau răm, hành phi, nước mắm chua ngọt.",
+  "nguon": "V9",
+  "chay": false,
+  "lyDo": [
+   "thịt",
+   "hải sản",
+   "nước mắm"
+  ]
+ },
+ {
+  "slug": "ca-loc-nuong-trui-cuon-banh-trang",
+  "ten": "Cá lóc nướng trui cuốn bánh tráng",
+  "dm": "?",
+  "nguyenLieu": "Cá lóc đồng nguyên con, rơm nướng, bánh tráng, bún, rau sống, chuối chát, khế, mắm nêm.",
+  "nguon": "V9",
+  "chay": false,
+  "lyDo": [
+   "hải sản",
+   "nước mắm"
+  ]
+ },
+ {
+  "slug": "ga-ta-hap-la-chanh",
+  "ten": "Gà ta hấp lá chanh",
+  "dm": "?",
+  "nguyenLieu": "Gà ta thả vườn, lá chanh, gừng, hành, muối tiêu chanh.",
+  "nguon": "V9",
+  "chay": false,
+  "lyDo": [
+   "gia cầm"
+  ]
+ },
+ {
+  "slug": "tom-cang-nuong-muoi-ot",
+  "ten": "Tôm càng nướng muối ớt",
+  "dm": "?",
+  "nguyenLieu": "Tôm càng xanh, muối hột, ớt hiểm, sả, hành lá, mỡ hành.",
+  "nguon": "V9",
+  "chay": false,
+  "lyDo": [
+   "hải sản"
+  ]
+ },
+ {
+  "slug": "suon-non-kho-to",
+  "ten": "Sườn non kho tộ",
+  "dm": "?",
+  "nguyenLieu": "Sườn non, nước màu dừa, nước mắm, hành tím, tiêu xanh, ớt.",
+  "nguon": "V9",
+  "chay": false,
+  "lyDo": [
+   "thịt",
+   "nước mắm"
+  ]
+ },
+ {
+  "slug": "com-chay-cha-bong-kho-quet",
+  "ten": "Cơm cháy chà bông kho quẹt",
+  "dm": "?",
+  "nguyenLieu": "Cơm cháy chiên giòn, chà bông, tóp mỡ, tôm khô, nước mắm kho quẹt, rau củ luộc.",
+  "nguon": "V9",
+  "chay": false,
+  "lyDo": [
+   "hải sản",
+   "nước mắm",
+   "mỡ động vật"
+  ]
+ },
+ {
+  "slug": "ca-keo-kho-rau-ram",
+  "ten": "Cá kèo kho rau răm",
+  "dm": "?",
+  "nguyenLieu": "Cá kèo tươi, rau răm, nước màu, ớt, tiêu.",
+  "nguon": "V9",
+  "chay": false,
+  "lyDo": [
+   "hải sản"
+  ]
+ },
+ {
+  "slug": "lau-mam-mien-tay",
+  "ten": "Lẩu mắm miền Tây",
+  "dm": "?",
+  "nguyenLieu": "Mắm cá linh, mắm cá sặc, cá basa, tôm, mực, thịt quay, cà tím, và mâm rau đồng hơn 10 loại.",
+  "nguon": "V9",
+  "chay": false,
+  "lyDo": [
+   "thịt",
+   "hải sản",
+   "nước mắm"
+  ]
+ },
+ {
+  "slug": "lau-ca-keo-la-giang",
+  "ten": "Lẩu cá kèo lá giang",
+  "dm": "?",
+  "nguyenLieu": "Cá kèo tươi, lá giang, măng chua, cà chua, rau muống, bún.",
+  "nguon": "V9",
+  "chay": false,
+  "lyDo": [
+   "hải sản"
+  ]
+ },
+ {
+  "slug": "lau-ga-la-e",
+  "ten": "Lẩu gà lá é",
+  "dm": "?",
+  "nguyenLieu": "Gà ta, lá é, măng tươi, ớt xiêm xanh, nấm.",
+  "nguon": "V9",
+  "chay": false,
+  "lyDo": [
+   "gia cầm"
+  ]
+ },
+ {
+  "slug": "combo-nuong-than-hoa",
+  "ten": "Combo nướng than hoa",
+  "dm": "?",
+  "nguyenLieu": "Ba chỉ bò, sườn heo, tôm sú, mực lá, nấm, rau củ, các loại nước chấm.",
+  "nguon": "V9",
+  "chay": false,
+  "lyDo": [
+   "thịt",
+   "hải sản",
+   "thịt khác"
+  ]
+ },
+ {
+  "slug": "heo-quay-gion-bi",
+  "ten": "Heo quay giòn bì",
+  "dm": "?",
+  "nguyenLieu": "Heo sữa, ngũ vị hương, giấm, muối, bánh hỏi và rau sống ăn kèm.",
+  "nguon": "V9",
+  "chay": false,
+  "lyDo": [
+   "thịt khác"
+  ]
+ },
+ {
+  "slug": "de-nuong-ngu-vi",
+  "ten": "Dê nướng ngũ vị",
+  "dm": "?",
+  "nguyenLieu": "Thịt dê, ngũ vị hương, sả, riềng, chao, rau răm, chuối chát.",
+  "nguon": "V9",
+  "chay": false,
+  "lyDo": [
+   "thịt",
+   "thịt khác"
+  ]
+ },
+ {
+  "slug": "che-buoi-can-tho",
+  "ten": "Chè bưởi Cần Thơ",
+  "dm": "?",
+  "nguyenLieu": "Cùi bưởi, đậu xanh cà vỏ, nước cốt dừa, bột năng, đường phèn.",
+  "nguon": "V9",
+  "chay": true,
+  "lyDo": []
+ },
+ {
+  "slug": "rau-cau-dua-la-dua",
+  "ten": "Rau câu dừa lá dứa",
+  "dm": "?",
+  "nguyenLieu": "Nước dừa tươi, lá dứa, bột rau câu, nước cốt dừa, đường.",
+  "nguon": "V9",
+  "chay": true,
+  "lyDo": []
+ },
+ {
+  "slug": "banh-da-lon-hap-la-dua",
+  "ten": "Bánh da lợn hấp lá dứa",
+  "dm": "?",
+  "nguyenLieu": "Bột năng, bột gạo, lá dứa, đậu xanh, nước cốt dừa.",
+  "nguon": "V9",
+  "chay": true,
+  "lyDo": []
+ },
+ {
+  "slug": "trai-cay-theo-mua",
+  "ten": "Trái cây theo mùa",
+  "dm": "?",
+  "nguyenLieu": "Trái cây miền Tây theo mùa: chôm chôm, măng cụt, xoài cát, dưa hấu, thanh long.",
+  "nguon": "V9",
+  "chay": true,
+  "lyDo": []
+ },
+ {
+  "slug": "nuoc-sam-la-dua-nha-nau",
+  "ten": "Nước sâm lá dứa nhà nấu",
+  "dm": "?",
+  "nguyenLieu": "Mía lau, rễ tranh, râu bắp, lá dứa, đường phèn.",
+  "nguon": "V9",
+  "chay": true,
+  "lyDo": []
+ },
+ {
+  "slug": "dua-tuoi-ben-tre",
+  "ten": "Dừa tươi Bến Tre",
+  "dm": "?",
+  "nguyenLieu": "Dừa xiêm Bến Tre.",
+  "nguon": "V9",
+  "chay": true,
+  "lyDo": []
+ },
+ {
+  "slug": "ruou-nep-than-u-12-thang",
+  "ten": "Rượu nếp than ủ 12 tháng",
+  "dm": "?",
+  "nguyenLieu": "Nếp than, men truyền thống, ủ 12 tháng.",
+  "nguon": "V9",
+  "chay": true,
+  "lyDo": []
+ },
+ {
+  "slug": "bia-nuoc-ngot",
+  "ten": "Bia & nước ngọt",
+  "dm": "?",
+  "nguyenLieu": "Các loại bia lon, nước ngọt, nước suối.",
+  "nguon": "V9",
+  "chay": true,
+  "lyDo": []
+ }
+]

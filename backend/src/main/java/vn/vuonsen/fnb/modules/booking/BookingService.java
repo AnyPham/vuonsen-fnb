@@ -7,10 +7,13 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
+import vn.vuonsen.fnb.modules.menu.Dish;
+import vn.vuonsen.fnb.modules.menu.DishRepository;
 import vn.vuonsen.fnb.common.exception.BusinessException;
 import vn.vuonsen.fnb.common.exception.ResourceNotFoundException;
 import vn.vuonsen.fnb.config.props.BookingProperties;
 import vn.vuonsen.fnb.config.props.MailProperties;
+import vn.vuonsen.fnb.modules.booking.dto.MonTuChonRequest;
 import vn.vuonsen.fnb.modules.booking.dto.BookingRequest;
 import vn.vuonsen.fnb.modules.booking.dto.BookingResponse;
 import vn.vuonsen.fnb.modules.booking.dto.QuoteRequest;
@@ -47,6 +50,7 @@ public class BookingService {
     private final SpaceRepository spaceRepository;
     private final PartyPackageRepository packageRepository;
     private final UserRepository userRepository;
+    private final DishRepository dishRepository;
     private final PricingService pricingService;
     private final EmailService emailService;
     private final BookingProperties properties;
@@ -57,22 +61,48 @@ public class BookingService {
         Space space = findSpace(request.spaceId());
         PartyPackage pkg = findPackage(request.packageId());
         validateGuestCount(request.guestCount(), space);
-        return QuoteResponse.from(
-                pricingService.calculate(space, pkg, request.guestCount(), request.eventDate()));
+
+        /*
+         * Báo giá phải đi qua đúng những ràng buộc của lúc đặt thật, không thì khách thấy
+         * một con số trên bảng tạm tính rồi bấm gửi lại bị từ chối.
+         */
+        List<MonDaChon> monDaChon = docMonTuChon(
+                new BookingRequest(null, null, null, request.guestCount(), request.spaceId(),
+                        request.packageId(), request.monTuChon(), null, null, null, null),
+                pkg);
+        BigDecimal tienMon = monDaChon.isEmpty() ? null : tongTienMon(monDaChon);
+
+        return QuoteResponse.from(pricingService.calculate(
+                space, pkg, tienMon, request.guestCount(), request.eventDate()));
     }
+
+    /*
+     * Tiệc tự chọn món chỉ mở cho nhóm nhỏ.
+     *
+     * Trên ngưỡng này thì bếp không kham nổi việc nấu lẻ từng món cho cả trăm khách, và
+     * gói tiệc cố định mới là thứ hợp lý. Con số lấy đúng bằng mức đã thống nhất với
+     * nhà hàng cho hình thức đặt sảnh nhỏ.
+     *
+     * Để công khai vì trợ lý tư vấn cũng phải nói đúng con số này khi khách hỏi. Gõ lại
+     * số 40 ở chỗ thứ hai thì sớm muộn hai nơi cũng lệch nhau.
+     */
+    public static final int SO_KHACH_TOI_DA_TU_CHON = 40;
 
     @Transactional
     public BookingResponse create(BookingRequest request, Long userId) {
         Space space = findSpace(request.spaceId());
         PartyPackage pkg = findPackage(request.packageId());
 
+        List<MonDaChon> monDaChon = docMonTuChon(request, pkg);
+
         validateGuestCount(request.guestCount(), space);
         validateLeadTime(request.eventDate(), request.guestCount());
         validatePackageFitsSlot(pkg, request.timeSlot());
         validateSlotAvailable(space, pkg, request.eventDate(), request.timeSlot());
 
-        PricingService.Quote quote =
-                pricingService.calculate(space, pkg, request.guestCount(), request.eventDate());
+        BigDecimal tienMon = monDaChon.isEmpty() ? null : tongTienMon(monDaChon);
+        PricingService.Quote quote = pricingService.calculate(
+                space, pkg, tienMon, request.guestCount(), request.eventDate());
 
         User user = userId == null ? null : userRepository.findById(userId).orElse(null);
 
@@ -95,12 +125,35 @@ public class BookingService {
                 .totalAmount(quote.totalAmount())
                 // Khoản phải cọc chốt luôn ở đây, đổi tỉ lệ cọc sau này không đụng tới đơn cũ
                 .depositAmount(quote.depositAmount())
+                .monTuChon(new java.util.ArrayList<>())
                 .customerName(request.customerName().trim())
                 .customerPhone(request.customerPhone().trim())
                 .customerEmail(request.customerEmail())
                 .note(request.note())
                 .status(BookingStatus.PENDING)
+                /*
+                 * Giữ buổi này lại cho khách trong lúc họ đi trả cọc.
+                 *
+                 * Từ lúc này tới khi hết hạn, không ai khác đặt được buổi đó. Trả cọc kịp
+                 * thì chỗ được giữ hẳn; không kịp thì mốc này trôi qua và buổi đó tự trống
+                 * lại, không cần ai can thiệp.
+                 */
+                .giuChoDen(LocalDateTime.now().plusMinutes(properties.holdMinutes()))
                 .build();
+
+        /*
+         * Chép tên và giá món tại thời điểm đặt. Nhà hàng đổi giá về sau thì đơn đã chốt
+         * vẫn giữ nguyên con số khách đã đồng ý.
+         */
+        for (MonDaChon m : monDaChon) {
+            booking.getMonTuChon().add(BookingDish.builder()
+                    .booking(booking)
+                    .dish(m.mon())
+                    .tenMon(m.mon().getName())
+                    .soLuong(m.soLuong())
+                    .donGia(m.mon().getPrice())
+                    .build());
+        }
 
         Booking saved = bookingRepository.save(booking);
         recordHistory(saved, null, BookingStatus.PENDING, "Khách gửi yêu cầu từ website",
@@ -261,7 +314,7 @@ public class BookingService {
                     booking.getEventDate(), booking.getTimeSlot());
         }
         if (target == BookingStatus.CANCELLED) {
-            note = withRefundPolicy(booking, note);
+            note = chotTienHoan(booking, note);
         }
 
         booking.setStatus(target);
@@ -293,20 +346,56 @@ public class BookingService {
         }
     }
 
-    // Ghi rõ mức hoàn cọc theo thời điểm hủy để hai bên khỏi tranh cãi về sau
-    private String withRefundPolicy(Booking booking, String note) {
-        long daysLeft = ChronoUnit.DAYS.between(LocalDate.now(), booking.getEventDate());
-        String policy;
-        if (daysLeft >= 30) {
-            policy = "Hủy trước %d ngày, hoàn 100%% tiền cọc".formatted(daysLeft);
-        } else if (daysLeft >= 15) {
-            policy = "Hủy trước %d ngày, hoàn 50%% tiền cọc".formatted(daysLeft);
-        } else if (daysLeft >= 0) {
-            policy = "Hủy trước %d ngày, không hoàn tiền cọc".formatted(daysLeft);
+    /*
+     * Chốt số tiền hoàn lại khi khách hủy đơn.
+     *
+     * Trước đây chỗ này chỉ ghi một câu mô tả chính sách vào lịch sử, ví dụ "hoàn 50% tiền
+     * cọc", mà không tính ra con số. Nhân viên phải tự nhẩm, còn khách tra đơn thì không
+     * thấy mình được nhận lại bao nhiêu.
+     *
+     * Tính trên số tiền khách đã đóng thật, không phải số phải đóng: khách mới đóng một
+     * nửa cọc thì chỉ hoàn theo phần đã đóng đó.
+     *
+     * Chép cả tỉ lệ lẫn số tiền vào đơn. Nhà hàng đổi chính sách hoàn tiền về sau thì đơn
+     * đã hủy vẫn giữ nguyên con số hai bên đã thống nhất lúc hủy.
+     */
+    private String chotTienHoan(Booking booking, String note) {
+        long conLai = ChronoUnit.DAYS.between(LocalDate.now(), booking.getEventDate());
+        BigDecimal daDong = booking.getDepositPaid() == null ? BigDecimal.ZERO : booking.getDepositPaid();
+
+        BigDecimal tiLe;
+        String moTa;
+        if (conLai < 0) {
+            tiLe = BigDecimal.ZERO;
+            moTa = "Hủy sau ngày tổ chức, không hoàn tiền cọc";
+        } else if (conLai >= properties.refundFullDays()) {
+            tiLe = BigDecimal.ONE;
+            moTa = "Hủy trước %d ngày, hoàn 100%% tiền cọc".formatted(conLai);
+        } else if (conLai >= properties.refundHalfDays()) {
+            tiLe = new BigDecimal("0.50");
+            moTa = "Hủy trước %d ngày, hoàn 50%% tiền cọc".formatted(conLai);
         } else {
-            policy = "Hủy sau ngày tổ chức";
+            tiLe = BigDecimal.ZERO;
+            moTa = "Hủy trước %d ngày, không hoàn tiền cọc".formatted(conLai);
         }
-        return (note == null || note.isBlank()) ? policy : note + " - " + policy;
+
+        BigDecimal tienHoan = daDong.multiply(tiLe).setScale(2, java.math.RoundingMode.HALF_UP);
+        booking.setRefundRate(tiLe);
+        booking.setRefundAmount(tienHoan);
+        booking.setRefundNote(moTa);
+
+        /*
+         * Khách chưa đóng đồng nào thì không nói chuyện hoàn tiền, chỉ ghi lý do hủy.
+         * Ghi "hoàn 0 đồng" cho một đơn chưa thu tiền chỉ làm người đọc tưởng có tranh chấp.
+         */
+        String cau = daDong.signum() == 0
+                ? moTa + " (chưa thu tiền cọc nên không phát sinh hoàn trả)"
+                : moTa + ", hoàn %,.0f trên %,.0f đã đóng".formatted(tienHoan, daDong);
+
+        log.info("Hủy đơn {}: còn {} ngày, đã đóng {}, hoàn {}",
+                booking.getCode(), conLai, daDong, tienHoan);
+
+        return (note == null || note.isBlank()) ? cau : note + " - " + cau;
     }
 
     private Space findSpace(Long spaceId) {
@@ -315,6 +404,54 @@ public class BookingService {
     }
 
     // Không chọn gói nghĩa là chỉ thuê không gian, trả về null thay vì báo lỗi
+    /* Một món đã đối chiếu với cơ sở dữ liệu, kèm số phần khách gọi. */
+    private record MonDaChon(Dish mon, int soLuong) {
+    }
+
+    /*
+     * Đọc danh sách món khách tự chọn và kiểm tra ngay tại đây.
+     *
+     * Bốn điều kiện: không đi cùng gói tiệc, chỉ cho nhóm nhỏ, món phải đang phục vụ, và
+     * không được gọi trùng một món hai dòng. Kiểm ở máy chủ chứ không tin giao diện, vì
+     * đường dẫn API gọi thẳng được.
+     */
+    private List<MonDaChon> docMonTuChon(BookingRequest request, PartyPackage pkg) {
+        List<MonTuChonRequest> gui = request.monTuChon();
+        if (gui == null || gui.isEmpty()) {
+            return List.of();
+        }
+        if (pkg != null) {
+            throw new IllegalArgumentException(
+                    "Đã chọn gói tiệc thì không chọn thêm món lẻ. Bỏ gói tiệc nếu muốn tự chọn thực đơn.");
+        }
+        if (request.guestCount() > SO_KHACH_TOI_DA_TU_CHON) {
+            throw new IllegalArgumentException(
+                    "Thực đơn tự chọn chỉ nhận tối đa " + SO_KHACH_TOI_DA_TU_CHON
+                            + " khách. Từ " + (SO_KHACH_TOI_DA_TU_CHON + 1) + " khách trở lên, vui lòng chọn một gói tiệc.");
+        }
+
+        java.util.Set<Long> daGap = new java.util.HashSet<>();
+        List<MonDaChon> ketQua = new java.util.ArrayList<>();
+        for (MonTuChonRequest m : gui) {
+            if (!daGap.add(m.dishId())) {
+                throw new IllegalArgumentException("Một món chỉ được chọn một dòng, hãy cộng số phần lại");
+            }
+            Dish mon = dishRepository.findById(m.dishId())
+                    .orElseThrow(() -> ResourceNotFoundException.of("món ăn", m.dishId()));
+            if (!mon.isAvailable()) {
+                throw new IllegalArgumentException("Món " + mon.getName() + " hiện không phục vụ");
+            }
+            ketQua.add(new MonDaChon(mon, m.soLuong()));
+        }
+        return ketQua;
+    }
+
+    private BigDecimal tongTienMon(List<MonDaChon> cacMon) {
+        return cacMon.stream()
+                .map(m -> m.mon().getPrice().multiply(BigDecimal.valueOf(m.soLuong())))
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+    }
+
     private PartyPackage findPackage(Long packageId) {
         if (packageId == null) {
             return null;
@@ -379,11 +516,24 @@ public class BookingService {
         return hours != null && hours >= properties.fullDayPackageHours();
     }
 
+    /*
+     * Buổi đó còn nhận được đơn nữa không.
+     *
+     * Trước đây chỉ xét đơn đã xác nhận, nên ba khách cùng chọn một buổi đều gửi đơn
+     * được rồi cùng chờ, và hai người thua cuộc chờ vô ích. Nay xét thêm đơn đang giữ
+     * chỗ tạm và đơn đã trả cọc, để người thứ hai biết ngay buổi đó đang có người giữ.
+     *
+     * Lọc trong bộ nhớ thay vì thêm điều kiện vào câu truy vấn, vì luật chiếm chỗ nằm
+     * gọn trong Booking.dangChiemCho và còn được dùng ở chỗ khác. Mỗi không gian một
+     * ngày chỉ có vài đơn nên lọc ở đây không tốn gì.
+     */
     private void validateSlotAvailable(Space space, PartyPackage pkg, LocalDate date, TimeSlot slot) {
-        List<Booking> confirmed = bookingRepository.findBySpaceIdAndEventDateAndStatus(
-                space.getId(), date, BookingStatus.CONFIRMED);
+        List<Booking> dangGiu = bookingRepository
+                .findBySpaceIdAndEventDate(space.getId(), date).stream()
+                .filter(Booking::dangChiemCho)
+                .toList();
 
-        for (Booking other : confirmed) {
+        for (Booking other : dangGiu) {
             if (isFullDay(other.getPartyPackage())) {
                 throw new BusinessException("%s đã cho thuê trọn ngày %s theo đơn %s"
                         .formatted(space.getName(), date, other.getCode()));

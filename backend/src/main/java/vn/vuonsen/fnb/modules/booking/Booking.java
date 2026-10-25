@@ -100,6 +100,15 @@ public class Booking extends BaseEntity {
     @Column(name = "customer_email", length = 160)
     private String customerEmail;
 
+    /*
+     * Món khách tự chọn, chỉ có với tiệc nhỏ không lấy gói cố định.
+     * Xóa đơn thì xóa luôn danh sách món, vì chúng không có nghĩa khi đứng một mình.
+     */
+    @jakarta.persistence.OneToMany(mappedBy = "booking",
+            cascade = jakarta.persistence.CascadeType.ALL, orphanRemoval = true)
+    @lombok.Builder.Default
+    private java.util.List<BookingDish> monTuChon = new java.util.ArrayList<>();
+
     @Column(length = 1000)
     private String note;
 
@@ -126,7 +135,56 @@ public class Booking extends BaseEntity {
     @Column(name = "deposit_paid_at")
     private LocalDateTime depositPaidAt;
 
+    /*
+     * Thời điểm hết hạn giữ chỗ tạm. NULL là không giữ chỗ.
+     *
+     * Đặt khi khách vừa gửi đơn, để buổi đó không ai đặt được trong lúc khách đi trả cọc.
+     * Không cần tác vụ nền quét đơn hết hạn: mọi phép kiểm đều so mốc này với giờ hiện
+     * tại, nên hết hạn là tự động hết tác dụng.
+     */
+    @Column(name = "giu_cho_den")
+    private LocalDateTime giuChoDen;
+
+    /*
+     * Đơn này có đang chiếm buổi đó hay không.
+     *
+     * Ba trường hợp chiếm chỗ:
+     *   - đã xác nhận, tức nhà hàng đã nhận đơn
+     *   - đã trả cọc, dù nhân viên chưa kịp xác nhận. Khách trả tiền rồi mà vẫn để người
+     *     khác giành mất chỗ thì không chấp nhận được
+     *   - đang trong thời gian giữ chỗ tạm, tức vừa gửi đơn và còn hạn trả cọc
+     *
+     * Gom luật vào một chỗ duy nhất, vì cùng câu hỏi này được hỏi ở ba nơi: lúc tạo đơn,
+     * lúc nhân viên xác nhận, và lúc trang đặt tiệc hiện nhãn buổi nào đã kín.
+     */
+    public boolean dangChiemCho() {
+        if (status == BookingStatus.CONFIRMED) {
+            return true;
+        }
+        if (status != BookingStatus.PENDING) {
+            return false;
+        }
+        boolean daCoc = depositPaid != null && depositPaid.signum() > 0;
+        boolean conHanGiuCho = giuChoDen != null && giuChoDen.isAfter(LocalDateTime.now());
+        return daCoc || conHanGiuCho;
+    }
+
     // CASH hoặc TRANSFER
+    /*
+     * Khoản hoàn lại khi hủy, chốt tại thời điểm hủy.
+     *
+     * Rỗng nghĩa là đơn chưa hủy, hoặc hủy khi chưa đóng đồng cọc nào. Chép cả tỉ lệ lẫn
+     * số tiền để về sau đối chiếu được, vì nhà hàng có thể đổi chính sách hoàn tiền.
+     */
+    @Column(name = "refund_rate", precision = 5, scale = 2)
+    private BigDecimal refundRate;
+
+    @Column(name = "refund_amount", precision = 15, scale = 2)
+    private BigDecimal refundAmount;
+
+    @Column(name = "refund_note", length = 255)
+    private String refundNote;
+
     @Column(name = "deposit_method", length = 20)
     private String depositMethod;
 

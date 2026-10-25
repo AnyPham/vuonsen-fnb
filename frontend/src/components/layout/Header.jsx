@@ -26,6 +26,7 @@ const ADMIN_ITEMS = [
   { to: '/quan-tri/goi-tiec', khoa: 'admin.packages' },
   { to: '/quan-tri/khong-gian', khoa: 'admin.spaces' },
   { to: '/quan-tri/ngay-le', khoa: 'admin.holidays' },
+  { to: '/quan-tri/lich-dat', khoa: 'admin.calendar' },
   { to: '/quan-tri/tai-khoan', khoa: 'admin.users' },
 ];
 

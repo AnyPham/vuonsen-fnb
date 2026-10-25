@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState } from 'react';
+import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { assistantApi } from '@/api/endpoints';
+import { selectUser } from '@/features/auth/authSlice';
 
 const LOI_CHAO = {
   vaiTro: 'bot',
@@ -43,7 +45,31 @@ export default function AssistantWidget() {
 
   const cuoiDanhSach = useRef(null);
   const oNhap = useRef(null);
+  const daXinLoiChao = useRef(false);
   const navigate = useNavigate();
+  const nguoiDung = useSelector(selectUser);
+
+  /*
+   * Đổi người đăng nhập thì xoá sạch hộp thoại.
+   *
+   * Đây là sửa một lỗi bảo mật thật. Hộp thoại nằm trong khung chung của mọi trang nên
+   * không bị dựng lại khi khách đăng xuất; nếu không xoá tay thì lời chào kèm tên khách,
+   * danh sách sảnh họ từng đặt và món họ từng gọi vẫn nằm nguyên trên màn hình cho người
+   * tiếp theo đọc. Trên máy dùng chung thì đó là lộ lịch sử giao dịch của người khác.
+   *
+   * Xoá cả khi đăng nhập lẫn khi đăng xuất, vì cả hai đều là đổi danh tính. Đặt lại cờ
+   * daXinLoiChao để lần mở kế tiếp xin lại màn mở đầu đúng với người mới.
+   */
+  const nguoiTruoc = useRef(nguoiDung?.id ?? null);
+  useEffect(() => {
+    const hienTai = nguoiDung?.id ?? null;
+    if (nguoiTruoc.current === hienTai) return;
+    nguoiTruoc.current = hienTai;
+
+    setTinNhan([LOI_CHAO]);
+    setNguon(null);
+    daXinLoiChao.current = false;
+  }, [nguoiDung?.id]);
 
   // Luôn cuộn xuống tin nhắn mới nhất
   useEffect(() => {
@@ -64,6 +90,45 @@ export default function AssistantWidget() {
     };
     document.addEventListener('keydown', onEsc);
     return () => document.removeEventListener('keydown', onEsc);
+  }, [moRong]);
+
+  /*
+   * Lần đầu mở hộp thoại thì xin máy chủ màn mở đầu đã cá nhân hóa.
+   *
+   * Gọi lúc mở chứ không gọi lúc nạp trang: phần lớn khách không mở hộp thoại, gọi sẵn
+   * cho mọi lượt truy cập là tốn truy vấn vô ích.
+   *
+   * Chỉ gọi một lần. Khách đóng rồi mở lại thì giữ nguyên cuộc trò chuyện đang có, dựng
+   * lại lời chào sẽ xóa mất những gì vừa hỏi.
+   *
+   * Hỏng thì im lặng giữ lời chào mặc định: không chào được đúng tên là chuyện nhỏ,
+   * không đáng để chặn khách đặt câu hỏi.
+   */
+  useEffect(() => {
+    if (!moRong || daXinLoiChao.current) return;
+    daXinLoiChao.current = true;
+
+    assistantApi.loiMoDau()
+      .then((kq) => {
+        setTinNhan((truoc) => {
+          /* Khách gõ nhanh hơn mạng thì đừng đạp lên cuộc trò chuyện đã bắt đầu. */
+          if (truoc.length > 1) return truoc;
+          return [{
+            vaiTro: 'bot',
+            noiDung: kq.loiChao,
+            goiY: kq.cauHoiGoiY,
+            nhom: [
+              { nhan: kq.khachQuen ? 'Nơi bạn từng đặt' : 'Được đặt nhiều nhất', muc: kq.sanh },
+              { nhan: 'Món bạn từng gọi', muc: kq.monDaGoi },
+              { nhan: 'Bạn đang quan tâm', muc: kq.dangQuanTam },
+              { nhan: 'Cùng loại bạn hay gọi', muc: kq.monTuongTu },
+              { nhan: 'Gói tiệc phổ biến', muc: kq.goiTiec },
+              { nhan: 'Món mới', muc: kq.monMoi },
+            ].filter((n) => n.muc?.length > 0),
+          }];
+        });
+      })
+      .catch(() => { /* giữ lời chào mặc định */ });
   }, [moRong]);
 
   const hoi = async (cauHoi) => {
@@ -149,6 +214,30 @@ export default function AssistantWidget() {
                 {tn.nhanLink || 'Xem thêm'} →
               </button>
             )}
+
+            {/*
+              * Các nhóm gợi ý của màn mở đầu: nơi từng đặt, thứ đang quan tâm, gói phổ
+              * biến, món mới. Mỗi mục là một thẻ bấm được dẫn thẳng tới trang liên quan,
+              * để khách đi tiếp bằng một cú bấm thay vì phải gõ câu hỏi.
+              */}
+            {tn.nhom?.map((n) => (
+              <div key={n.nhan} className="tro-ly-nhom" data-test="assistant-group">
+                <div className="tro-ly-nhom-nhan">{n.nhan}</div>
+                {n.muc.map((m) => (
+                  <button
+                    key={`${n.nhan}-${m.id}`}
+                    type="button"
+                    className="tro-ly-the"
+                    onClick={() => moTrang(m.link)}
+                    data-test="assistant-card"
+                  >
+                    <span className="tro-ly-the-ten">{m.tieuDe}</span>
+                    {m.moTa && <span className="tro-ly-the-mo-ta">{m.moTa}</span>}
+                    <span className="tro-ly-the-nut">{m.nhanNut} →</span>
+                  </button>
+                ))}
+              </div>
+            ))}
 
             {tn.goiY?.length > 0 && (
               <div className="tro-ly-goi-y">

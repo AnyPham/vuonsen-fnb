@@ -12,10 +12,10 @@
  * Thong ke o muc 5 duoc tinh tu chinh du lieu ben duoi, khong go tay, de sua
  * test case thi bang tong hop tu dong dung theo.
  *
- * Cap nhat 17/09/2026: doi chieu voi ma kiem thu kiemthu/.../kichban, them Luong 14, 15,
+ * Bang nay da doi chieu voi ma kiem thu kiemthu/.../kichban, them Luong 14, 15,
  * sua ket qua mong doi cho dung cach giao dien chan loi.
  *
- * Cap nhat 01/10/2026: them Luong 16 cho trang goi tiec. Truoc do ca bo kiem thu khong co
+ * Luong 16 cho trang goi tiec them sau. Truoc do ca bo kiem thu khong co
  * kich ban nao di qua trang bang gia, du day la mot trong nam trang khach xem nhieu nhat
  * truoc khi quyet dinh dat tiec. Du lieu mong doi lay theo migration V23, ban mo rong danh
  * sach goi tiec tu 3 len 8.
@@ -82,15 +82,59 @@ const bang = (widths, header, rows, o = {}) => new Table({
 });
 
 // ---------- Bang dac ta test case ----------
-const COT_TC = [820, 1750, 2530, 2500, 700, 726];
+/*
+ * Ky thuat thiet ke da sinh ra truong hop kiem thu nay.
+ *
+ * Suy tu noi dung ca kiem thu thay vi go tay tung ca, de khong lech khi sua noi dung.
+ * Luat xet theo thu tu tu cu the den tong quat: ca nao khop luat som hon thi dung luat
+ * do. Ca khong khop luat nao thi la kiem thu theo use case, vi toan bo tai lieu to chuc
+ * theo luong nghiep vu.
+ *
+ * Ca kiem thu co the tu khai truong kt de de len suy doan, dung cho nhung ca ma noi dung
+ * khong lo ra ky thuat.
+ */
+const kyThuatCua = (tc, maLuong) => {
+  if (tc.kt) return tc.kt;
+  const chu = (tc.mucTieu + ' ' + tc.buoc + ' ' + tc.ketQua).toLowerCase();
 
-const bangTC = (ds) => new Table({
+  /* Doan loi: nhung tinh huong nghi ngo tu kinh nghiem, khong suy ra tu dac ta duoc. */
+  if (/ba lần liên tiếp|thật nhanh|đồng thời|về muộn|bỏ qua kết quả|hai lần trong cùng một giây/.test(chu)) {
+    return 'Đoán lỗi';
+  }
+
+  /* Chuyen trang thai: ca nao noi den viec doi trang thai don. */
+  if (/duyệt|xác nhận đơn|hoàn thành|hủy đơn|trạng thái|chờ xác nhận|đã hủy/.test(chu)
+      || maLuong === 'ADMIN') {
+    return 'Chuyển trạng thái';
+  }
+
+  /* Bang quyet dinh: ca nao dung toi to hop chinh sach gia. */
+  if (/giảm giá|ưu đãi|dịp lễ|đặt sớm|miễn phí thuê|cộng dồn|tạm tính|vat|tổng chi phí|tiền cọc/.test(chu)) {
+    return 'Bảng quyết định';
+  }
+
+  /* Gia tri bien: ca nao neu mot con so sat nguong nghiep vu. */
+  if (/tối đa|tối thiểu|vượt|chứa nổi|sức chứa|trở lên|trở xuống|đủ \d|thiếu \d|\d+ ngày|\d+ khách|\d+ mâm|ít nhất|quá \d/.test(chu)) {
+    return 'Giá trị biên';
+  }
+
+  /* Phan vung tuong duong: ca nao thu mot gia tri khong hop le ve kieu hay dinh dang. */
+  if (/không đúng định dạng|sai định dạng|bỏ trống|để trống|không hợp lệ|đã được đăng ký|không tồn tại|sai mật khẩu|ký tự/.test(chu)) {
+    return 'Phân vùng tương đương';
+  }
+
+  return 'Use case';
+};
+
+const COT_TC = [700, 1500, 2150, 2150, 620, 620, 1286];
+
+const bangTC = (ds, maLuong) => new Table({
   columnWidths: COT_TC,
   width: { size: W, type: WidthType.DXA },
   rows: [
     new TableRow({
       tableHeader: true,
-      children: ['Mã', 'Mục tiêu', 'Các bước', 'Kết quả mong đợi', 'Loại', 'Ưu tiên']
+      children: ['Mã', 'Mục tiêu', 'Các bước', 'Kết quả mong đợi', 'Loại', 'Ưu tiên', 'Kỹ thuật']
         .map((h, i) => cell(h, COT_TC[i], { bold: true, bg: HDR, center: i >= 4 })),
     }),
     ...ds.map((tc) => new TableRow({
@@ -101,6 +145,7 @@ const bangTC = (ds) => new Table({
         cell(tc.ketQua, COT_TC[3]),
         cell(tc.loai, COT_TC[4], { center: true }),
         cell(tc.uuTien, COT_TC[5], { center: true }),
+        cell(kyThuatCua(tc, maLuong), COT_TC[6], { center: true }),
       ],
     })),
   ],
@@ -113,7 +158,7 @@ const TB = 'TB';
 const Th = 'Thấp';
 
 // ============================================================
-// DU LIEU TEST CASE THEO 13 LUONG
+// DU LIEU TEST CASE THEO CAC LUONG NGHIEP VU
 // ============================================================
 const LUONG = [];
 // lop: lớp kịch bản Selenium chứa các test case của luồng, để đối chiếu từ tài liệu sang mã
@@ -122,7 +167,8 @@ const LOP = {
   BOOK: 'KiemThuDatTiec', BOOKV: 'KiemThuRangBuocDatTiec', TRACK: 'KiemThuTraCuuTiec', DISH: 'KiemThuDatMon',
   DISHV: 'KiemThuRangBuocDatMon', REV: 'KiemThuDanhGia', BOT: 'KiemThuTroLy', PERM: 'KiemThuPhanQuyen',
   ADMIN: 'KiemThuQuanTri', HOL: 'KiemThuGiamGiaNgayLe', HADM: 'KiemThuQuanTriNgayLe',
-  PKG: 'KiemThuGoiTiec',
+  PKG: 'KiemThuGoiTiec', CAL: 'KiemThuQuanTriLich',
+  PROMO: 'KiemThuThongBaoKhuyenMai', CMENU: 'KiemThuMonTuChon',
 };
 const luong = (ma, ten, url, tienDieuKien, ds) => {
   LUONG.push({ ma, ten, url, tienDieuKien, ds, lop: LOP[ma] });
@@ -242,6 +288,22 @@ luong('MENU', 'Thực đơn và chi tiết món', '/thuc-don, /thuc-don/:slug',
   { ma: 'TC-MENU-08', mucTieu: "Đường dẫn món không tồn tại thì báo không tìm thấy",
     buoc: ['1. Mở /thuc-don/mon-khong-co'],
     ketQua: 'Hiện trang báo không tìm thấy', loai: N, uuTien: TB },
+  { ma: 'TC-MENU-09', mucTieu: 'Bật lọc món chay thì mọi món còn lại đều mang nhãn Món chay',
+    buoc: ['1. Mở /thuc-don', '2. Bấm nút "Chỉ hiện món chay"'],
+    ketQua: 'Danh sách còn 41 trên 126 món, mọi thẻ còn lại đều có nhãn Món chay, không lẫn món mặn. '
+      + 'Cột vegetarian trong cơ sở dữ liệu quyết định, không suy từ tên món.', loai: T, uuTien: C },
+  { ma: 'TC-MENU-10', mucTieu: 'Nộm hoa chuối không nằm trong danh sách món chay',
+    buoc: ['1. Mở /thuc-don', '2. Bấm "Chỉ hiện món chay"', '3. Dò tên Nộm hoa chuối trong danh sách'],
+    ketQua: 'Không có Nộm hoa chuối, vì nguyên liệu món này có nước mắm chua ngọt tức nước mắm thường. '
+      + 'Đây đúng là món mà trợ lý từng xếp nhầm là chay hồi còn phải đoán theo tên, nên canh riêng.',
+    loai: T, uuTien: C },
+  { ma: 'TC-MENU-11', mucTieu: 'Lọc chay ghép được với tab danh mục',
+    buoc: ['1. Mở /thuc-don', '2. Bấm "Chỉ hiện món chay"', '3. Bấm tab Tráng miệng'],
+    ketQua: 'Còn 17 món tráng miệng chay, tab Tráng miệng ở trạng thái đang chọn và nút lọc chay vẫn bật. '
+      + 'Chọn danh mục không được làm mất điều kiện lọc chay.', loai: T, uuTien: C },
+  { ma: 'TC-MENU-12', mucTieu: 'Tắt lọc chay thì danh sách quay lại đủ món',
+    buoc: ['1. Mở /thuc-don, bấm "Chỉ hiện món chay"', '2. Bấm lại nút đó để tắt'],
+    ketQua: 'Danh sách quay lại đủ 126 món, nút lọc trở về trạng thái tắt', loai: T, uuTien: TB },
 ]);
 
 // ---------- 5 ----------
@@ -635,6 +697,112 @@ luong('PKG', 'Xem và lọc gói tiệc', '/goi-tiec',
 // ============================================================
 // THONG KE TU DONG
 // ============================================================
+// ---------- 17 ----------
+luong('CAL', 'Lịch đặt chỗ của bộ phận quản trị', '/quan-tri/lich-dat',
+  'Trang gộp đơn đặt tiệc và đơn đặt món lên cùng một lịch, chỉ nhân viên và quản trị vào được. '
+  + 'Đơn tiệc xếp theo ngày tổ chức, đơn món xếp theo thời điểm khách nhận. Có hai chế độ xem: '
+  + 'xem tháng dạng lưới bảy cột bắt đầu từ thứ Hai, và xem ngày dạng bảng chi tiết. '
+  + 'Kịch bản tự tạo đơn qua API vào ngày chưa có đơn nào rồi mới mở lịch, nên không phụ thuộc dữ liệu mẫu. '
+  + 'Số khách dùng 120, tức 12 mâm, để không chạm luật tiệc từ 20 mâm phải đặt trước 7 ngày.', [
+  { ma: 'TC-CAL-01', mucTieu: 'Khách chưa đăng nhập không vào được lịch',
+    buoc: ['1. Đăng xuất nếu đang đăng nhập', '2. Mở thẳng /quan-tri/lich-dat'],
+    ketQua: 'Bị đưa về trang đăng nhập, không thấy lưới lịch', loai: N, uuTien: C },
+  { ma: 'TC-CAL-02', mucTieu: 'Quản trị mở lịch thì thấy lưới tháng hiện tại',
+    buoc: ['1. Đăng nhập bằng tài khoản quản trị', '2. Mở /quan-tri/lich-dat'],
+    ketQua: 'Hiện lưới tháng, tiêu đề ghi đúng tháng và năm hiện tại', loai: T, uuTien: C },
+  { ma: 'TC-CAL-03', mucTieu: 'Lưới tháng luôn đủ tuần trọn vẹn',
+    buoc: ['1. Mở /quan-tri/lich-dat bằng tài khoản quản trị'],
+    ketQua: 'Số ô chia hết cho 7, nằm trong khoảng 28 đến 42 ô, vì lưới bắt đầu từ thứ Hai của tuần chứa mùng 1', loai: T, uuTien: TB },
+  { ma: 'TC-CAL-04', mucTieu: 'Ngày chưa có đơn nào được ghi rõ là còn trống',
+    buoc: ['1. Mở /quan-tri/lich-dat bằng tài khoản quản trị'],
+    ketQua: 'Ít nhất một ô trong tháng ghi chữ còn trống, thay vì để ô rỗng không rõ nghĩa', loai: T, uuTien: TB },
+  { ma: 'TC-CAL-05', mucTieu: 'Đơn đặt tiệc hiện đúng ô ngày tổ chức kèm buổi',
+    buoc: ['1. Tạo đơn tiệc 120 khách buổi tối vào một ngày chưa có đơn',
+      '2. Mở lịch và chuyển tới tháng chứa ngày đó'],
+    ketQua: 'Ô ngày đó hiện thẻ ghi Buổi tối và không còn chữ còn trống', loai: T, uuTien: C },
+  { ma: 'TC-CAL-06', mucTieu: 'Dòng tóm tắt đếm số đơn trong khoảng đang xem',
+    buoc: ['1. Tạo một đơn tiệc', '2. Mở lịch ở tháng chứa đơn đó'],
+    ketQua: 'Dòng tóm tắt ghi số đơn đặt tiệc và số đơn đặt món của khoảng đang xem', loai: T, uuTien: TB },
+  { ma: 'TC-CAL-07', mucTieu: 'Chuyển tháng qua lại thì về đúng tháng ban đầu',
+    buoc: ['1. Ghi nhớ tiêu đề tháng đang xem', '2. Bấm Tháng sau', '3. Bấm Tháng trước'],
+    ketQua: 'Tiêu đề quay lại đúng tháng ban đầu, lưới vẽ lại theo tháng đó', loai: T, uuTien: TB },
+  { ma: 'TC-CAL-08', mucTieu: 'Bấm một ô có đơn thì mở chi tiết ngày đó',
+    buoc: ['1. Tạo đơn tiệc vào một ngày chưa có đơn', '2. Mở lịch tới tháng đó', '3. Bấm vào ô ngày đó'],
+    ketQua: 'Chuyển sang chế độ xem ngày, bảng chi tiết liệt kê đúng mã đơn vừa tạo, cột loại ghi Đặt tiệc', loai: T, uuTien: C },
+  { ma: 'TC-CAL-09', mucTieu: 'Xem một ngày không có đơn thì báo trống thay vì bảng rỗng',
+    buoc: ['1. Chuyển sang chế độ Xem ngày', '2. Chọn một ngày chưa có đơn nào'],
+    ketQua: 'Không hiện bảng chi tiết, thay vào đó là thông báo ngày này chưa có đơn nào', loai: N, uuTien: TB },
+  { ma: 'TC-CAL-10', mucTieu: 'Đơn mới tạo hiện đúng trạng thái chờ xác nhận',
+    buoc: ['1. Tạo đơn tiệc buổi sáng vào một ngày chưa có đơn', '2. Xem ngày đó trên lịch'],
+    ketQua: 'Dòng của đơn ghi trạng thái Chờ xác nhận, đúng trạng thái khởi tạo của đơn mới gửi', loai: T, uuTien: C },
+]);
+
+
+// ---------- 18 ----------
+luong('PROMO', 'Thông báo khuyến mãi trên trang chủ', '/ (dải đầu trang chủ)',
+  'Dải ở đầu trang chủ báo dịp lễ đáng chú ý nhất: dịp đang diễn ra được ưu tiên, sau đó mới tới dịp sắp tới gần nhất. '
+  + 'Nhiều dịp chồng nhau thì lấy mức giảm cao nhất, đúng cách hệ thống tính tiền nên khách thấy số nào là được số đó. '
+  + 'Kịch bản tự tạo dịp lễ qua API rồi xóa sau mỗi ca, nên không phụ thuộc dữ liệu mẫu; dịp tạo ra đều rơi vào ngày thường '
+  + 'để không trùng dịp lễ có sẵn. Mỗi ca đều xóa dấu đã đóng trong localStorage, khóa vuonsen.khuyenmai.daDong, trước khi mở trang.', [
+  { ma: 'TC-PROMO-01', mucTieu: 'Có dịp lễ sắp tới thì trang chủ hiện dải khuyến mãi',
+    buoc: ['1. Tạo một dịp lễ giảm 18% bắt đầu sau 10 ngày', '2. Xóa dấu đã đóng rồi mở trang chủ'],
+    ketQua: 'Dải hiện ra, ghi đúng tên dịp vừa tạo và mức giảm có số 18', loai: T, uuTien: C },
+  { ma: 'TC-PROMO-02', mucTieu: 'Dịp đang diễn ra được báo là đang áp dụng',
+    buoc: ['1. Tạo dịp lễ giảm 15% bắt đầu từ hôm nay', '2. Mở trang chủ'],
+    ketQua: 'Dải ghi đúng tên dịp đó, dòng chữ phụ có chữ Đang áp dụng chứ không đếm ngày', loai: T, uuTien: C },
+  { ma: 'TC-PROMO-03', mucTieu: 'Dịp sắp tới hiện số ngày còn lại',
+    buoc: ['1. Tạo dịp lễ bắt đầu sau 12 ngày', '2. Mở trang chủ'],
+    ketQua: 'Dòng chữ phụ có chữ Còn và chữ ngày, tức đếm ngược tới ngày bắt đầu', loai: T, uuTien: TB },
+  { ma: 'TC-PROMO-04', mucTieu: 'Hai dịp cùng diễn ra thì báo dịp có mức giảm cao hơn',
+    buoc: ['1. Tạo hai dịp cùng khoảng ngày, một giảm 10% và một giảm 20%', '2. Mở trang chủ'],
+    ketQua: 'Dải nêu tên dịp giảm 20%, mức giảm có số 20. Lấy mức cao nhất, khớp với cách tính tiền', loai: T, uuTien: C },
+  { ma: 'TC-PROMO-05', mucTieu: 'Dịp đã tắt thì không được đem ra báo',
+    buoc: ['1. Tạo dịp lễ giảm 20% nhưng đặt trạng thái tắt', '2. Mở trang chủ'],
+    ketQua: 'Dải không nêu tên dịp đã tắt. Nếu dữ liệu mẫu còn dịp khác đang bật thì dải vẫn hiện, nhưng phải là dịp khác', loai: N, uuTien: C },
+  { ma: 'TC-PROMO-06', mucTieu: 'Bấm Xem ưu đãi thì sang trang ưu đãi',
+    buoc: ['1. Tạo dịp lễ đang diễn ra', '2. Mở trang chủ', '3. Bấm Xem ưu đãi trên dải'],
+    ketQua: 'Trình duyệt chuyển sang đường dẫn /uu-dai', loai: T, uuTien: TB },
+  { ma: 'TC-PROMO-07', mucTieu: 'Đóng rồi thì mở lại trang chủ không hiện lại nữa',
+    buoc: ['1. Tạo dịp lễ đang diễn ra', '2. Mở trang chủ rồi bấm nút đóng trên dải', '3. Mở lại trang chủ'],
+    ketQua: 'Dải mất ngay sau khi đóng, và lần mở trang sau cũng không hiện lại. Dấu đã đóng ghi theo mã dịp nên dịp khác vẫn báo được', loai: T, uuTien: C },
+  { ma: 'TC-PROMO-08', mucTieu: 'Dải có thuộc tính trợ năng để máy đọc màn hình nhận ra',
+    buoc: ['1. Tạo dịp lễ đang diễn ra', '2. Mở trang chủ', '3. Đọc thuộc tính của khối dải'],
+    ketQua: 'Thuộc tính role bằng status và aria-live bằng polite, để máy đọc màn hình đọc thông báo mà không cắt ngang việc khách đang làm', loai: T, uuTien: TB },
+]);
+
+// ---------- 19 ----------
+luong('CMENU', 'Đặt sảnh nhỏ với thực đơn tự chọn', '/dat-tiec (bước 2)',
+  'Hình thức dành cho nhóm nhỏ không lấy gói tiệc cố định: khách tự chọn từng món, trả tiền theo đúng số phần đã gọi, '
+  + 'cộng phí thuê không gian và vẫn được hưởng giảm giá dịp lễ. Giới hạn 40 khách, lấy theo hằng số '
+  + 'SO_KHACH_TOI_DA_TU_CHON trong BookingService; trên mức đó lựa chọn không hiện ra và máy chủ cũng từ chối nếu có ai '
+  + 'gọi thẳng đường dẫn API. Kịch bản dùng Cụm Chòi Sen, không gian nhỏ nhất đang mở, nhận từ 8 khách; '
+  + 'loại hình họp mặt gia đình, buổi trưa, ngày tổ chức sau 20 ngày.', [
+  { ma: 'TC-CMENU-01', mucTieu: 'Nhóm nhỏ thì thấy lựa chọn tự chọn món',
+    buoc: ['1. Mở /dat-tiec, điền bước 1 với 20 khách', '2. Sang bước 2 và chọn Cụm Chòi Sen'],
+    ketQua: 'Bước 2 hiện lựa chọn tự chọn thực đơn, bên cạnh các gói tiệc cố định', loai: T, uuTien: C },
+  { ma: 'TC-CMENU-02', mucTieu: 'Nhóm trên 40 khách thì không có lựa chọn tự chọn món',
+    buoc: ['1. Mở /dat-tiec, điền bước 1 với 120 khách', '2. Sang bước 2 và chọn không gian'],
+    ketQua: 'Lựa chọn tự chọn thực đơn không hiện ra. Giao diện ẩn đúng theo luật 40 khách của máy chủ, khách không mất công chọn rồi bị từ chối', loai: N, uuTien: C },
+  { ma: 'TC-CMENU-03', mucTieu: 'Bật tự chọn món thì hiện danh sách món của thực đơn',
+    buoc: ['1. Sang bước 2 với 20 khách', '2. Bấm vào lựa chọn tự chọn thực đơn'],
+    ketQua: 'Hiện danh sách món đang phục vụ, mỗi món một dòng kèm nút thêm và bớt phần', loai: T, uuTien: C },
+  { ma: 'TC-CMENU-04', mucTieu: 'Thêm một phần thì dòng tổng đếm đúng',
+    buoc: ['1. Bật tự chọn thực đơn', '2. Bấm thêm một phần ở món đầu danh sách'],
+    ketQua: 'Dòng tổng ghi 1 món và 1 phần', loai: T, uuTien: C },
+  { ma: 'TC-CMENU-05', mucTieu: 'Bấm thêm ba lần liên tiếp thì cộng đủ ba phần',
+    buoc: ['1. Bật tự chọn thực đơn', '2. Bấm thêm ba lần liên tiếp không nghỉ ở cùng một món'],
+    ketQua: 'Dòng tổng ghi 3 phần. Đây là ca canh lỗi đã gặp thật: phép cộng từng nằm ở thành phần giao diện nên cả ba lần bấm cùng đọc một bản danh sách cũ, kết quả chỉ cộng được một phần; đã chuyển phép tính vào kho trạng thái', loai: T, uuTien: C },
+  { ma: 'TC-CMENU-06', mucTieu: 'Bớt về không thì món rời khỏi danh sách đã chọn',
+    buoc: ['1. Thêm một phần cho một món', '2. Bấm bớt một phần ở đúng món đó'],
+    ketQua: 'Dòng tổng trở lại 0 món, món không còn nằm trong danh sách đã chọn', loai: T, uuTien: TB },
+  { ma: 'TC-CMENU-07', mucTieu: 'Bảng tạm tính hiện tiền ăn và không hiện số mâm',
+    buoc: ['1. Bật tự chọn thực đơn', '2. Thêm hai phần cho một món', '3. Đọc bảng chi phí tạm tính'],
+    ketQua: 'Bảng có dòng tiền ăn, không có dòng số mâm. Hình thức này tính theo số phần đã gọi chứ không theo mâm, nên để dòng số mâm là sai nghĩa', loai: T, uuTien: C },
+  { ma: 'TC-CMENU-08', mucTieu: 'Bật tự chọn mà chưa chọn món nào thì không cho sang bước ba',
+    buoc: ['1. Bật tự chọn thực đơn', '2. Không chọn món nào', '3. Bấm Tiếp tục'],
+    ketQua: 'Vẫn ở bước 2, hiện câu nhắc Vui lòng chọn ít nhất một món', loai: N, uuTien: C },
+]);
+
 const tongTC = LUONG.reduce((s, l) => s + l.ds.length, 0);
 const dem = (loc) => LUONG.reduce((s, l) => s + l.ds.filter(loc).length, 0);
 const soThuan = dem((t) => t.loai === T);
@@ -691,6 +859,9 @@ const noiDung = [
   ]),
 
   // ---- 3 ----
+  h2('2.4. Kỹ thuật thiết kế'),
+  p('Cột Kỹ thuật ở mỗi bảng đặc tả ghi kỹ thuật đã sinh ra trường hợp kiểm thử đó. Sáu giá trị có thể gặp là Phân vùng tương đương, Giá trị biên, Bảng quyết định, Chuyển trạng thái, Use case và Đoán lỗi, giải thích ở mục 4. Một trường hợp có thể thỏa nhiều kỹ thuật, khi đó ghi kỹ thuật cụ thể hơn: ví dụ ca thử 145 khách với không gian chứa tối đa 144 vừa là phân vùng tương đương vừa là giá trị biên, và được ghi là giá trị biên.'),
+
   h1('3. Môi trường và dữ liệu kiểm thử'),
   h2('3.1. Môi trường'),
   bang([2400, 6626], ['Thành phần', 'Cấu hình khi kiểm thử'], [
@@ -758,21 +929,160 @@ const noiDung = [
     ['Quốc khánh', '2/9 mỗi năm', '15%'],
   ]),
 
+
   // ---- 4 ----
-  h1('4. Đặc tả trường hợp kiểm thử'),
+  h1('4. Kỹ thuật thiết kế trường hợp kiểm thử'),
+  p('Kiểm thử toàn diện, tức thử mọi tổ hợp đầu vào có thể, là điều không làm được: '
+    + 'chỉ riêng ô số khách đã nhận hàng trăm giá trị, nhân với sáu không gian, tám gói tiệc '
+    + 'và ba buổi thì số tổ hợp đã vượt xa khả năng thực hiện. Vì vậy phải chọn ra một tập con '
+    + 'các trường hợp sao cho xác suất phát hiện lỗi là cao nhất.'),
+  p('Mục này trình bày các kỹ thuật đã dùng để chọn tập con đó. Mỗi trường hợp kiểm thử ở mục 5 '
+    + 'đều ghi rõ sinh ra từ kỹ thuật nào ở cột Kỹ thuật, để người đọc kiểm chứng được cách chọn '
+    + 'chứ không phải tin vào danh sách có sẵn.'),
+
+  h2('4.1. Phân vùng tương đương'),
+  p('Nguyên lý: chia miền giá trị của một đầu vào thành các lớp mà mọi giá trị trong cùng một lớp '
+    + 'được hệ thống xử lý như nhau. Thử một đại diện của lớp là đủ đại diện cho cả lớp, vì nếu một '
+    + 'giá trị trong lớp làm lộ lỗi thì các giá trị còn lại cũng vậy.'),
+  bang([1900, 3200, 3926], ['Đầu vào', 'Lớp hợp lệ', 'Lớp không hợp lệ'], [
+    ['Số khách đặt tiệc', 'Nằm trong khoảng sức chứa của không gian đã chọn',
+      'Nhỏ hơn sức chứa tối thiểu · Lớn hơn sức chứa tối đa · Bằng 0 hoặc âm'],
+    ['Số khách cho thực đơn tự chọn', 'Từ 1 đến 40 khách', 'Trên 40 khách'],
+    ['Mật khẩu', 'Từ 6 ký tự trở lên', 'Dưới 6 ký tự · Để trống'],
+    ['Số điện thoại', '10 hoặc 11 chữ số, bắt đầu bằng số 0',
+      'Sai độ dài · Có chữ cái · Không bắt đầu bằng 0'],
+    ['Email', 'Đúng định dạng và chưa có trong hệ thống',
+      'Sai định dạng · Đã có người dùng · Để trống'],
+    ['Ngày tổ chức', 'Sau hôm nay và đủ thời gian báo trước',
+      'Trong quá khứ · Hôm nay · Chưa đủ thời gian báo trước'],
+    ['Mã đơn khi tra cứu', 'Mã có thật trong hệ thống', 'Mã không tồn tại · Để trống · Sai định dạng'],
+  ]),
+  p('Phân vùng tương đương cho các đầu vào chính', { italic: true, size: 20, center: true, after: 140 }),
+
+  h2('4.2. Phân tích giá trị biên'),
+  p('Nguyên lý: lỗi lập trình tập trung ở ranh giới giữa các lớp tương đương, vì đó là chỗ người viết '
+    + 'mã dễ nhầm giữa lớn hơn và lớn hơn hoặc bằng. Với mỗi biên, kỹ thuật ba điểm thử giá trị ngay '
+    + 'trước biên, đúng biên, và ngay sau biên.'),
+  p('Hệ thống có sáu biên nghiệp vụ, tất cả đều lấy từ tham số cấu hình hoặc dữ liệu thật chứ không '
+    + 'phải con số tự đặt ra để kiểm thử.'),
+  bang([2500, 1500, 2500, 2526],
+    ['Biên nghiệp vụ', 'Giá trị biên', 'Ba điểm thử', 'Nguồn của con số'], [
+    ['Sức chứa tối thiểu của Cụm Chòi Sen', '8 khách', '7 · 8 · 9', 'Cột capacity_min của bản ghi không gian'],
+    ['Sức chứa tối đa của Cụm Chòi Sen', '144 khách', '143 · 144 · 145', 'Cột capacity_max'],
+    ['Giới hạn khách cho thực đơn tự chọn', '40 khách', '39 · 40 · 41', 'Hằng số SO_KHACH_TOI_DA_TU_CHON'],
+    ['Ngưỡng tiệc lớn phải báo trước dài hơn', '20 mâm', '19 · 20 · 21 mâm', 'Tham số large-party-tables'],
+    ['Thời gian báo trước cho tiệc lớn', '7 ngày', '6 · 7 · 8 ngày', 'Tham số large-party-min-days'],
+    ['Mốc hoàn đủ tiền cọc khi hủy', '30 ngày', '29 · 30 · 31 ngày', 'Tham số refund-full-days'],
+    ['Mốc hoàn nửa tiền cọc khi hủy', '15 ngày', '14 · 15 · 16 ngày', 'Tham số refund-half-days'],
+    ['Hạn giữ chỗ tạm chờ trả cọc', '15 phút', '14 · 15 · 16 phút', 'Tham số hold-minutes'],
+  ]),
+  p('Tám biên nghiệp vụ và ba điểm thử của mỗi biên', { italic: true, size: 20, center: true, after: 140 }),
+  p('Giá trị biên lấy từ tham số cấu hình nên khi nhà hàng đổi chính sách, trường hợp kiểm thử phải '
+    + 'được cập nhật theo. Đây là lý do mã kiểm thử đọc các mốc này từ cấu hình thay vì ghi cứng con số.'),
+
+  h2('4.3. Bảng quyết định'),
+  p('Nguyên lý: khi kết quả phụ thuộc vào nhiều điều kiện có thể kết hợp với nhau, liệt kê mọi tổ hợp '
+    + 'điều kiện thành bảng rồi xác định hành động tương ứng. Cách này bảo đảm không bỏ sót tổ hợp nào, '
+    + 'điều mà đọc đặc tả bằng mắt rất dễ sót.'),
+  p('Mô hình tính giá của hệ thống phụ thuộc ba điều kiện có thể chồng lấn, cho 2 mũ 3 bằng 8 luật. '
+    + 'Ký hiệu T là điều kiện đúng, F là sai, dấu x là hành động được áp dụng.'),
+  bang([2800, 700, 700, 700, 700, 700, 700, 700, 826],
+    ['Điều kiện / Hành động', 'L1', 'L2', 'L3', 'L4', 'L5', 'L6', 'L7', 'L8'], [
+    ['Tiền ăn đạt ngưỡng miễn phí thuê', 'T', 'T', 'T', 'T', 'F', 'F', 'F', 'F'],
+    ['Đặt trước từ 60 ngày trở lên', 'T', 'T', 'F', 'F', 'T', 'T', 'F', 'F'],
+    ['Ngày tổ chức rơi vào dịp lễ', 'T', 'F', 'T', 'F', 'T', 'F', 'T', 'F'],
+    ['Miễn phí thuê không gian', 'x', 'x', 'x', 'x', '', '', '', ''],
+    ['Thu phí thuê không gian', '', '', '', '', 'x', 'x', 'x', 'x'],
+    ['Giảm giá đặt sớm 5%', '', 'x', '', 'x', '', 'x', '', 'x'],
+    ['Giảm giá dịp lễ 10% đến 20%', 'x', '', 'x', '', 'x', '', 'x', ''],
+  ], { center: true }),
+  p('Bảng quyết định cho mô hình tính giá, tám luật từ ba điều kiện', { italic: true, size: 20, center: true, after: 140 }),
+  p('Hai luật đáng chú ý nhất là L1 và L5, nơi cả hai ưu đãi cùng thỏa điều kiện. Quy tắc nghiệp vụ là '
+    + 'không cộng dồn mà lấy mức giảm cao hơn, nên ở hai luật này chỉ giảm giá dịp lễ được áp dụng. '
+    + 'Nếu không lập bảng mà chỉ đọc đặc tả thì rất dễ hiểu thành cộng cả hai, và lỗi đó chỉ lộ ra khi '
+    + 'có khách đặt sớm đúng vào dịp lễ.'),
+
+  h2('4.4. Kiểm thử chuyển trạng thái'),
+  p('Nguyên lý: với đối tượng có vòng đời gồm nhiều trạng thái, kiểm thử phải phủ cả các chuyển đổi '
+    + 'hợp lệ lẫn các chuyển đổi bị cấm. Chỉ thử đường đi thuận lợi thì không phát hiện được trường hợp '
+    + 'hệ thống cho phép một chuyển đổi lẽ ra phải chặn.'),
+  p('Đơn đặt tiệc có bốn trạng thái. Bảng dưới liệt kê mọi cặp chuyển đổi có thể nghĩ tới, '
+    + 'trong đó ô ghi Hợp lệ là chuyển đổi được phép, ô ghi Phải chặn là chuyển đổi hệ thống bắt buộc '
+    + 'từ chối.'),
+  bang([2200, 1700, 1700, 1700, 1726],
+    ['Từ trạng thái', 'Sang Chờ xác nhận', 'Sang Đã xác nhận', 'Sang Đã hoàn thành', 'Sang Đã hủy'], [
+    ['Chờ xác nhận', 'Không đổi', 'Hợp lệ', 'Phải chặn', 'Hợp lệ'],
+    ['Đã xác nhận', 'Phải chặn', 'Không đổi', 'Hợp lệ', 'Hợp lệ'],
+    ['Đã hoàn thành', 'Phải chặn', 'Phải chặn', 'Không đổi', 'Phải chặn'],
+    ['Đã hủy', 'Phải chặn', 'Phải chặn', 'Phải chặn', 'Không đổi'],
+  ], { center: true }),
+  p('Ma trận chuyển trạng thái của đơn đặt tiệc', { italic: true, size: 20, center: true, after: 140 }),
+  p('Hai trạng thái Đã hoàn thành và Đã hủy là trạng thái cuối, không chuyển đi đâu được nữa. '
+    + 'Đây là chỗ sinh ra các trường hợp kiểm thử nghịch quan trọng: thử hủy một đơn đã hoàn thành, '
+    + 'hoặc thử đưa đơn đã hủy trở lại trạng thái chờ.'),
+  p('Hệ thống còn một máy trạng thái thứ hai là vòng đời giữ chỗ của đơn vừa gửi: từ Đang giữ chỗ, '
+    + 'đơn chuyển sang Giữ chỗ vĩnh viễn nếu khách trả cọc kịp hạn, hoặc sang Hết hạn giữ chỗ nếu '
+    + 'không. Cả hai nhánh đều phải kiểm thử, vì nhánh hết hạn quyết định buổi đó có trống lại cho '
+    + 'khách khác hay không.'),
+
+  h2('4.5. Kiểm thử theo use case'),
+  p('Nguyên lý: lấy từng kịch bản sử dụng thực tế của người dùng làm đơn vị kiểm thử, đi hết luồng '
+    + 'chính rồi tới các luồng rẽ nhánh. Kỹ thuật này phát hiện loại lỗi mà kiểm thử từng hàm riêng lẻ '
+    + 'không thấy, cụ thể là lỗi chỉ lộ ra khi các bước ghép lại với nhau.'),
+  p('Toàn bộ 19 luồng nghiệp vụ ở mục 5 được tổ chức theo nguyên lý này. Mỗi luồng tương ứng một use '
+    + 'case, trong đó các trường hợp thuận đi theo luồng chính và các trường hợp nghịch đi theo luồng '
+    + 'rẽ khi có gì đó không đúng.'),
+
+  h2('4.6. Đoán lỗi dựa trên kinh nghiệm'),
+  p('Ngoài bốn kỹ thuật có quy tắc rõ ràng ở trên, một số trường hợp kiểm thử sinh ra từ kinh nghiệm '
+    + 'về những chỗ phần mềm hay hỏng. Kỹ thuật này không thay thế các kỹ thuật kia mà bổ sung cho '
+    + 'chúng, vì có những lỗi không nằm ở biên cũng không nằm ở tổ hợp điều kiện nào.'),
+  bang([2900, 3200, 2926], ['Tình huống đoán lỗi', 'Lý do nghi ngờ', 'Được canh ở đâu'], [
+    ['Bấm nút thêm phần ăn ba lần thật nhanh',
+      'Giao diện có thể đọc bản dữ liệu cũ của lần vẽ trước nên chỉ cộng được một lần',
+      'TC-CMENU-05 trong tài liệu này'],
+    ['Đổi bộ lọc liên tục rồi dừng',
+      'Kết quả lần lọc cũ có thể về sau kết quả mới, làm trang hiện danh sách của bộ lọc đã bỏ',
+      'Chưa có ca kiểm thử, đã sửa ở mã giao diện'],
+    ['Hai quản trị cùng xác nhận hai đơn tranh một buổi',
+      'Cả hai cùng đọc thấy buổi còn trống rồi cùng xác nhận',
+      'Kiểm thử đơn vị XuLyDongThoiDatTiecTest'],
+    ['Khách gửi đơn rồi không trả cọc, buổi đó có bị kẹt không',
+      'Giữ chỗ tạm mà không có cơ chế thả thì một người bỏ ngang chặn mọi người khác',
+      'Kiểm thử đơn vị GiuChoTamTest'],
+    ['Gửi dữ liệu sai bảng mã lên máy chủ',
+      'Máy chủ có thể trả lỗi 500 thay vì 400, tức đổ lỗi hệ thống cho lỗi của bên gửi',
+      'Chưa có ca kiểm thử, đã sửa ở GlobalExceptionHandler'],
+    ['Đăng nhập hai lần trong cùng một giây',
+      'Hai thẻ làm mới sinh cùng thời điểm có thể trùng khóa',
+      'Kiểm thử đơn vị về xử lý đồng thời'],
+  ]),
+  p('Các tình huống đoán lỗi, lý do nghi ngờ và nơi được canh', { italic: true, size: 20, center: true, after: 140 }),
+  p('Cần nói rõ phạm vi của bảng này để không hiểu nhầm. Chỉ tình huống đầu tiên nằm trong tài liệu '
+    + 'đặc tả này, vì đây là tài liệu đặc tả kiểm thử giao diện. Bốn tình huống còn lại được canh bởi '
+    + 'kiểm thử đơn vị phía máy chủ, nơi dựng được tình huống nhiều luồng chạy chồng nhau mà qua trình '
+    + 'duyệt thì không dựng nổi. Hai tình huống chưa có ca kiểm thử thì lỗi đã được sửa, nhưng chưa có '
+    + 'gì canh để lỗi không quay lại, và đây là chỗ cần bổ sung.'),
+  p('Giá trị của kỹ thuật đoán lỗi thể hiện ở chỗ: cả sáu tình huống đều là lỗi có thật đã xảy ra '
+    + 'trong quá trình phát triển, và không tình huống nào suy ra được từ bốn kỹ thuật có quy tắc ở '
+    + 'trên. Chúng không nằm ở biên, không nằm ở tổ hợp điều kiện nào trong đặc tả, mà nằm ở chỗ hai '
+    + 'việc xảy ra gần nhau về thời gian.'),
+
+  // ---- 5 ----
+  h1('5. Đặc tả trường hợp kiểm thử'),
 ];
 
 LUONG.forEach((l, i) => {
-  noiDung.push(h2('4.' + (i + 1) + '. Luồng ' + (i + 1) + ': ' + l.ten));
+  noiDung.push(h2('5.' + (i + 1) + '. Luồng ' + (i + 1) + ': ' + l.ten));
   noiDung.push(p('Đường dẫn: ' + l.url + '. Lớp kịch bản: ' + l.lop, { size: 21, italic: true, after: 60 }));
   noiDung.push(p('Tiền điều kiện: ' + l.tienDieuKien, { size: 21, after: 100 }));
-  noiDung.push(bangTC(l.ds));
+  noiDung.push(bangTC(l.ds, l.ma));
   noiDung.push(p('', { after: 80 }));
 });
 
 // ---- 5 ----
-noiDung.push(h1('5. Tổng hợp'));
-noiDung.push(p('Bảng dưới đây được tính tự động từ chính phần đặc tả ở mục 4, nên luôn khớp khi bổ sung hoặc bớt trường hợp kiểm thử.'));
+noiDung.push(h1('6. Tổng hợp'));
+noiDung.push(p('Bảng dưới đây được tính tự động từ chính phần đặc tả ở mục 5, nên luôn khớp khi bổ sung hoặc bớt trường hợp kiểm thử.'));
 noiDung.push(bang(
   [450, 2150, 800, 2226, 800, 800, 900, 900],
   ['STT', 'Luồng nghiệp vụ', 'Mã', 'Lớp kịch bản', 'Số test case', 'Thuận', 'Nghịch', 'Ưu tiên cao'],
@@ -787,7 +1097,7 @@ noiDung.push(bullet('Ưu tiên cao ' + soCao + ', trung bình ' + soTB + ', th�
 noiDung.push(bullet('Hai luồng nặng nhất là đặt tiệc và đặt món lẻ, cộng cả phần ràng buộc thì chiếm khoảng một nửa số trường hợp. Đúng với thực tế: đây là hai luồng có công thức tính tiền và nhiều điều kiện từ chối nhất.'));
 
 // ---- 6 ----
-noiDung.push(h1('6. Việc phải chuẩn bị trước khi viết mã kiểm thử'));
+noiDung.push(h1('7. Việc phải chuẩn bị trước khi viết mã kiểm thử'));
 noiDung.push(p('Bốn việc dưới đây phát sinh trong lúc đặc tả ngày 12/09. Cột cuối ghi tình trạng tại lần cập nhật 17/09.'));
 
 noiDung.push(bang([500, 2000, 4126, 2400], ['STT', 'Việc', 'Lý do và hướng xử lý', 'Tình trạng 17/09'], [
@@ -801,16 +1111,19 @@ noiDung.push(bang([500, 2000, 4126, 2400], ['STT', 'Việc', 'Lý do và hướn
     'Nhiều trường hợp dùng ngày tương đối như sau 30 ngày hoặc sau 70 ngày. Kịch bản phải tính ngày lúc chạy chứ không được ghi cứng một ngày cụ thể, nếu không thì vài tháng sau chạy lại sẽ trượt.', 'Đã làm: ngày tính lúc chạy, tự né ngày lễ.'],
 ]));
 
-noiDung.push(h1('7. Kết luận của mốc này'));
+noiDung.push(h1('8. Kết luận của mốc này'));
 noiDung.push(bullet('Đã đặc tả ' + tongTC + ' trường hợp kiểm thử phủ đủ ' + LUONG.length + ' luồng nghiệp vụ trong phạm vi đề tài.'));
 noiDung.push(bullet('Toàn bộ kết quả mong đợi đã đối chiếu với mã nguồn và tệp cấu hình thật, gồm cả các con số tính tiền và các câu thông báo lỗi nguyên văn.'));
 noiDung.push(bullet('Đã xác định được bốn việc phải chuẩn bị trước khi viết mã, trong đó việc bổ sung thuộc tính data-test cần làm sớm nhất vì nó đụng tới mã nguồn frontend.'));
-noiDung.push(p('Ghi chú cập nhật 17/09: các mốc cài đặt Selenium, dựng Page Object Model và viết mã kiểm thử đã hoàn thành sớm. Bộ kiểm thử hiện có ' + tongTC + ' test case trên ' + LUONG.length + ' luồng; kết quả chạy ghi trong tài liệu BaoCao_KiemThuTuDong.docx.'));
+noiDung.push(p('Ghi chú cập nhật 12/10: các mốc cài đặt Selenium, dựng Page Object Model và viết mã kiểm thử đã hoàn thành sớm. Bộ kiểm thử hiện có ' + tongTC + ' test case trên ' + LUONG.length + ' luồng; kết quả chạy ghi trong tài liệu BaoCao_KiemThuTuDong.docx.'));
 
-noiDung.push(h1('8. Lịch sử cập nhật'));
+noiDung.push(h1('9. Lịch sử cập nhật'));
 noiDung.push(bang([1500, 7526], ['Ngày', 'Nội dung'], [
   ['12/09/2026', 'Bản đầu: 108 trường hợp kiểm thử trên 13 luồng nghiệp vụ.'],
   ['17/09/2026', 'Đối chiếu lại với mã kiểm thử và giao diện thật. Bổ sung Luồng 14 và Luồng 15 (22 trường hợp). Thống nhất tên trường hợp với tên trong mã. Sửa tiền điều kiện Luồng 1 và Luồng 7. Sửa kết quả mong đợi của 21 trường hợp ở bảng dưới. Ghi chú né ngày lễ cho các luồng tính tiền, cập nhật môi trường, tài khoản, tham số và dữ liệu mẫu dịp lễ, thêm tên lớp kịch bản cho từng luồng.'],
+  ['01/10/2026', 'Bổ sung Luồng 16 cho trang gói tiệc (10 trường hợp). Trước đó không kịch bản nào đi qua trang bảng giá, dù đây là một trong năm trang khách xem nhiều nhất trước khi quyết định đặt tiệc.'],
+  ['05/10/2026', 'Bổ sung Luồng 17 cho màn hình lịch đặt chỗ của bộ phận quản trị (10 trường hợp).'],
+  ['12/10/2026', 'Bổ sung Luồng 18 cho dải thông báo khuyến mãi trên trang chủ và Luồng 19 cho hình thức đặt sảnh nhỏ với thực đơn tự chọn, mỗi luồng 8 trường hợp. Sau đợt này số trường hợp trong tài liệu khớp đúng số ca trong mã kiểm thử.'],
 ]));
 noiDung.push(p(''));
 noiDung.push(p('Các trường hợp sửa kết quả mong đợi ngày 17/09:', { bold: true, after: 80 }));

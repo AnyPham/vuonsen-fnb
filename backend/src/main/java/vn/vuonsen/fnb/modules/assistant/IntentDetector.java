@@ -29,8 +29,38 @@ public class IntentDetector {
             Map.entry(Intent.CHAO_HOI, List.of(
                     "xin chao", "chao ban", "chao shop", "hello", "alo", "hi", "chao")),
 
+            /*
+             * Hoàn cọc phải đứng trước đặt cọc.
+             *
+             * Hai nhóm dùng chung chữ "cọc", mà câu "hủy thì có được hoàn cọc không" vừa
+             * chứa từ khóa nhóm này vừa chứa nhóm kia. Khách hỏi về hủy thì điều họ cần
+             * biết là mất bao nhiêu, không phải phải đóng bao nhiêu.
+             */
+            Map.entry(Intent.HOAN_COC, List.of(
+                    "hoan coc", "hoan tien", "huy don", "huy tiec", "doi y",
+                    "co lay lai", "mat coc", "tra lai tien", "khong to chuc nua")),
+
             Map.entry(Intent.DAT_COC, List.of(
                     "dat coc", "tien coc", "coc bao nhieu", "phai coc", "giu cho")),
+
+            /*
+             * Thanh toán đứng trước chi phí: "thanh toán bằng cách nào" hỏi về phương
+             * thức trả tiền, không phải hỏi giá bao nhiêu.
+             */
+            Map.entry(Intent.THANH_TOAN, List.of(
+                    "thanh toan", "chuyen khoan", "quet ma", "ma qr", "vietqr", "vnpay",
+                    "tra tien", "the ngan hang", "tra bang gi", "hinh thuc thanh toan")),
+
+            /*
+             * Sảnh nhỏ đứng trước cả không gian lẫn thực đơn.
+             *
+             * Câu "nhóm 20 người tự chọn món được không" chứa chữ của nhóm thực đơn, còn
+             * "sảnh nhỏ" chứa chữ "sanh" của nhóm không gian. Cả hai đều trả lời trượt
+             * điều khách hỏi, nên nhóm này phải xét trước.
+             */
+            Map.entry(Intent.SANH_NHO, List.of(
+                    "sanh nho", "tu chon mon", "chon mon le", "thuc don tu chon", "nhom nho",
+                    "khong lay goi", "khong can goi tiec", "an theo phan", "tu chon thuc don")),
 
             Map.entry(Intent.KHUYEN_MAI, List.of(
                     "khuyen mai", "giam gia", "uu dai", "dat som", "mien phi thue", "dip le", "ngay le")),

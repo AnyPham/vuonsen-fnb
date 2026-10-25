@@ -57,7 +57,7 @@ class GeminiLlmClientTest {
     // ---------------- Thử lại khi gặp lỗi nhất thời ----------------
 
     /*
-     * Ngày 03/10/2026 chạy thử với khóa thật, nhiều câu hỏi liên tiếp bị Gemini trả 503.
+     * Chạy thử với khóa thật, nhiều câu hỏi liên tiếp bị Gemini trả 503.
      * Lỗi nhất thời bên Google chứ không phải hệ thống hỏng, nên gọi lại là được.
      */
     @Test

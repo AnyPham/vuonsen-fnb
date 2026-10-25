@@ -22,8 +22,26 @@ export default function MenuPage() {
   // Món bán chạy lấy riêng, không qua Redux vì chỉ trang này dùng
   const [bestSellers, setBestSellers] = useState([]);
   const [tuKhoa, setTuKhoa] = useState('');
+  /*
+   * Danh mục đang chọn giữ thêm một bản ở đây, dù Redux cũng có activeCategory.
+   *
+   * Vì bộ lọc chay phải ghép được với danh mục: bấm "món chay" rồi bấm "tráng miệng" thì
+   * phải ra tráng miệng chay, chứ không phải mất một trong hai điều kiện. Đọc ngược từ
+   * Redux thì vòng lặp, vì chính lệnh gọi này mới đặt ra activeCategory.
+   */
+  const [danhMuc, setDanhMuc] = useState('');
+  const [chiMonChay, setChiMonChay] = useState(false);
   const { t, tDb } = useI18n();
   const dd = useDinhDang();
+
+  /** Gọi lại danh sách món theo đúng ba điều kiện đang bật. */
+  const napMon = (dm, tim, chay) => {
+    const params = {};
+    if (dm) params.category = dm;
+    if (tim) params.keyword = tim;
+    if (chay) params.vegetarian = true;
+    dispatch(fetchDishes(params));
+  };
 
   // Món tính giá linh hoạt thì không có giá, hiện ghi chú cách tính thay cho con số
   const hienGia = (dish) => (dish.price ? dd.tien(dish.price) : tDb(dish, 'priceNote'));
@@ -36,9 +54,10 @@ export default function MenuPage() {
    */
   useEffect(() => {
     if (!tuKhoa) return undefined;
-    const hen = setTimeout(() => dispatch(fetchDishes({ keyword: tuKhoa })), 350);
+    const hen = setTimeout(() => napMon('', tuKhoa, chiMonChay), 350);
     return () => clearTimeout(hen);
-  }, [dispatch, tuKhoa]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [dispatch, tuKhoa, chiMonChay]);
 
   useEffect(() => {
     dispatch(fetchCategories());
@@ -101,7 +120,7 @@ export default function MenuPage() {
           <button
             type="button"
             className={`btn btn-sm ${!activeCategory && !tuKhoa ? 'btn-dark' : 'btn-outline'}`}
-            onClick={() => { setTuKhoa(''); dispatch(fetchDishes({})); }}
+            onClick={() => { setTuKhoa(''); setDanhMuc(''); napMon('', '', chiMonChay); }}
             data-test="category-tab-all"
           >
             {t('menu.all')}
@@ -111,12 +130,32 @@ export default function MenuPage() {
               key={category.code}
               type="button"
               className={`btn btn-sm ${activeCategory === category.code ? 'btn-dark' : 'btn-outline'}`}
-              onClick={() => { setTuKhoa(''); dispatch(fetchDishes({ category: category.code })); }}
+              onClick={() => { setTuKhoa(''); setDanhMuc(category.code); napMon(category.code, '', chiMonChay); }}
               data-test={`category-tab-${category.code}`}
             >
               {tDb(category, 'name')}
             </button>
           ))}
+        </div>
+
+        {/*
+          Tách khỏi hàng tab danh mục vì đây là điều kiện khác loại: danh mục chọn một
+          trong năm, còn lọc chay thì bật hoặc tắt và ghép được với bất kỳ danh mục nào.
+        */}
+        <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 34 }}>
+          <button
+            type="button"
+            className={`btn btn-sm ${chiMonChay ? 'btn-dark' : 'btn-outline'}`}
+            aria-pressed={chiMonChay}
+            data-test="filter-vegetarian"
+            onClick={() => {
+              const bat = !chiMonChay;
+              setChiMonChay(bat);
+              napMon(danhMuc, tuKhoa, bat);
+            }}
+          >
+            {t('menu.vegetarianOnly')}
+          </button>
         </div>
 
         {status === 'loading' && <Loading />}
@@ -141,6 +180,11 @@ export default function MenuPage() {
                   {dish.bestSeller && (
                     <span className="tag tag-PENDING" style={{ marginLeft: 8 }}>
                       {t('menu.best')}
+                    </span>
+                  )}
+                  {dish.vegetarian && (
+                    <span className="tag tag-CONFIRMED" style={{ marginLeft: 8 }} data-test="dish-vegetarian">
+                      {t('menu.vegetarian')}
                     </span>
                   )}
                 </strong>

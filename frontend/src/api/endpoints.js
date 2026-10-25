@@ -44,6 +44,14 @@ export const recommendationApi = {
 export const assistantApi = {
   // history: các lượt trước dạng { role: 'user' | 'assistant', content }, cũ trước mới sau
   ask: (question, history = []) => axiosClient.post('/api/v1/assistant/ask', { question, history }),
+
+  /*
+   * Màn mở đầu, gọi lúc khách bấm mở hộp thoại.
+   *
+   * Không truyền mã khách lên: máy chủ tự lấy danh tính từ thẻ truy cập trong tiêu đề
+   * Authorization. Khách chưa đăng nhập gọi vẫn được, nhận bản dành cho khách mới.
+   */
+  loiMoDau: () => axiosClient.get('/api/v1/assistant/loi-mo-dau'),
 };
 
 export const bookingApi = {
@@ -75,6 +83,13 @@ export const vnpayApi = {
   xacNhan: (thamSo) => axiosClient.post('/api/v1/payments/vnpay/verify', thamSo),
 };
 
+export const pushApi = {
+  khoaCongKhai: () => axiosClient.get('/api/v1/push/khoa-cong-khai'),
+  dangKy: (body) => axiosClient.post('/api/v1/push/dang-ky', body),
+  huyDangKy: (endpoint) => axiosClient.delete('/api/v1/push/dang-ky', { params: { endpoint } }),
+  guiKhuyenMai: (id) => axiosClient.post(`/api/v1/admin/push/khuyen-mai/${id}`),
+};
+
 export const holidayApi = {
   // Các dịp lễ đang áp dụng hoặc sắp tới, cho trang Ưu đãi
   list: () => axiosClient.get('/api/v1/holidays'),
@@ -86,6 +101,7 @@ export const galleryApi = {
 
 export const adminApi = {
   bookings: (params) => axiosClient.get('/api/v1/admin/bookings', { params }),
+  calendar: (params) => axiosClient.get('/api/v1/admin/calendar', { params }),
   // Đếm nhanh số đơn theo trạng thái, dùng cho mấy ô nhỏ trên trang danh sách đơn
   statistics: () => axiosClient.get('/api/v1/admin/bookings/statistics'),
   // Số liệu đầy đủ cho trang thống kê biểu đồ. Bỏ trống params thì lấy 12 tháng gần nhất.

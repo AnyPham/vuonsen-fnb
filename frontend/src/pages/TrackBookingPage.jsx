@@ -164,6 +164,19 @@ export default function TrackBookingPage() {
                       <td data-test="result-deposit">{moTaCoc(booking, t, dd)}</td>
                     </tr>
                   )}
+                  {/*
+                    * Chỉ hiện khi đơn đã hủy và có phát sinh hoàn trả. Đơn chưa hủy mà
+                    * thấy dòng hoàn tiền thì khách tưởng mình đang bị hủy.
+                    */}
+                  {Number(booking.refundAmount) > 0 && (
+                    <tr>
+                      <th>{t('track.refund')}</th>
+                      <td data-test="result-refund">
+                        {dd.tien(booking.refundAmount)}
+                        {booking.refundNote && <span className="muted"> · {booking.refundNote}</span>}
+                      </td>
+                    </tr>
+                  )}
                 </tbody>
               </table>
 

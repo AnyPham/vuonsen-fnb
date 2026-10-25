@@ -81,6 +81,13 @@ app:
     large-party-min-days: 7      # tiệc lớn phải báo trước 7 ngày
     full-day-package-hours: 8     # gói từ 8 tiếng trở lên tính là thuê trọn ngày
 
+    # Hủy trước 30 ngày hoàn đủ cọc, trước 15 ngày hoàn một nửa, sát ngày thì không hoàn.
+    refund-full-days: 30
+    refund-half-days: 15
+
+    # Giu cho tam bao nhieu phut cho khach kip tra coc, het gio thi tha ra
+    hold-minutes: 15
+
   # Trong so cua thuat toan goi y. Tong nam trong so bang 100 cho de doc diem.
   # Tinh chinh o day roi chay lai, khong phai dich lai ma nguon.
   recommendation:
@@ -160,7 +167,13 @@ app:
   # khach khong thay loi.
   assistant:
     llm:
-      enabled: ${ASSISTANT_LLM_ENABLED:true}
+      # Mac dinh TAT. Tro ly chay bang ngan hang cau hoi va du lieu doc tu CSDL, khong
+      # goi mo hinh ngon ngu nao.
+      #
+      # Ly do chon tat lam mac dinh: cau tra loi phai giai thich duoc tung con so lay o
+      # dau, va phai giong nhau qua moi lan hoi. Mo hinh ngon ngu khong hua duoc ca hai.
+      # Ma nhanh goi mo hinh van giu nguyen, bat lai bang mot dong cau hinh khi can.
+      enabled: ${ASSISTANT_LLM_ENABLED:false}
 
       # Nha cung cap mo hinh:
       #   gemini     Google Gemini, co han muc dung mien phi

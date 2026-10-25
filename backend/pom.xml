@@ -25,6 +25,20 @@
   </properties>
 
   <dependencies>
+    <!-- web-push can BouncyCastle de ky va ma hoa theo chuan VAPID. -->
+    <dependency>
+      <groupId>org.bouncycastle</groupId>
+      <artifactId>bcprov-jdk18on</artifactId>
+      <version>1.78.1</version>
+    </dependency>
+
+    <!-- Gui web push theo chuan VAPID. Khong ton phi: day qua dich vu push cua chinh trinh duyet. -->
+    <dependency>
+      <groupId>nl.martijndwars</groupId>
+      <artifactId>web-push</artifactId>
+      <version>5.1.1</version>
+    </dependency>
+
     <!-- Web / REST -->
     <dependency>
       <groupId>org.springframework.boot</groupId>

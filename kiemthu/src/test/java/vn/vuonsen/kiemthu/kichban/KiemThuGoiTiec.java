@@ -11,7 +11,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 /*
  * Luồng 16 — Xem và lọc gói tiệc, ứng với TC-PKG-01 đến TC-PKG-10.
  *
- * Luồng thêm sau ngày 01/10/2026, cùng đợt với bộ lọc gói tiệc. Trước đó cả bộ kiểm thử
+ * Luồng này thêm sau, cùng đợt với bộ lọc gói tiệc. Trước đó cả bộ kiểm thử
  * không có kịch bản nào đi qua trang bảng giá, dù đây là một trong năm trang khách xem
  * nhiều nhất trước khi quyết định đặt tiệc.
  *

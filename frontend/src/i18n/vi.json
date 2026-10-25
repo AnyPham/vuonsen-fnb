@@ -30,7 +30,8 @@
     "packages": "Gói tiệc",
     "spaces": "Không gian",
     "holidays": "Ngày lễ",
-    "users": "Tài khoản"
+    "users": "Tài khoản",
+    "calendar": "Lịch đặt chỗ"
   },
   "footer": {
     "about": "Khu ẩm thực sân vườn và dịch vụ cho thuê không gian tiệc ven sông Sài Gòn.",
@@ -119,6 +120,8 @@
     "searchPlaceholder": "Gõ tên món, ví dụ: gỏi, cá lóc, lẩu…",
     "all": "Tất cả",
     "best": "Best",
+    "vegetarian": "Món chay",
+    "vegetarianOnly": "Chỉ hiện món chay",
     "noMatch": "Không tìm thấy món nào khớp \"{{tuKhoa}}\".",
     "emptyCategory": "Danh mục này chưa có món."
   },
@@ -327,7 +330,8 @@
     "depositFull": "Đã nhận đủ {{daDong}}",
     "depositPartial": "Đã nhận {{daDong}}, còn {{conLai}}",
     "depositNone": "Cần đóng {{phaiDong}} để giữ ngày",
-    "pay": "Thanh toán đơn này"
+    "pay": "Thanh toán đơn này",
+    "refund": "Tiền hoàn lại"
   },
   "trackDish": {
     "title": "Đơn đặt món",
@@ -475,7 +479,18 @@
     "doneSuffix": ". Hãy lưu lại để tra cứu.",
     "sendAnother": "Gửi yêu cầu khác",
     "lookup": "Tra cứu đơn này",
-    "payDeposit": "Đóng cọc giữ ngày"
+    "payDeposit": "Đóng cọc giữ ngày",
+    "tuChonMon": "Tự chọn món",
+    "tuChonMonDesc": "Tiệc nhỏ, tính tiền theo đúng số phần bạn gọi",
+    "dangTaiThucDon": "Đang tải thực đơn…",
+    "tuChonQuaDong": "Thực đơn tự chọn chỉ nhận tối đa {{n}} khách. Đông hơn, bạn chọn một gói tiệc nhé.",
+    "tuChonLocDanhMuc": "Lọc theo danh mục",
+    "tuChonTatCa": "Tất cả danh mục",
+    "tuChonTimMon": "Tìm theo tên món",
+    "tuChonBot": "Bớt một phần {{mon}}",
+    "tuChonThem": "Thêm một phần {{mon}}",
+    "tuChonTong": "Đã chọn {{mon}} món, {{phan}} phần",
+    "errChuaChonMon": "Vui lòng chọn ít nhất một món"
   },
   "reviews": {
     "title": "Đánh giá dịch vụ",
@@ -499,5 +514,104 @@
   "site": {
     "title": "Vườn Sen — Khu ẩm thực & Tiệc sân vườn",
     "description": "Vườn Sen — khu ẩm thực sân vườn và dịch vụ cho thuê không gian tiệc tại TP.HCM. Tiệc cưới, tiệc công ty, sinh nhật, họp mặt gia đình."
+  },
+  "meta": {
+    "trangChu": {
+      "title": "Khu ẩm thực & tiệc sân vườn ven sông Sài Gòn",
+      "description": "Sáu không gian tiệc từ 20 đến 800 khách, thực đơn 126 món và dịch vụ tổ chức trọn gói tại Bình Thạnh, TP.HCM."
+    },
+    "khongGian": {
+      "title": "Cho thuê không gian tổ chức tiệc",
+      "description": "Sáu không gian tiệc sân vườn và trong nhà, sức chứa 8 đến 800 khách. Lọc theo số khách, loại sự kiện và giá thuê."
+    },
+    "chiTietKhongGian": {
+      "title": "Chi tiết không gian tiệc",
+      "description": "Sức chứa, tiện ích đi kèm, thư viện ảnh và vị trí trên bản đồ của từng không gian tiệc tại Vườn Sen."
+    },
+    "thucDon": {
+      "title": "Thực đơn tiệc và món lẻ",
+      "description": "126 món khai vị, món chính, lẩu, tráng miệng và đồ uống. Có bộ lọc món chay và tìm theo tên món."
+    },
+    "chiTietMon": {
+      "title": "Chi tiết món ăn",
+      "description": "Nguyên liệu, cách chế biến, khẩu phần và lưu ý cho từng món trong thực đơn Vườn Sen."
+    },
+    "goiTiec": {
+      "title": "Bảng giá gói tiệc theo mâm",
+      "description": "Tám gói tiệc tính theo mâm 10 khách, từ 1.800.000đ. Lọc theo giá, số món và số giờ sử dụng không gian."
+    },
+    "datTiec": {
+      "title": "Đặt tiệc trực tuyến, có báo giá ngay",
+      "description": "Ba bước chọn sự kiện, không gian và gói tiệc. Bảng chi phí tạm tính cập nhật liên tục, chưa cần thanh toán."
+    },
+    "datMon": {
+      "title": "Đặt món lẻ giao tận nhà hoặc ăn tại chỗ",
+      "description": "Chọn món từ thực đơn, chọn hình thức nhận và thời điểm. Bên mình gọi xác nhận trước khi bếp làm."
+    },
+    "uuDai": {
+      "title": "Ưu đãi theo dịp lễ",
+      "description": "Các dịp lễ đang được giảm giá tiệc và đơn đặt món tại Vườn Sen, kèm mức giảm và thời gian áp dụng."
+    },
+    "thuVien": {
+      "title": "Thư viện ảnh không gian và tiệc",
+      "description": "Ảnh thật các không gian, món ăn và tiệc đã tổ chức tại khu ẩm thực sân vườn Vườn Sen."
+    },
+    "danhGia": {
+      "title": "Đánh giá của khách đã tổ chức tiệc",
+      "description": "Nhận xét và số sao của khách đã dùng dịch vụ. Khách có mã đơn đã hoàn thành gửi được đánh giá."
+    },
+    "traCuu": {
+      "title": "Tra cứu đơn đặt tiệc",
+      "description": "Nhập mã đơn để xem trạng thái, bảng kê chi phí và tình trạng đặt cọc của đơn đặt tiệc."
+    },
+    "traCuuMon": {
+      "title": "Tra cứu đơn đặt món",
+      "description": "Nhập mã đơn để xem trạng thái và chi tiết đơn đặt món lẻ."
+    },
+    "thanhToan": {
+      "title": "Thanh toán đơn hàng",
+      "description": "Nhập mã đơn để lấy mã VietQR hoặc thanh toán qua VNPay."
+    },
+    "dangNhap": {
+      "title": "Đăng nhập",
+      "description": "Đăng nhập để xem đơn của bạn và điền sẵn thông tin khi đặt tiệc."
+    },
+    "dangKy": {
+      "title": "Đăng ký tài khoản",
+      "description": "Tạo tài khoản để lần sau đặt tiệc không phải nhập lại thông tin."
+    },
+    "quenMatKhau": {
+      "title": "Khôi phục mật khẩu",
+      "description": "Nhập email đã đăng ký để nhận liên kết đặt lại mật khẩu."
+    },
+    "hoSo": {
+      "title": "Hồ sơ cá nhân",
+      "description": "Thông tin liên hệ được điền sẵn khi bạn đặt tiệc."
+    },
+    "donCuaToi": {
+      "title": "Đơn của tôi",
+      "description": "Danh sách đơn đặt tiệc và đơn đặt món của tài khoản."
+    },
+    "quanTri": {
+      "title": "Khu quản trị",
+      "description": "Trang quản trị nội bộ của Vườn Sen."
+    }
+  },
+  "khuyenMai": {
+    "giam": "Giảm {{n}}%",
+    "dangApDung": "Đang áp dụng, đặt tiệc ngay hôm nay",
+    "batDauMai": "Bắt đầu từ ngày mai",
+    "conNgay": "Còn {{n}} ngày nữa là bắt đầu",
+    "xemChiTiet": "Xem ưu đãi",
+    "dongAria": "Đóng thông báo khuyến mãi",
+    "nhanAria": "Thông báo khuyến mãi dịp lễ",
+    "bat": "🔔 Nhận thông báo",
+    "dangBat": "🔔 Đang nhận thông báo",
+    "tatDi": "Tắt thông báo",
+    "daBat": "Xong! Có khuyến mãi mới là bạn nhận được ngay.",
+    "tuChoi": "Bạn đã chặn thông báo. Mở lại trong phần cài đặt của trình duyệt nhé.",
+    "khongHoTro": "Trình duyệt này chưa hỗ trợ thông báo.",
+    "mayChuChuaBat": "Nhà hàng chưa bật tính năng này.",
+    "loi": "Chưa bật được, thử lại sau nhé."
   }
 }

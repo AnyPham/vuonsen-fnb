@@ -30,7 +30,8 @@
     "packages": "Party packages",
     "spaces": "Venues",
     "holidays": "Holidays",
-    "users": "Accounts"
+    "users": "Accounts",
+    "calendar": "Booking calendar"
   },
   "footer": {
     "about": "A riverside garden dining venue and event space for hire on the Saigon River.",
@@ -119,6 +120,8 @@
     "searchPlaceholder": "Type a dish name, for example: salad, fish, hotpot…",
     "all": "All",
     "best": "Best",
+    "vegetarian": "Vegetarian",
+    "vegetarianOnly": "Vegetarian only",
     "noMatch": "No dish matches \"{{tuKhoa}}\".",
     "emptyCategory": "Nothing in this category yet."
   },
@@ -327,7 +330,8 @@
     "depositFull": "Received in full: {{daDong}}",
     "depositPartial": "{{daDong}} received, {{conLai}} outstanding",
     "depositNone": "{{phaiDong}} due to hold the date",
-    "pay": "Pay for this booking"
+    "pay": "Pay for this booking",
+    "refund": "Refund"
   },
   "trackDish": {
     "title": "Food order",
@@ -475,7 +479,18 @@
     "doneSuffix": ". Keep it to look the booking up later.",
     "sendAnother": "Send another request",
     "lookup": "Look this booking up",
-    "payDeposit": "Pay the deposit"
+    "payDeposit": "Pay the deposit",
+    "tuChonMon": "Choose dishes",
+    "tuChonMonDesc": "Small party, priced by the portions you order",
+    "dangTaiThucDon": "Loading the menu…",
+    "tuChonQuaDong": "A custom menu is limited to {{n}} guests. For larger groups, please pick a package.",
+    "tuChonLocDanhMuc": "Filter by category",
+    "tuChonTatCa": "All categories",
+    "tuChonTimMon": "Search by dish name",
+    "tuChonBot": "Remove one portion of {{mon}}",
+    "tuChonThem": "Add one portion of {{mon}}",
+    "tuChonTong": "{{mon}} dishes, {{phan}} portions selected",
+    "errChuaChonMon": "Please choose at least one dish"
   },
   "reviews": {
     "title": "Service reviews",
@@ -499,5 +514,104 @@
   "site": {
     "title": "Vuon Sen — Garden Dining & Events",
     "description": "Vuon Sen — a riverside garden dining venue and event space for hire in Ho Chi Minh City. Weddings, corporate events, birthdays and family gatherings."
+  },
+  "meta": {
+    "trangChu": {
+      "title": "Garden dining & event venue by the Saigon River",
+      "description": "Six event spaces for 20 to 800 guests, a 126-dish menu and full-service party packages in Binh Thanh, Ho Chi Minh City."
+    },
+    "khongGian": {
+      "title": "Event spaces for rent",
+      "description": "Six garden and indoor event spaces for 8 to 800 guests. Filter by guest count, event type and rental price."
+    },
+    "chiTietKhongGian": {
+      "title": "Event space details",
+      "description": "Capacity, amenities, photo gallery and map location for each Vuon Sen event space."
+    },
+    "thucDon": {
+      "title": "Party and à la carte menu",
+      "description": "126 starters, mains, hotpots, desserts and drinks. Vegetarian filter and search by dish name."
+    },
+    "chiTietMon": {
+      "title": "Dish details",
+      "description": "Ingredients, preparation, serving size and notes for each dish on the Vuon Sen menu."
+    },
+    "goiTiec": {
+      "title": "Party package pricing per table",
+      "description": "Eight packages priced per table of 10 guests, from 1,800,000d. Filter by price, dish count and venue hours."
+    },
+    "datTiec": {
+      "title": "Book an event online with instant quote",
+      "description": "Three steps: event, space and package. The estimate updates as you choose; no payment required."
+    },
+    "datMon": {
+      "title": "Order dishes for delivery or dine-in",
+      "description": "Pick dishes from the menu, choose delivery or dine-in and a time. We call to confirm before cooking."
+    },
+    "uuDai": {
+      "title": "Holiday promotions",
+      "description": "Holidays currently discounted for events and food orders at Vuon Sen, with rates and valid dates."
+    },
+    "thuVien": {
+      "title": "Photo gallery",
+      "description": "Real photos of the spaces, dishes and events hosted at Vuon Sen garden dining area."
+    },
+    "danhGia": {
+      "title": "Guest reviews",
+      "description": "Ratings and comments from guests who hosted events here. Guests with a completed booking code can review."
+    },
+    "traCuu": {
+      "title": "Track your event booking",
+      "description": "Enter your booking code to see status, cost breakdown and deposit state."
+    },
+    "traCuuMon": {
+      "title": "Track your food order",
+      "description": "Enter your order code to see status and details of your à la carte order."
+    },
+    "thanhToan": {
+      "title": "Pay your order",
+      "description": "Enter your order code to get a VietQR code or pay via VNPay."
+    },
+    "dangNhap": {
+      "title": "Sign in",
+      "description": "Sign in to view your orders and prefill your details when booking."
+    },
+    "dangKy": {
+      "title": "Create an account",
+      "description": "Create an account so you do not have to re-enter your details next time."
+    },
+    "quenMatKhau": {
+      "title": "Reset your password",
+      "description": "Enter your registered email to receive a password reset link."
+    },
+    "hoSo": {
+      "title": "Your profile",
+      "description": "Contact details prefilled when you book an event."
+    },
+    "donCuaToi": {
+      "title": "My orders",
+      "description": "Your event bookings and food orders."
+    },
+    "quanTri": {
+      "title": "Admin area",
+      "description": "Internal administration pages for Vuon Sen."
+    }
+  },
+  "khuyenMai": {
+    "giam": "{{n}}% off",
+    "dangApDung": "Running now, book today",
+    "batDauMai": "Starts tomorrow",
+    "conNgay": "Starts in {{n}} days",
+    "xemChiTiet": "View offer",
+    "dongAria": "Dismiss promotion notice",
+    "nhanAria": "Holiday promotion notice",
+    "bat": "🔔 Get notified",
+    "dangBat": "🔔 Notifications on",
+    "tatDi": "Turn off",
+    "daBat": "Done! You will hear from us when a new offer starts.",
+    "tuChoi": "Notifications are blocked. Re-enable them in your browser settings.",
+    "khongHoTro": "This browser does not support notifications.",
+    "mayChuChuaBat": "The restaurant has not enabled this yet.",
+    "loi": "Could not turn it on, please try again."
   }
 }

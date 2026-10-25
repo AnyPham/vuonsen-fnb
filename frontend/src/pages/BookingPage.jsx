@@ -8,10 +8,11 @@ import {
   resetBooking,
   selectBooking,
   submitBooking,
-  updateForm,
+  updateForm, doiSoPhanMon,
 } from '@/features/booking/bookingSlice';
 import { fetchPackages, fetchSpaces, selectPackages, selectSpaces } from '@/features/catalog/catalogSlice';
 import { bookingApi } from '@/api/endpoints';
+import ChonMonTuChon from '@/components/booking/ChonMonTuChon';
 import { useI18n } from '@/i18n';
 import { useDinhDang } from '@/i18n/dinhDang';
 import { ErrorBlock } from '@/components/common/StateBlock';
@@ -67,7 +68,9 @@ function validateStep(step, form, rules, t) {
   if (step === 2) {
     if (!form.spaceId) errors.spaceId = t('booking.errSpace');
     // Gói tiệc không bắt buộc, nhưng phải chọn rõ: một gói, hoặc chỉ thuê không gian
-    if (!form.packageId && !form.noPackage) {
+    if (form.tuChonMon && (form.monTuChon || []).length === 0) {
+      errors.packageId = t('booking.errChuaChonMon');
+    } else if (!form.packageId && !form.noPackage) {
       errors.packageId = t('booking.errPackage');
     }
   }
@@ -119,18 +122,26 @@ export default function BookingPage() {
 
   // Đổi số khách, không gian, gói tiệc hay ngày thì hỏi lại giá từ server
   useEffect(() => {
-    const { spaceId, packageId, noPackage, guestCount, eventDate } = form;
+    const { spaceId, packageId, noPackage, guestCount, eventDate, tuChonMon, monTuChon } = form;
     if (!spaceId || !guestCount || (!packageId && !noPackage)) return;
+    /* Đã bật tự chọn món mà chưa chọn gì thì chưa có gì để báo giá. */
+    if (tuChonMon && (monTuChon || []).length === 0) return;
     const timer = setTimeout(() => {
       dispatch(fetchQuote({
         spaceId,
         packageId: packageId || null,
+        monTuChon: tuChonMon ? monTuChon : null,
         guestCount: Number(guestCount),
         eventDate: eventDate || null,
       }));
     }, 350); // đợi người dùng gõ xong rồi mới gọi API
     return () => clearTimeout(timer);
-  }, [dispatch, form.spaceId, form.packageId, form.noPackage, form.guestCount, form.eventDate]);
+    /*
+     * Phải theo dõi cả món tự chọn, không thì khách thêm bớt món mà bảng tạm tính đứng yên.
+     * Dùng chuỗi JSON để so, vì mảng dựng lại mỗi lần vẽ nên so theo tham chiếu luôn khác.
+     */
+  }, [dispatch, form.spaceId, form.packageId, form.noPackage, form.guestCount, form.eventDate,
+    form.tuChonMon, JSON.stringify(form.monTuChon || [])]);
 
   const rules = options.rules;
   const slotHours = options.timeSlots?.find((s) => s.value === form.timeSlot)?.durationHours;
@@ -180,6 +191,7 @@ export default function BookingPage() {
       submitBooking({
         ...duLieu,
         packageId: noPackage ? null : duLieu.packageId,
+        monTuChon: duLieu.tuChonMon ? duLieu.monTuChon : null,
         guestCount: Number(form.guestCount),
         customerEmail: form.customerEmail || null,
         note: form.note || null,
@@ -337,8 +349,16 @@ function StepEvent({ form, set, options, errors, rules }) {
   );
 }
 
+/*
+ * Số khách tối đa còn được tự chọn món. Phải khớp với SO_KHACH_TOI_DA_TU_CHON ở máy chủ:
+ * đây chỉ là lớp báo trước cho khách, máy chủ vẫn kiểm lại lúc gửi đơn.
+ */
+const KHACH_TOI_DA_TU_CHON = 40;
+
 // Bước 2: chọn không gian và gói tiệc
 function StepChoices({ form, set, spaces, packages, errors, slotHours, fullDayHours, tinhTrangTrong }) {
+  /* Bước này là thành phần riêng nên phải tự lấy dispatch, không dùng được của trang cha. */
+  const dispatch = useDispatch();
   const guests = Number(form.guestCount) || 0;
   const { t, tDb } = useI18n();
   const dd = useDinhDang();
@@ -427,14 +447,36 @@ function StepChoices({ form, set, spaces, packages, errors, slotHours, fullDayHo
           {/* Khách chỉ cần mặt bằng: tự lo ăn uống, hoặc sự kiện không có tiệc */}
           <button
             type="button"
-            className={`pick ${form.noPackage && !form.packageId ? 'sel' : ''}`}
-            onClick={() => set({ packageId: null, noPackage: true })}
+            className={`pick ${form.noPackage && !form.packageId && !form.tuChonMon ? 'sel' : ''}`}
+            onClick={() => set({ packageId: null, noPackage: true, tuChonMon: false, monTuChon: [] })}
             data-test="no-package-pick"
           >
             <span className="t">{t('booking.noPackage')}</span>
             <span className="s">{t('booking.noPackageDesc')}</span>
           </button>
+
+          {/* Tiệc nhỏ: không lấy gói cố định mà tự chọn từng món, trả tiền theo đúng phần đã gọi */}
+          {guests > 0 && guests <= KHACH_TOI_DA_TU_CHON && (
+            <button
+              type="button"
+              className={`pick ${form.tuChonMon ? 'sel' : ''}`}
+              onClick={() => set({ packageId: null, noPackage: true, tuChonMon: true })}
+              data-test="custom-menu-pick"
+            >
+              <span className="t">{t('booking.tuChonMon')}</span>
+              <span className="s">{t('booking.tuChonMonDesc')}</span>
+            </button>
+          )}
         </div>
+
+        {form.tuChonMon && (
+          <ChonMonTuChon
+            soKhach={guests}
+            gioiHanKhach={KHACH_TOI_DA_TU_CHON}
+            daChon={form.monTuChon || []}
+            onDoiSo={(dishId, buoc) => dispatch(doiSoPhanMon({ dishId, buoc }))}
+          />
+        )}
         {errors.packageId && <div className="err" data-test="error-package">{errors.packageId}</div>}
       </div>
     </>
@@ -520,7 +562,11 @@ function EstimatePanel({ quote, loading }) {
 
       {quote && (
         <>
-          {/* Đơn chỉ thuê không gian không có mâm và tiền ăn, ẩn ba dòng này đi */}
+          {/*
+            * Số mâm và đơn giá mâm chỉ có nghĩa với gói tiệc. Đơn chỉ thuê không gian
+            * không có hai dòng này, mà thực đơn tự chọn cũng không: khách trả theo phần
+            * đã gọi chứ không theo mâm.
+            */}
           {Number(quote.tableCount) > 0 && (
             <>
               <div className="est-row">
@@ -531,11 +577,18 @@ function EstimatePanel({ quote, loading }) {
                 <span>{t('booking.unitPrice')}</span>
                 <span data-test="unit-price">{dd.tien(quote.unitPrice)}</span>
               </div>
-              <div className="est-row">
-                <span>{t('booking.foodAmount')}</span>
-                <span data-test="food-total">{dd.tien(quote.foodAmount)}</span>
-              </div>
             </>
+          )}
+          {/*
+            * Tiền ăn hiện bất cứ khi nào có, kể cả khi không theo mâm. Trước đây dòng này
+            * nằm chung khối với số mâm nên thực đơn tự chọn có tiền ăn mà khách không thấy,
+            * chỉ thấy tổng cuối cùng.
+            */}
+          {Number(quote.foodAmount) > 0 && (
+            <div className="est-row">
+              <span>{t('booking.foodAmount')}</span>
+              <span data-test="food-total">{dd.tien(quote.foodAmount)}</span>
+            </div>
           )}
           <div className="est-row">
             <span>{t('booking.spaceFee')}</span>

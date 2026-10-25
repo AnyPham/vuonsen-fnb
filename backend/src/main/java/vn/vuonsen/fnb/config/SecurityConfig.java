@@ -58,7 +58,18 @@ public class SecurityConfig {
                                 "/api/v1/bookings/track/**",
                                 // Xem buổi nào còn trống và có ưu đãi gì, không cần đăng nhập
                                 "/api/v1/bookings/availability",
-                                "/api/v1/holidays").permitAll()
+                                "/api/v1/holidays",
+                                /*
+                                 * Màn mở đầu hộp thoại trợ lý. Mở cho cả khách chưa đăng nhập,
+                                 * khi đó trả bản dành cho khách mới. Khách đã đăng nhập thì bộ
+                                 * lọc JWT đã gắn danh tính vào ngữ cảnh trước khi tới đây, nên
+                                 * controller vẫn đọc được principal và trả bản cá nhân hóa.
+                                 */
+                                "/api/v1/assistant/loi-mo-dau").permitAll()
+                        /* Khách vãng lai cũng đăng ký nhận khuyến mãi được, không bắt tạo tài khoản. */
+                        .requestMatchers(HttpMethod.GET, "/api/v1/push/khoa-cong-khai").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/v1/push/dang-ky").permitAll()
+                        .requestMatchers(HttpMethod.DELETE, "/api/v1/push/dang-ky").permitAll()
 
                         // Gửi đánh giá không bắt đăng nhập: đã phải nhập mã đơn có thật, và
                         // đánh giá còn phải qua bước quản trị duyệt mới hiện công khai

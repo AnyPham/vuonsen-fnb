@@ -71,6 +71,18 @@ public class Dish extends BaseEntity {
     @Builder.Default
     private boolean available = true;
 
+    /*
+     * Món chay theo mức thông dụng của nhà hàng Việt: không thịt, hải sản, nước mắm
+     * thường, dầu hào, trứng hay mỡ động vật. Vẫn cho phép sữa và hành tỏi.
+     *
+     * Phải là dữ liệu chứ không để suy từ tên món. Trước khi có cột này, trợ lý tự đoán
+     * và xếp Nộm hoa chuối vào danh sách chay, trong khi nguyên liệu có nước mắm chua
+     * ngọt. Khách ăn chay trường gọi phải món đó là lỗi của nhà hàng, không phải lỗi nhỏ.
+     */
+    @Column(nullable = false)
+    @Builder.Default
+    private boolean vegetarian = false;
+
     @Column(name = "sort_order", nullable = false)
     @Builder.Default
     private Integer sortOrder = 0;

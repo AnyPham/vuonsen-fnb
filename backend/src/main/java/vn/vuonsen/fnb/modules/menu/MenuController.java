@@ -36,11 +36,12 @@ public class MenuController {
 
     @GetMapping("/dishes")
     @Transactional(readOnly = true)
-    @Operation(summary = "Danh sách món ăn, lọc theo danh mục và từ khóa")
+    @Operation(summary = "Danh sách món ăn, lọc theo danh mục, từ khóa và món chay")
     public ResponseEntity<List<DishResponse>> dishes(
             @RequestParam(required = false) String category,
-            @RequestParam(required = false) String keyword) {
-        return ResponseEntity.ok(dishRepository.search(category, keyword)
+            @RequestParam(required = false) String keyword,
+            @RequestParam(required = false) Boolean vegetarian) {
+        return ResponseEntity.ok(dishRepository.search(category, keyword, vegetarian)
                 .stream().map(DishResponse::from).toList());
     }
 

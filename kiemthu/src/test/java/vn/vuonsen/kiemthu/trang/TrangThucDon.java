@@ -18,6 +18,9 @@ public class TrangThucDon extends TrangCoSo {
     private static final By TEN_MON = dt("dish-card-link");
     private static final By KHOI_BAN_CHAY = dt("best-sellers");
     private static final By THE_TRONG_KHOI_BAN_CHAY = By.cssSelector("[data-test='best-sellers'] .card");
+    private static final By NUT_LOC_CHAY = dt("filter-vegetarian");
+    private static final By THE_MON = dt("dish-card");
+    private static final By NHAN_CHAY = dt("dish-vegetarian");
 
     public TrangThucDon(WebDriver driver) {
         super(driver);
@@ -48,6 +51,30 @@ public class TrangThucDon extends TrangCoSo {
     /** Tên các món đang hiện trong lưới, đọc khi danh sách đã tải xong. */
     public List<String> tenMonDangHien() {
         return docDanhSachOnDinh(TEN_MON);
+    }
+
+    /** Bật hoặc tắt bộ lọc chỉ hiện món chay. */
+    public TrangThucDon batTatLocChay() {
+        bam(NUT_LOC_CHAY);
+        return this;
+    }
+
+    public boolean dangLocChay() {
+        return "true".equals(choHien(NUT_LOC_CHAY).getDomAttribute("aria-pressed"));
+    }
+
+    /**
+     * Số thẻ món đang mang nhãn "Món chay". So với tổng số thẻ để biết danh sách có lẫn
+     * món mặn hay không, mà không phải tra từng tên món một.
+     */
+    public int soMonCoNhanChay() {
+        tenMonDangHien();
+        return driver.findElements(NHAN_CHAY).size();
+    }
+
+    public int soMonDangHien() {
+        tenMonDangHien();
+        return driver.findElements(THE_MON).size();
     }
 
     public int soMonTrongKhoiBanChay() {

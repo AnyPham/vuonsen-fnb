@@ -1,7 +1,7 @@
 /*
  * Sinh tài liệu mốc 9 (16/10 - 22/10): Nghiên cứu Git, GitHub và GitHub Actions.
  *
- * Mọi thông số kỹ thuật trong tài liệu đều tra lại từ tài liệu chính thức ngày 20/09/2026
+ * Mọi thông số kỹ thuật trong tài liệu đều tra lại từ tài liệu chính thức
  * (phiên bản các action, ảnh máy chủ chạy) chứ không viết theo trí nhớ. Phần quy trình chạy
  * bộ kiểm thử bám đúng cấu hình thật của dự án: Java 17, Maven, Vite 5, cổng 8080 và 5173,
  * tham số dòng lệnh của lớp CauHinh.

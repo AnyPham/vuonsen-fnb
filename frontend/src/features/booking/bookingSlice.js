@@ -59,6 +59,22 @@ const bookingSlice = createSlice({
     updateForm: (state, action) => {
       state.form = { ...state.form, ...action.payload };
     },
+    /*
+     * Đổi số phần của một món tự chọn.
+     *
+     * Phép cộng trừ nằm trong reducer chứ không ở thành phần giao diện. Lý do: khách bấm
+     * dấu cộng ba lần liên tiếp thì cả ba lần cùng đọc một bản danh sách cũ trong closure
+     * của lần vẽ lại trước, kết quả chỉ cộng được một phần. Reducer thì luôn chạy trên
+     * trạng thái mới nhất nên không mất lần bấm nào.
+     */
+    doiSoPhanMon: (state, action) => {
+      const { dishId, buoc } = action.payload;
+      const ds = state.form.monTuChon || [];
+      const cu = ds.find((d) => d.dishId === dishId);
+      const moi = Math.max(0, Math.min(200, (cu ? cu.soLuong : 0) + buoc));
+      const con = ds.filter((d) => d.dishId !== dishId);
+      state.form.monTuChon = moi === 0 ? con : [...con, { dishId, soLuong: moi }];
+    },
     goToStep: (state, action) => {
       state.step = Math.min(3, Math.max(1, action.payload));
     },
@@ -108,7 +124,7 @@ const bookingSlice = createSlice({
   },
 });
 
-export const { updateForm, goToStep, resetBooking } = bookingSlice.actions;
+export const { updateForm, doiSoPhanMon, goToStep, resetBooking } = bookingSlice.actions;
 
 export const selectBooking = (state) => state.booking;
 

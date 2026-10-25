@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 import { fetchPackages, fetchSpaces, selectPackages, selectSpaces } from '@/features/catalog/catalogSlice';
 import { galleryApi, menuApi, reviewApi } from '@/api/endpoints';
 import Thumb from '@/components/common/Thumb';
+import ThongBaoKhuyenMai from '@/components/common/ThongBaoKhuyenMai';
 import { useI18n } from '@/i18n';
 import { useDinhDang } from '@/i18n/dinhDang';
 
@@ -64,6 +65,8 @@ export default function HomePage() {
 
   return (
     <>
+      <ThongBaoKhuyenMai />
+
       <section className="hero" style={nenHero}>
         <div className="wrap">
           <div className="eyebrow">{t('home.heroEyebrow')}</div>

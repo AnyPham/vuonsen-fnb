@@ -47,12 +47,12 @@ public class GeminiLlmClient implements LlmClient {
      * Chọn bản Flash chứ không phải Pro: Flash nằm trong hạn mức miễn phí, trả lời nhanh,
      * và câu tư vấn nhà hàng không cần tới sức suy luận của bản Pro.
      *
-     * Trước đây để gemini-2.5-flash. Khóa tạo ngày 03/10/2026 gọi bản đó bị trả mã 404 kèm
+     * Trước đây để gemini-2.5-flash. Khóa mới tạo gọi bản đó thì bị trả mã 404 kèm
      * câu "no longer available to new users": Google đã ngừng cấp bản 2.5 cho tài khoản mới
      * và chỉ sang 3.8. Đáng lưu ý là đường dẫn liệt kê mô hình vẫn còn kê tên 2.5-flash, nên
      * chỉ nhìn danh sách đó thì tưởng vẫn dùng được; phải gọi thật mới biết.
      *
-     * Rồi cũng không lấy 3.8: đo thử năm bản cùng ngày 03/10 thì 3.8-flash trả 429 vì mới ra
+     * Rồi cũng không lấy 3.8: đo thử năm bản thì 3.8-flash trả 429 vì mới ra
      * nên đông người dùng và hạn mức miễn phí bị siết, 3.5-flash mất 45 giây một câu, còn
      * 3.5-flash-lite trả lời trong 0,87 giây. Việc của trợ lý chỉ là diễn đạt lại dữ liệu
      * hệ thống đưa sang thành câu tiếng Việt tự nhiên, không phải suy luận gì khó, nên bản

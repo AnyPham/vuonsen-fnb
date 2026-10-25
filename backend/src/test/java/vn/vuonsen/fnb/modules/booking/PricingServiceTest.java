@@ -34,7 +34,9 @@ class PricingServiceTest {
                 new BigDecimal("0.3"),       // cọc 30%
                 10, 800,
                 3, 20, 14,                   // báo trước 3 ngày, tiệc lớn 20 mâm báo trước 14 ngày
-                8);                          // gói từ 8 tiếng là thuê trọn ngày
+                8,
+                30, 15, /* hủy trước 30 ngày hoàn đủ, trước 15 ngày hoàn nửa */
+                15 /* giu cho tam 15 phut */);                          // gói từ 8 tiếng là thuê trọn ngày
         // Ngày thường, không có dịp lễ nào
         pricingService = new PricingService(properties, ngay -> Optional.empty());
 

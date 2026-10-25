@@ -472,4 +472,9 @@ public final class GoiApi {
             dau = dau.plusDays(k + 1L);
         }
     }
+
+    /** Xóa một dịp lễ theo mã. Dùng khi tạo dữ liệu có tên thật, không mang tiền tố kiểm thử. */
+    public static void xoaDipLe(long id) {
+        goi("DELETE", "/api/v1/admin/holidays/" + id, null, tokenQuanTri());
+    }
 }

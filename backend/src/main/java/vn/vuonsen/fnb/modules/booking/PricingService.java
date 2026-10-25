@@ -64,7 +64,39 @@ public class PricingService {
     }
 
     public Quote calculate(Space space, PartyPackage partyPackage, int guestCount, LocalDate eventDate) {
+        return calculate(space, partyPackage, null, guestCount, eventDate);
+    }
+
+    /*
+     * Bản đầy đủ, nhận thêm tiền món khách tự chọn.
+     *
+     * tienMonTuChon khác null nghĩa là khách tự chọn từng món thay cho gói tiệc. Khi đó
+     * tiền ăn lấy thẳng tổng tiền món, không nhân theo mâm và không áp mức mâm tối thiểu
+     * của sảnh: khách đã chọn đúng số phần mình cần, ép thêm mâm là tính tiền phần khách
+     * không gọi.
+     */
+    public Quote calculate(Space space, PartyPackage partyPackage, BigDecimal tienMonTuChon,
+                           int guestCount, LocalDate eventDate) {
         BangQuyTac rules = new BangQuyTac();
+
+        if (tienMonTuChon != null) {
+            BigDecimal foodAmountTuChon = money(tienMonTuChon);
+            rules.them("Thực đơn tự chọn, tính theo từng món khách gọi",
+                    "Custom menu, priced per dish ordered");
+
+            BigDecimal spaceFeeTuChon = spaceFeeFor(space, guestCount, foodAmountTuChon, rules);
+            BigDecimal subtotalTuChon = foodAmountTuChon.add(spaceFeeTuChon);
+            BigDecimal discountTuChon = discountFor(subtotalTuChon, eventDate, rules);
+            BigDecimal taxableTuChon = subtotalTuChon.subtract(discountTuChon);
+            BigDecimal vatRateTuChon = properties.vatRate();
+            BigDecimal vatTuChon = money(taxableTuChon.multiply(vatRateTuChon));
+            BigDecimal totalTuChon = money(taxableTuChon.add(vatTuChon));
+
+            return new Quote(guestCount, 0, BigDecimal.ZERO, foodAmountTuChon, spaceFeeTuChon,
+                    discountTuChon, vatRateTuChon, vatTuChon, totalTuChon,
+                    money(totalTuChon.multiply(properties.depositRate())), rules.vi, rules.en);
+        }
+
 
         /*
          * Không kèm gói tiệc nghĩa là khách chỉ thuê không gian: không có mâm, không có

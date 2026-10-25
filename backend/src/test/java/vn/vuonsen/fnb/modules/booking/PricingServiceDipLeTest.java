@@ -26,7 +26,9 @@ class PricingServiceDipLeTest {
             10, new BigDecimal("0.08"), 10,
             60, new BigDecimal("0.05"),      // đặt trước 60 ngày giảm 5%
             new BigDecimal("0.3"),
-            10, 800, 3, 20, 14, 8);
+            10, 800, 3, 20, 14, 8,
+                30, 15, /* hủy trước 30 ngày hoàn đủ, trước 15 ngày hoàn nửa */
+                15 /* giu cho tam 15 phut */);
 
     private final Space sanhSenVang = Space.builder()
             .name("Sảnh Sen Vàng").spaceType(SpaceType.INDOOR)
