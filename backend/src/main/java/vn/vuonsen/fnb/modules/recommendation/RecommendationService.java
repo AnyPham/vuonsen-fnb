@@ -91,6 +91,16 @@ public class RecommendationService {
      * Lấy các phương án điểm cao nhất nhưng giới hạn mỗi không gian xuất hiện
      * tối đa mấy lần. Không có bước này thì cả ba phương án hay rơi vào cùng một
      * sảnh, chỉ khác gói tiệc, khách không có gì để so sánh.
+     *
+     * Thứ tự danh sách trả về, nói rõ vì dễ bị hiểu nhầm là lỗi rồi "sửa" hỏng:
+     * danh sách gồm hai nhóm nối nhau, nhóm chọn đa dạng trước rồi mới tới nhóm nới
+     * giới hạn, mỗi nhóm tự xếp theo điểm giảm dần. Toàn danh sách KHÔNG xếp theo
+     * điểm giảm dần, vì phương án nới thêm có thể hơn điểm phương án của sảnh thứ hai.
+     *
+     * Chủ ý là vậy. Tính đa dạng sảnh mới là thứ khách nhìn thấy và dùng được, còn
+     * điểm chỉ là cách xếp hạng bên trong, giao diện không in ra. Đổi sang xếp lại
+     * toàn danh sách theo điểm thì hai phương án đầu có thể rơi vào cùng một sảnh,
+     * tức mất đúng cái mà hàm này sinh ra để bảo đảm.
      */
     private List<Suggestion> chonDaDangKhongGian(List<Suggestion> xepTheoDiem) {
         List<Suggestion> ketQua = new ArrayList<>();
@@ -117,6 +127,7 @@ public class RecommendationService {
                 ketQua.add(s);
             }
         }
+
         return ketQua;
     }
 

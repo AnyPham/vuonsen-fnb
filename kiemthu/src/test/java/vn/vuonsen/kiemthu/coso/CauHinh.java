@@ -43,6 +43,17 @@ public final class CauHinh {
     public static final Duration CHO_TOI_DA =
             Duration.ofSeconds(Long.parseLong(doc("cho.giay", "KIEMTHU_CHO_GIAY", "10")));
 
+    /*
+     * Mức chờ riêng cho trợ lý tư vấn.
+     *
+     * Trợ lý gọi dịch vụ mô hình ngôn ngữ ở ngoài và có cơ chế thử lại tới hai lần khi
+     * gặp mã 503, nên một câu trả lời có thể lâu hơn hẳn các thao tác giao diện khác.
+     * Dùng chung mức 10 giây thì chạy riêng vẫn qua, nhưng chạy cả bộ lúc dịch vụ bị
+     * siết lượt gọi là hết giờ, mà đó không phải lỗi của hệ thống.
+     */
+    public static final Duration CHO_TRO_LY =
+            Duration.ofSeconds(Long.parseLong(doc("cho.troly.giay", "KIEMTHU_CHO_TROLY_GIAY", "45")));
+
     /** Tài khoản quản trị do backend tự tạo khi khởi động lần đầu. */
     public static final String EMAIL_QUAN_TRI = doc("admin.email", "KIEMTHU_ADMIN_EMAIL", "admin@vuonsen.vn");
     public static final String MAT_KHAU_QUAN_TRI = doc("admin.password", "KIEMTHU_ADMIN_PASSWORD", "Admin@123");

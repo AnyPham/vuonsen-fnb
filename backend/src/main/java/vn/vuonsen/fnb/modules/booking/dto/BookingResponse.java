@@ -44,6 +44,9 @@ public record BookingResponse(
         BigDecimal depositPaid,
         LocalDateTime depositPaidAt,
         String depositMethod,
+        BigDecimal refundRate,
+        BigDecimal refundAmount,
+        String refundNote,
 
         LocalDateTime createdAt
 ) {
@@ -63,6 +66,7 @@ public record BookingResponse(
                 b.getCustomerName(), b.getCustomerPhone(), b.getCustomerEmail(), b.getNote(),
                 b.getStatus().name(), b.getStatus().getLabel(), b.getStatus().getLabelEn(),
                 b.getDepositAmount(), b.getDepositPaid(), b.getDepositPaidAt(), b.getDepositMethod(),
+                b.getRefundRate(), b.getRefundAmount(), b.getRefundNote(),
                 b.getCreatedAt());
     }
 }

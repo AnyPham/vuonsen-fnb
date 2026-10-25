@@ -23,6 +23,15 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
     List<Booking> findBySpaceIdAndEventDateAndStatus(
             Long spaceId, LocalDate eventDate, BookingStatus status);
 
+    /*
+     * Mọi đơn của một không gian trong một ngày, không lọc trạng thái.
+     *
+     * Dùng cho phép kiểm trùng lịch, vì giờ không chỉ đơn đã xác nhận mới chiếm chỗ mà
+     * cả đơn đang giữ chỗ tạm và đơn đã trả cọc. Việc quyết định đơn nào thật sự chiếm
+     * chỗ để trong Booking.dangChiemCho, không rải điều kiện ra câu truy vấn.
+     */
+    List<Booking> findBySpaceIdAndEventDate(Long spaceId, LocalDate eventDate);
+
     // Các đơn còn chờ duyệt của cùng không gian, cùng ngày, cùng buổi
     List<Booking> findBySpaceIdAndEventDateAndTimeSlotAndStatus(
             Long spaceId, LocalDate eventDate, TimeSlot timeSlot, BookingStatus status);
@@ -84,4 +93,7 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
             ORDER BY b.eventDate
             """)
     List<Booking> thongKeTheoKhoang(@Param("from") LocalDate from, @Param("to") LocalDate to);
+
+    /* Lấy mọi đơn tiệc có ngày tổ chức nằm trong khoảng, phục vụ màn hình lịch đặt chỗ. */
+    List<Booking> findByEventDateBetween(LocalDate tuNgay, LocalDate denNgay);
 }

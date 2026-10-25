@@ -34,6 +34,8 @@ import AdminReviewsPage from '@/pages/admin/AdminReviewsPage';
 import AdminMenuPage from '@/pages/admin/AdminMenuPage';
 import AdminPackagesPage from '@/pages/admin/AdminPackagesPage';
 import AdminSpacesPage from '@/pages/admin/AdminSpacesPage';
+import MetaTrang from '@/components/common/MetaTrang';
+import AdminCalendarPage from '@/pages/admin/AdminCalendarPage';
 import AdminHolidaysPage from '@/pages/admin/AdminHolidaysPage';
 import ReviewsPage from '@/pages/ReviewsPage';
 import NotFoundPage from '@/pages/NotFoundPage';
@@ -56,6 +58,8 @@ export default function App() {
   }, [dispatch]);
 
   return (
+    <>
+      <MetaTrang />
     <Routes>
       <Route element={<Layout />}>
         <Route path="/" element={<HomePage />} />
@@ -102,6 +106,14 @@ export default function App() {
               <Suspense fallback={<Loading label="Đang tải biểu đồ…" />}>
                 <AdminStatsPage />
               </Suspense>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/quan-tri/lich-dat"
+          element={
+            <ProtectedRoute roles={['ADMIN', 'STAFF']}>
+              <AdminCalendarPage />
             </ProtectedRoute>
           }
         />
@@ -182,5 +194,6 @@ export default function App() {
         <Route path="*" element={<NotFoundPage />} />
       </Route>
     </Routes>
+    </>
   );
 }

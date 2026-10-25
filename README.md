@@ -205,7 +205,7 @@ dự phòng thay vì báo lỗi, nên tải mã nguồn về là chạy được
 | Gửi email xác nhận | `SPRING_MAIL_HOST`, `SPRING_MAIL_USERNAME`, `SPRING_MAIL_PASSWORD` | Ghi toàn văn thư vào bảng `email_logs`, luồng nghiệp vụ vẫn chạy trọn vẹn |
 | Cổng thanh toán VNPay | `VNPAY_TMN_CODE`, `VNPAY_HASH_SECRET` | Giao diện ẩn nút VNPay, khách trả bằng mã VietQR |
 | Chuyển khoản VietQR | Mục `app.payment` trong `application.yml` | Dùng số tài khoản thử, kèm cảnh báo đừng chuyển tiền thật |
-| Trợ lý tư vấn AI | `ASSISTANT_LLM_API_KEY` | Dựng câu trả lời từ dữ liệu thật trong cơ sở dữ liệu |
+| Trợ lý tư vấn AI | `ASSISTANT_LLM_PROVIDER`, `ASSISTANT_LLM_API_KEY` | Dựng câu trả lời từ dữ liệu thật trong cơ sở dữ liệu — xem [Trợ lý tư vấn](#-trợ-lý-tư-vấn) |
 | Bản đồ Google | `VITE_GOOGLE_MAPS_API_KEY` | Hiện bản đồ bằng đường nhúng không cần khoá |
 
 ---
@@ -414,6 +414,37 @@ Các bảng chính: `users`, `spaces`, `dishes`, `party_packages`, `bookings`, `
 Bảng `bookings` và `dish_order_items` chép lại tên và giá tại thời điểm khách đặt thay vì chỉ
 giữ khoá ngoại. Bảng giá thay đổi theo thời gian mà hoá đơn cũ phải giữ đúng con số đã chốt
 với khách.
+
+---
+
+## 🤖 Trợ lý tư vấn
+
+Hộp thoại trợ lý trả lời câu hỏi của khách về không gian, thực đơn, gói tiệc và cách đặt.
+Điểm cốt lõi: **trợ lý chỉ được nói những gì có trong cơ sở dữ liệu**. Mỗi lần khách hỏi, hệ
+thống đọc thẳng từ cơ sở dữ liệu ra 126 món kèm giá, 6 không gian, 8 gói tiệc, luật tính giá
+và các dịp lễ đang giảm giá, chép vào chỉ dẫn gửi kèm, rồi ra lệnh không được nói ra ngoài
+phạm vi đó. Sửa giá trong trang quản trị là trợ lý biết ngay, không phải khởi động lại.
+
+Chọn nguồn trả lời bằng `ASSISTANT_LLM_PROVIDER`:
+
+| Nguồn | Chi phí | Cần gì | Ghi chú |
+|---|---|---|---|
+| `gemini` *(mặc định)* | Miễn phí trong hạn mức | Khóa ở [AI Studio](https://aistudio.google.com/apikey), không cần thẻ | Tiếng Việt tốt, đủ dùng cho quy mô một nhà hàng |
+| `ollama` | Miễn phí hoàn toàn | [Ollama](https://ollama.com) cài trên máy | Chạy được cả khi mất mạng, dữ liệu không rời khỏi máy; chất lượng tùy cấu hình máy |
+| `anthropic` | Trả theo lượng dùng | Tín dụng ở [Console](https://console.anthropic.com) | Chất lượng cao nhất |
+
+**Không khai báo gì cũng chạy.** Thiếu khóa thì trợ lý tự lùi về cơ chế dự phòng dựng sẵn
+trong hệ thống: nhận diện ý định bằng từ khóa rồi ghép câu từ dữ liệu thật. Câu chữ cứng
+nhắc hơn nhưng không bao giờ sai số liệu, và không cần mạng. Nhật ký khởi động luôn nói rõ
+đang dùng nguồn nào.
+
+Dùng Ollama thì cài xong chạy thêm một lệnh để tải mô hình về:
+
+```bash
+ollama pull qwen2.5:3b
+```
+
+Hướng dẫn đầy đủ cho cả ba nguồn nằm trong `backend/tro-ly-ai.properties.example`.
 
 ---
 

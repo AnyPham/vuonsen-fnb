@@ -13,7 +13,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 class AnthropicLlmClientTest {
 
     private static AssistantProperties.Llm cauHinh(String model) {
-        return new AssistantProperties.Llm(true, "khoa-thu", null, model, "low", 4000, 20);
+        return new AssistantProperties.Llm(true, AssistantProperties.Llm.ANTHROPIC,
+                "khoa-thu", null, model, "low", 4000, 20);
     }
 
     @Test

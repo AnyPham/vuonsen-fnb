@@ -1,5 +1,6 @@
 package vn.vuonsen.fnb.modules.booking.dto;
 
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Future;
 import jakarta.validation.constraints.Min;
@@ -11,6 +12,7 @@ import vn.vuonsen.fnb.modules.booking.EventType;
 import vn.vuonsen.fnb.modules.booking.TimeSlot;
 
 import java.time.LocalDate;
+import java.util.List;
 
 // Dữ liệu form đặt tiệc 3 bước
 public record BookingRequest(
@@ -26,6 +28,11 @@ public record BookingRequest(
         @NotNull(message = "Vui lòng chọn không gian") Long spaceId,
         // Để trống nghĩa là chỉ thuê không gian, không kèm gói tiệc
         Long packageId,
+        /*
+         * Món khách tự chọn, dành cho tiệc nhỏ ở sảnh nhỏ. Không đi cùng packageId:
+         * hoặc lấy gói cố định, hoặc tự chọn món, không có chuyện vừa gói vừa chọn thêm.
+         */
+        @Valid List<MonTuChonRequest> monTuChon,
 
         // Bước 3: thông tin liên hệ
         @NotBlank(message = "Vui lòng nhập họ tên")

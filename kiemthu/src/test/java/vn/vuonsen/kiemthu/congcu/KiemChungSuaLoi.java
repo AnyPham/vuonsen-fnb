@@ -24,7 +24,7 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /*
- * Kiểm chứng tạm thời cho hai lỗi sửa ngày 17/09, chạy trước và sau khi sửa:
+ * Kiểm chứng tạm thời cho hai lỗi vừa sửa, chạy trước và sau khi sửa:
  *
  *   mvn -f kiemthu/pom.xml test "-Dtest=KiemChungSuaLoi" "-Dheadless=true"
  *

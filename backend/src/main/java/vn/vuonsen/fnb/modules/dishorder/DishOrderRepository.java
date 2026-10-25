@@ -58,4 +58,7 @@ public interface DishOrderRepository extends JpaRepository<DishOrder, Long> {
             """)
     List<DishOrder> thongKeTheoKhoang(@Param("from") LocalDateTime from,
                                       @Param("to") LocalDateTime to);
+
+    /* Lấy mọi đơn món có thời điểm nhận nằm trong khoảng, phục vụ màn hình lịch đặt chỗ. */
+    List<DishOrder> findByServeAtBetween(LocalDateTime dau, LocalDateTime cuoi);
 }

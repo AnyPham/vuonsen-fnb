@@ -84,12 +84,19 @@ public class SystemContextBuilder {
                 trò chuyện trước để hiểu khách đang nói tới điều gì.
                 7. Chỉ nhắc tới những trang có trong mục Các trang trên website, không tự đặt ra \
                 đường dẫn nào khác.
+                8. Hễ nói tới giảm giá dịp lễ thì phải nói kèm rằng ưu đãi này không cộng dồn \
+                với ưu đãi đặt sớm, dùng đúng cụm "không cộng dồn". Khách nghe giảm 20%% dịp lễ \
+                rất dễ tưởng được cộng thêm 5%% đặt sớm, rồi tới lúc xem bảng giá mới vỡ lẽ.
+                9. Trong DỮ LIỆU có tên riêng và con số hợp với câu khách hỏi thì phải nêu thẳng                 tên và con số đó ra. Không gộp thành "các dịp lễ" hay "nhiều mức giảm" rồi mời                 khách sang trang khác tự xem, vì khách hỏi là để biết ngay.
 
                 CÁCH VIẾT
                 - Xưng "mình", gọi khách là "bạn". Lịch sự, tự nhiên, không khách sáo quá.
-                - Ngắn gọn, khoảng 2 đến 5 câu. Cần liệt kê thì mỗi dòng một ý, mở đầu bằng dấu •
-                - Viết chữ thường, không dùng dấu ** hay ## để làm đậm hay làm tiêu đề.
+                - Ngắn gọn, khoảng 2 đến 5 câu, nhưng cần kể ra danh sách cụ thể thì được dài hơn.                 Cần liệt kê thì mỗi dòng một ý, mở đầu bằng dấu •
+                - Viết thành văn xuôi thuần, không dùng dấu ** hay ## để làm đậm hay làm tiêu đề.
+                - Viết hoa đúng chính tả tiếng Việt: hoa đầu câu, và giữ nguyên cách viết hoa \
+                tên riêng như trong dữ liệu, ví dụ Sảnh Ven Sông, Gói Sen Vàng.
                 - Tiền viết như trong dữ liệu, ví dụ 1.250.000đ.
+                - Giờ giấc, ngày tháng và mọi con số khác cũng chép đúng cách viết trong dữ liệu.                 Dữ liệu ghi 22:00 thì viết 22:00, không đổi thành 22h hay 10 giờ tối.
 
                 DỮ LIỆU
 
@@ -218,9 +225,22 @@ public class SystemContextBuilder {
             if (d.isBestSeller()) {
                 sb.append(" (món bán chạy)");
             }
+            /*
+             * Đánh dấu món chay ngay trong danh sách gửi sang mô hình.
+             *
+             * Thiếu dấu này thì mô hình phải đoán theo tên món, và nó đoán sai thật: từng
+             * xếp Nộm hoa chuối vào danh sách chay dù nguyên liệu có nước mắm chua ngọt.
+             * Luật ở phần đầu chỉ dẫn cấm nói ra ngoài dữ liệu, nhưng cấm thế nào cũng vô
+             * ích nếu dữ liệu không mang sẵn thông tin mà khách đang hỏi.
+             */
+            if (d.isVegetarian()) {
+                sb.append(" (món chay)");
+            }
             sb.append("\n");
         }
-        sb.append("Giá trên là giá phần ăn tại nhà hàng. Tiệc theo mâm thì tính theo gói tiệc.");
+        sb.append("Giá trên là giá phần ăn tại nhà hàng. Tiệc theo mâm thì tính theo gói tiệc.\n");
+        sb.append("Chỉ món nào ghi rõ (món chay) mới là món chay. Món không ghi thì không được ")
+                .append("coi là chay, kể cả khi tên nghe như món rau: nhiều món rau vẫn nêm nước mắm.");
         return sb.toString();
     }
 

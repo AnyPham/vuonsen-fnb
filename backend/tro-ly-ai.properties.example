@@ -1,14 +1,28 @@
-# Khoa API cua tro ly tu van, backend doc tu dong moi lan khoi dong.
+# Cau hinh tro ly tu van. Chep tep nay thanh tro-ly-ai.properties roi dien gia tri.
+# Khong co tep do thi tro ly van chay bang co che du phong trong he thong.
 #
-# Cach dung:
-#   1. Chep tep nay thanh tro-ly-ai.properties, dat cung thu muc backend.
-#   2. Dan khoa API cua Anthropic vao dong app.assistant.llm.api-key ben duoi.
-#   3. Khoi dong lai backend. Nhat ky khoi dong se bao "da bat AI".
-#
-# Tep tro-ly-ai.properties da nam trong .gitignore nen khoa khong bi day len git.
-# Tuyet doi khong dan khoa vao tep .example nay vi tep nay nam trong git.
-app.assistant.llm.api-key=
+# Tep tro-ly-ai.properties nam trong .gitignore; khong dan khoa vao tep .example nay.
 
-# Tuy chon: doi mo hinh hoac muc cong suc suy luan (low, medium, high)
-# app.assistant.llm.model=claude-opus-5
-# app.assistant.llm.effort=low
+
+# --- Google Gemini ---
+# app.assistant.llm.provider=gemini
+# app.assistant.llm.api-key=
+
+
+# --- Ollama, chay tren may, khong can khoa ---
+# qwen2.5:3b vua card do hoa 4GB; qwen2.5:7b can card 8GB tro len
+# app.assistant.llm.provider=ollama
+# app.assistant.llm.model=qwen2.5:3b
+
+
+# --- Anthropic Claude ---
+# app.assistant.llm.provider=anthropic
+# app.assistant.llm.api-key=
+# app.assistant.llm.model=claude-opus-5-5
+
+
+# --- Tuy chon chung ---
+# app.assistant.llm.enabled=true
+# app.assistant.llm.max-tokens=800
+# app.assistant.llm.timeout-seconds=20
+# app.assistant.llm.base-url=http://192.168.1.50:11434

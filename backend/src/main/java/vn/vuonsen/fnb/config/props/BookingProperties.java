@@ -29,6 +29,25 @@ public record BookingProperties(
         int largePartyMinDays,
 
         // Gói tiệc từ số giờ này trở lên được tính là thuê trọn ngày
-        int fullDayPackageHours
+        int fullDayPackageHours,
+
+        /*
+         * Mức hoàn tiền cọc khi khách hủy, theo số ngày còn lại tới ngày tổ chức.
+         *
+         * Để trong cấu hình chứ không ghi cứng trong mã: đây là điều khoản thương mại,
+         * nhà hàng đổi chính sách thì sửa một dòng cấu hình, không phải sửa mã rồi dựng lại.
+         */
+        int refundFullDays,
+        int refundHalfDays,
+
+        /*
+         * Số phút giữ chỗ tạm cho đơn vừa gửi, trong lúc khách đi trả tiền cọc.
+         *
+         * Hết khoảng này mà chưa có cọc thì buổi đó trống lại cho người khác.
+         *
+         * Đặt bao nhiêu là một đánh đổi: ngắn quá thì khách chưa kịp mở ứng dụng ngân
+         * hàng đã mất chỗ; dài quá thì một người bỏ ngang chặn người khác quá lâu.
+         */
+        int holdMinutes
 ) {
 }

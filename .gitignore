@@ -37,30 +37,16 @@ desktop.ini
 npm-debug.log*
 logs/
 
-# --- Ghi chu ca nhan, khong day len git ---
-doc/TODO.md
+# --- Tai lieu: khong day len kho ma nguon ---
+# Kho nay chi chua ma nguon de ca nhom chay bo kiem thu. Bao cao, slide, tieu luan
+# va cac tai lieu khac trao doi qua Google Drive, khong theo doi bang git.
+doc/
 ~$*
-doc/BaoCao_DoiChieu_TienDo.docx
-doc/NhatKyCongViec_PhamTranTuanAnh.docx
-doc/21130004_PhamTranTuanAnh_KeHoachVaTienDo.docx
-doc/DANH-SACH-ANH.md
-doc/NGUON-ANH-BO-SUNG.md
-doc/TIEN-DO.md
-doc/PhamVi_DoiTuong_YeuCau_KiemThu.docx
 
-# Tai lieu nghien cuu cua chang kiem thu
-doc/TongQuan_KiemThuPhanMem.docx
-doc/NghienCuu_SeleniumWebDriver.docx
-doc/NghienCuu_PageObjectModel.docx
-doc/DacTa_TestCase.docx
-doc/BaoCao_KiemThuTuDong.docx
-doc/BaoCao_HoanThienWebsite_17-09-2026.docx
-doc/NghienCuu_Git_GitHubActions.docx
-doc/Testing Tóm tắt.docx
-doc/Jira_KTVS_danh-sach-cong-viec.csv
+# --- Bo sinh tai lieu: khong lien quan toi viec chay kiem thu ---
+cong-cu/bao-cao/
+cong-cu/tieu-luan/
+cong-cu/yeu-cau/
 
 # Anh goc tai ve, da dua len Cloudinary nen khong day vao kho ma nguon
 anh-tai-ve/
-doc/CoSoLyThuyet_HeThongGoiY.docx
-doc/PhanTichVaThietKe_HeThong.docx
-doc/TongQuanCongNghe.docx

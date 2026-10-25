@@ -171,13 +171,31 @@ class XuLyDongThoiDatTiecTest {
                 .getId();
     }
 
+    /*
+     * Tạo một đơn rồi cho hết hạn giữ chỗ ngay.
+     *
+     * Đơn mới gửi được giữ chỗ tạm vài phút, nên bình thường không tạo được đơn thứ hai
+     * cho cùng buổi — đó chính là tác dụng của cơ chế giữ chỗ. Nhưng tình huống hai đơn
+     * cùng chờ duyệt cho một buổi vẫn xảy ra thật: khách thứ nhất gửi đơn rồi không trả
+     * cọc, hết hạn giữ chỗ, khách thứ hai mới gửi được đơn. Lúc đó hai đơn cùng ở trạng
+     * thái chờ, và nếu hai nhân viên bấm duyệt cùng lúc thì mới lộ ra lỗi trùng lịch.
+     *
+     * Vậy nên phải xóa mốc giữ chỗ ngay sau khi tạo, để dựng lại đúng tình huống đó.
+     * Không xóa thì đơn thứ hai bị chặn ngay lúc tạo, kịch bản không chạy tới được chỗ
+     * cần kiểm.
+     */
     private BookingResponse taoDon(LocalDate ngay, TimeSlot buoi, Long goi) {
         Long khongGian = spaceRepository.findBySlug("sanh-sen-vang").orElseThrow().getId();
 
         BookingResponse don = bookingService.create(new BookingRequest(
-                EventType.OTHER, ngay, buoi, 200, khongGian, goi,
+                EventType.OTHER, ngay, buoi, 200, khongGian, goi, null,
                 "Khách thử đồng thời", "0901234567", null, null), null);
         donDaTao.add(don.id());
+
+        Booking vuaTao = bookingRepository.findById(don.id()).orElseThrow();
+        vuaTao.setGiuChoDen(null);
+        bookingRepository.save(vuaTao);
+
         return don;
     }
 

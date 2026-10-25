@@ -17,6 +17,7 @@ public record DishResponse(
         String priceNoteEn,
         String imageUrl,
         boolean bestSeller,
+        boolean vegetarian,
         String categoryCode,
         String categoryName,
         String categoryNameEn
@@ -26,7 +27,7 @@ public record DishResponse(
                 d.getId(), d.getName(), d.getNameEn(), d.getSlug(),
                 d.getDescription(), d.getDescriptionEn(),
                 d.getPrice(), d.getPriceNote(), d.getPriceNoteEn(),
-                d.getImageUrl(), d.isBestSeller(),
+                d.getImageUrl(), d.isBestSeller(), d.isVegetarian(),
                 d.getCategory().getCode(), d.getCategory().getName(), d.getCategory().getNameEn());
     }
 }

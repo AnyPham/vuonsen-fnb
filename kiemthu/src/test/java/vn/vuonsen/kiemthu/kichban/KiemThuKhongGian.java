@@ -40,7 +40,7 @@ class KiemThuKhongGian extends KiemThuCoSo {
 
     /*
      * Đặc tả gốc ghi lọc 50 khách chỉ còn các không gian có sức chứa tối thiểu không vượt 50.
-     * Điều đó mâu thuẫn quy tắc nghiệp vụ đã chốt ngày 18/08: bộ lọc chỉ chặn khi vượt sức chứa
+     * Điều đó mâu thuẫn quy tắc nghiệp vụ đã chốt: bộ lọc chỉ chặn khi vượt sức chứa
      * tối đa, khách ít hơn mức tối thiểu vẫn đặt được và tính theo số mâm tối thiểu. Kịch bản
      * theo quy tắc nghiệp vụ, và dùng 70 khách để kiểm chứng đúng hai vế của quy tắc: loại Nhà
      * Rường Gỗ vì tối đa 60, nhưng vẫn giữ Sảnh Ven Sông dù tối thiểu 300.

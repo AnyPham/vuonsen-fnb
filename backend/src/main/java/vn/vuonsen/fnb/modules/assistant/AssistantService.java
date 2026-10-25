@@ -59,6 +59,9 @@ public class AssistantService {
             case THUC_DON -> traLoiThucDon();
             case CHI_PHI -> traLoiChiPhi();
             case DAT_COC -> traLoiDatCoc();
+            case HOAN_COC -> traLoiHoanCoc();
+            case THANH_TOAN -> traLoiThanhToan();
+            case SANH_NHO -> traLoiSanhNho();
             case KHUYEN_MAI -> traLoiKhuyenMai();
             case QUY_TRINH_DAT -> traLoiQuyTrinh();
             case TRA_CUU_DON -> traLoiTraCuu();
@@ -244,6 +247,77 @@ public class AssistantService {
         return new AnswerResponse(s, Intent.QUY_TRINH_DAT,
                 List.of("Đặt cọc bao nhiêu?", "Tra cứu đơn ở đâu?", "Sảnh nào chứa được 300 khách?"),
                 "/dat-tiec", "Đặt tiệc ngay");
+    }
+
+    /*
+     * Hủy đơn thì lấy lại được bao nhiêu.
+     *
+     * Hai mốc ngày và hai mức hoàn đều đọc từ tệp cấu hình, đúng các giá trị mà
+     * BookingService dùng để tính tiền hoàn thật. Gõ cứng ở đây thì nhà hàng đổi chính
+     * sách là trợ lý nói một đằng hệ thống trả một nẻo, loại sai tệ nhất với chuyện tiền.
+     */
+    private AnswerResponse traLoiHoanCoc() {
+        return new AnswerResponse(
+                ("Mức hoàn tiền cọc tính theo thời điểm bạn báo hủy, so với ngày tổ chức: "
+                        + "hủy trước %d ngày trở lên thì hoàn đủ 100%% tiền cọc; "
+                        + "hủy trong khoảng %d đến %d ngày thì hoàn 50%%; "
+                        + "hủy sát hơn %d ngày thì không hoàn, vì ngày đó nhà hàng đã giữ chỗ "
+                        + "và từ chối khách khác rồi. Số tiền hoàn cụ thể hiện ngay trên đơn khi nhân viên xác nhận hủy.")
+                        .formatted(booking.refundFullDays(), booking.refundHalfDays(),
+                                booking.refundFullDays() - 1, booking.refundHalfDays()),
+                Intent.HOAN_COC,
+                List.of("Giữ chỗ cần cọc bao nhiêu?", "Tra cứu đơn của tôi", "Số điện thoại liên hệ?"),
+                "/tra-cuu", "Tra cứu đơn");
+    }
+
+    /*
+     * Trả tiền bằng cách nào.
+     *
+     * Tỉ lệ cọc lấy từ cấu hình chứ không ghi 30%, cùng lý do với mục hoàn cọc.
+     */
+    private AnswerResponse traLoiThanhToan() {
+        String phanTram = booking.depositRate().multiply(BigDecimal.valueOf(100))
+                .stripTrailingZeros().toPlainString();
+        return new AnswerResponse(
+                ("Có hai cách trả tiền cọc, đều làm trực tuyến. Một là quét mã VietQR bằng ứng dụng ngân hàng: "
+                        + "hệ thống sinh mã kèm sẵn số tiền và nội dung chuyển khoản nên bạn không phải gõ tay, "
+                        + "khỏi lo sai nội dung. Hai là đi qua cổng VNPay nếu bạn quen thanh toán bằng thẻ. "
+                        + "Vào trang Tra cứu đơn, nhập mã đơn rồi bấm Thanh toán là ra. "
+                        + "Số tiền cần trả là %s%% tổng hóa đơn; phần còn lại thanh toán khi tiệc diễn ra.")
+                        .formatted(phanTram),
+                Intent.THANH_TOAN,
+                List.of("Giữ chỗ cần cọc bao nhiêu?", "Hủy thì có được hoàn cọc không?", "Tra cứu đơn của tôi"),
+                "/tra-cuu", "Tra cứu đơn");
+    }
+
+    /*
+     * Nhóm nhỏ không muốn lấy trọn gói tiệc.
+     *
+     * Giới hạn khách lấy từ hằng số công khai của BookingService, đúng con số mà máy chủ
+     * dùng để từ chối đơn, nên trợ lý không thể hứa một đằng hệ thống chặn một nẻo.
+     *
+     * Có nêu tên không gian nhỏ nhất đang mở, đọc từ cơ sở dữ liệu: khách hỏi câu này
+     * thường là đang phân vân chỗ nào vừa, nói thẳng tên đỡ cho họ một lượt tìm.
+     */
+    private AnswerResponse traLoiSanhNho() {
+        int toiDa = vn.vuonsen.fnb.modules.booking.BookingService.SO_KHACH_TOI_DA_TU_CHON;
+        String goiYSanh = spaceRepository.findByActiveTrueOrderBySortOrderAsc().stream()
+                .filter(s -> s.getCapacityMin() != null && s.getCapacityMin() <= toiDa)
+                .min(java.util.Comparator.comparing(Space::getCapacityMin))
+                .map(s -> " Không gian nhỏ nhất đang mở là %s, nhận từ %d khách."
+                        .formatted(s.getName(), s.getCapacityMin()))
+                .orElse("");
+
+        return new AnswerResponse(
+                ("Nhóm từ %d khách trở xuống thì không bắt buộc lấy trọn gói tiệc. Bạn chọn đặt sảnh nhỏ "
+                        + "rồi tự chọn từng món trong thực đơn, trả tiền theo đúng số phần đã gọi "
+                        + "cộng phí thuê không gian, và vẫn được hưởng giảm giá dịp lễ như thường. "
+                        + "Trên %d khách thì bếp không nấu lẻ từng món được nữa, lúc đó gói tiệc mới là lựa chọn hợp lý.%s "
+                        + "Cách làm: vào trang Đặt tiệc, điền số khách ở bước một, tới bước hai chọn tự chọn thực đơn.")
+                        .formatted(toiDa, toiDa, goiYSanh),
+                Intent.SANH_NHO,
+                List.of("Thực đơn có món gì?", "Chi phí một tiệc bao nhiêu?", "Đặt tiệc như thế nào?"),
+                "/dat-tiec", "Đặt tiệc");
     }
 
     private AnswerResponse traLoiTraCuu() {

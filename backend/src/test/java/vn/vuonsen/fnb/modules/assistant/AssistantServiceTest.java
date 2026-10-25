@@ -17,6 +17,9 @@ class AssistantServiceTest {
     @Autowired
     private IntentDetector detector;
 
+    @Autowired
+    private vn.vuonsen.fnb.config.props.BookingProperties booking;
+
     @Test
     @DisplayName("Nhận ra được từng loại câu hỏi")
     void detectsEachIntent() {
@@ -121,6 +124,68 @@ class AssistantServiceTest {
             assertThat(assistantService.answer(cau).suggestions())
                     .as("câu hỏi: %s", cau)
                     .isNotEmpty();
+        }
+    }
+
+    @Test
+    @DisplayName("Nhận ra câu hỏi về hoàn cọc, không nhầm sang đặt cọc")
+    void refundIsNotMistakenForDeposit() {
+        // Hai nhóm dùng chung chữ "cọc" nên rất dễ nhầm. Hoàn cọc phải thắng.
+        assertThat(detector.detect("Hủy thì có được hoàn cọc không?")).isEqualTo(Intent.HOAN_COC);
+        assertThat(detector.detect("Tôi muốn hủy đơn")).isEqualTo(Intent.HOAN_COC);
+        assertThat(detector.detect("Đổi ý rồi thì sao?")).isEqualTo(Intent.HOAN_COC);
+        // Còn hỏi phải đóng bao nhiêu thì vẫn là đặt cọc
+        assertThat(detector.detect("Đặt cọc bao nhiêu?")).isEqualTo(Intent.DAT_COC);
+    }
+
+    @Test
+    @DisplayName("Nhận ra câu hỏi về cách thanh toán, không nhầm sang hỏi giá")
+    void paymentIsNotMistakenForPrice() {
+        assertThat(detector.detect("Thanh toán bằng cách nào?")).isEqualTo(Intent.THANH_TOAN);
+        assertThat(detector.detect("Có quét mã QR được không?")).isEqualTo(Intent.THANH_TOAN);
+        assertThat(detector.detect("Chuyển khoản được không?")).isEqualTo(Intent.THANH_TOAN);
+    }
+
+    @Test
+    @DisplayName("Nhận ra câu hỏi về sảnh nhỏ tự chọn món")
+    void smallHallIsDetected() {
+        assertThat(detector.detect("Nhóm nhỏ tự chọn món được không?")).isEqualTo(Intent.SANH_NHO);
+        assertThat(detector.detect("Tôi muốn đặt sảnh nhỏ")).isEqualTo(Intent.SANH_NHO);
+        assertThat(detector.detect("Không lấy gói thì sao?")).isEqualTo(Intent.SANH_NHO);
+    }
+
+    @Test
+    @DisplayName("Ba câu trả lời mới nêu đúng con số lấy từ cấu hình, không gõ cứng")
+    void newAnswersQuoteConfiguredNumbers() {
+        /*
+         * Canh đúng chỗ dễ hỏng nhất: câu trả lời gõ cứng con số thay vì đọc cấu hình.
+         * Nhà hàng đổi chính sách mà trợ lý vẫn đọc số cũ là sai nặng với chuyện tiền.
+         */
+        assertThat(assistantService.answer("Hủy thì có được hoàn cọc không?").answer())
+                .contains(String.valueOf(booking.refundFullDays()))
+                .contains(String.valueOf(booking.refundHalfDays()))
+                .contains("100%")
+                .contains("50%");
+
+        assertThat(assistantService.answer("Thanh toán bằng cách nào?").answer())
+                .contains("VietQR")
+                .contains("VNPay");
+
+        assertThat(assistantService.answer("Nhóm nhỏ tự chọn món được không?").answer())
+                .contains(String.valueOf(
+                        vn.vuonsen.fnb.modules.booking.BookingService.SO_KHACH_TOI_DA_TU_CHON));
+    }
+
+    @Test
+    @DisplayName("Ba nhóm câu hỏi mới đều có gợi ý và đường dẫn đi tiếp")
+    void newAnswersHaveSuggestionsAndLink() {
+        for (String cau : new String[] {
+                "Hủy thì có được hoàn cọc không?",
+                "Thanh toán bằng cách nào?",
+                "Nhóm nhỏ tự chọn món được không?" }) {
+            var kq = assistantService.answer(cau);
+            assertThat(kq.suggestions()).as("gợi ý cho: %s", cau).isNotEmpty();
+            assertThat(kq.link()).as("đường dẫn cho: %s", cau).isNotBlank();
         }
     }
 }

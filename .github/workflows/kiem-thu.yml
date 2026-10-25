@@ -2,15 +2,22 @@
 #
 # Hai bộ kiểm thử khác hẳn nhau nên tách thành hai công việc riêng:
 #
-#   kiem-thu-don-vi     181 kiểm thử đơn vị JUnit của backend. Chạy trên H2 trong bộ nhớ,
+#   kiem-thu-don-vi     189 kiểm thử đơn vị JUnit của backend. Chạy trên H2 trong bộ nhớ,
 #                       không cần cài thêm gì, xong trong vài phút.
 #
-#   kiem-thu-giao-dien  130 test case Selenium theo mô hình Page Object Model. Phải dựng
-#                       đủ MySQL, backend và giao diện rồi mới chạy được.
+#   kiem-thu-giao-dien  140 test case Selenium theo mô hình Page Object Model trên 16 luồng.
+#                       Phải dựng đủ MySQL, backend và giao diện rồi mới chạy được.
 #
 # Cố ý không cho công việc thứ hai phụ thuộc công việc thứ nhất. Đây là hai kết quả thực
 # nghiệm riêng của đề tài; kiểm thử đơn vị trượt mà chặn luôn kiểm thử giao diện thì mất
 # số liệu của lần chạy đó, trong khi hai bộ không kiểm cùng một thứ.
+#
+# Ghim ubuntu-24.04 thay vì dùng ubuntu-latest. Hai lý do, đều vì đây là môi trường thực
+# nghiệm của một đề tài chứ không phải máy chủ dựng phần mềm thông thường: báo cáo có mục
+# ghi rõ cấu hình môi trường, mà nhãn latest thì cùng một tệp workflow chạy hai thời điểm
+# lại ra hai hệ điều hành khác nhau; và GitHub đã báo nhãn latest sẽ chuyển sang Ubuntu 26
+# từ 19/10/2026, rơi đúng giữa các mốc thực nghiệm còn lại từ 05/10 đến 31/10. Nâng lên
+# bản mới là việc nên làm có chủ đích sau khi nộp, không phải việc tự xảy ra giữa chừng.
 
 name: Kiểm thử tự động
 
@@ -33,27 +40,27 @@ jobs:
   # ===========================================================================
   kiem-thu-don-vi:
     name: Kiểm thử đơn vị (JUnit)
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 20
 
     steps:
       - name: Lấy mã nguồn
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Cài JDK 17
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v6
         with:
           java-version: '17'
           distribution: temurin
           cache: maven
 
-      - name: Chạy 181 kiểm thử đơn vị
+      - name: Chạy 189 kiểm thử đơn vị
         working-directory: backend
         run: mvn -B test
 
       - name: Lưu báo cáo kiểm thử
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: bao-cao-kiem-thu-don-vi
           path: backend/target/surefire-reports/
@@ -64,7 +71,7 @@ jobs:
   # ===========================================================================
   kiem-thu-giao-dien:
     name: Kiểm thử giao diện (Selenium)
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 75
 
     env:
@@ -95,17 +102,17 @@ jobs:
 
     steps:
       - name: Lấy mã nguồn
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Cài JDK 17
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v6
         with:
           java-version: '17'
           distribution: temurin
           cache: maven
 
       - name: Cài Node 20
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v7
         with:
           node-version: '20'
           cache: npm
@@ -142,7 +149,7 @@ jobs:
           # ngoài, mà một số kịch bản lại kiểm đúng thông điệp lỗi hiện trên giao diện.
           SPRING_PROFILES_ACTIVE: local
           # Hai dòng này chỉ hạ bớt lượng log. Profile local vốn in mọi câu lệnh SQL,
-          # chạy 130 kịch bản thì tệp log phình lên hàng trăm megabyte.
+          # chạy 140 kịch bản thì tệp log phình lên hàng trăm megabyte.
           SPRING_JPA_SHOW_SQL: 'false'
           LOGGING_LEVEL_VN_VUONSEN_FNB: INFO
           # Giao diện chạy ở cổng 4173 và gọi thẳng sang cổng 8080, tức khác nguồn,
@@ -205,7 +212,7 @@ jobs:
           tail -50 "$GITHUB_WORKSPACE/frontend.log" || true
           exit 1
 
-      - name: Chạy 130 test case Selenium
+      - name: Chạy 140 test case Selenium
         working-directory: kiemthu
         run: |
           mvn -B test \
@@ -222,7 +229,7 @@ jobs:
 
       - name: Lưu báo cáo và ảnh chụp lỗi
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: bao-cao-kiem-thu-giao-dien
           path: |

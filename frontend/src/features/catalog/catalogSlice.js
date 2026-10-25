@@ -15,7 +15,9 @@ export const fetchDishes = createAsyncThunk('catalog/dishes', async (params = {}
   menuApi.dishes(params),
 );
 
-export const fetchPackages = createAsyncThunk('catalog/packages', async () => packageApi.list());
+export const fetchPackages = createAsyncThunk('catalog/packages', async (filters = {}) =>
+  packageApi.list(filters),
+);
 
 const initialState = {
   spaces: { items: [], status: 'idle', error: null, requestId: null },

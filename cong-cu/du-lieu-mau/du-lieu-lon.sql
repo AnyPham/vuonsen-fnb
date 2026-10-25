@@ -1,7 +1,7 @@
 /*
  * Dữ liệu quy mô lớn cho website Vườn Sen.
  *
- * Sinh ngày 2026-09-28 bằng cong-cu/du-lieu-mau/tao-du-lieu-lon.js.
+ * Sinh bằng cong-cu/du-lieu-mau/tao-du-lieu-lon.js.
  * KHÔNG phải migration của Flyway: đây là dữ liệu để xem cho giống hệ thống chạy thật,
  * không phải một phần cấu trúc cơ sở dữ liệu. Nạp bằng tay khi cần.
  *

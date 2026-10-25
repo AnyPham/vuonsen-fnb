@@ -11,6 +11,7 @@ import com.anthropic.models.messages.StopReason;
 import com.anthropic.models.messages.TextBlock;
 import com.anthropic.models.messages.TextBlockParam;
 import org.springframework.beans.factory.DisposableBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 import vn.vuonsen.fnb.config.props.AssistantProperties;
 
@@ -35,10 +36,17 @@ import java.util.stream.Collectors;
  *   chối được chạy lại trên mô hình khác do Anthropic chọn theo loại từ chối.
  */
 @Component
+@ConditionalOnProperty(name = "app.assistant.llm.provider", havingValue = AssistantProperties.Llm.ANTHROPIC)
 public class AnthropicLlmClient implements LlmClient, DisposableBean {
 
     static final String BETA_DU_PHONG_TU_CHOI = "server-side-fallback-2026-07-01";
     private static final String DIA_CHI_MAC_DINH = "https://api.anthropic.com";
+
+    /*
+     * Opus 5.5 là bản kế nhiệm của Opus 5: rẻ hơn mà mạnh hơn, nên không có lý do dùng
+     * bản cũ. Muốn tiết kiệm hơn nữa thì đặt ASSISTANT_LLM_MODEL=claude-sonnet-5-5.
+     */
+    private static final String MO_HINH_MAC_DINH = "claude-opus-5-5";
 
     private final AssistantProperties.Llm cauHinh;
 
@@ -71,8 +79,19 @@ public class AnthropicLlmClient implements LlmClient, DisposableBean {
     }
 
     @Override
+    public boolean sanSang() {
+        return cauHinh.coKhoa();
+    }
+
+    @Override
+    public String huongDanBat() {
+        return "chưa có khóa Anthropic. Mua tín dụng ở https://console.anthropic.com "
+                + "rồi dán khóa vào backend/tro-ly-ai.properties";
+    }
+
+    @Override
     public String tenDichVu() {
-        return "Anthropic " + cauHinh.model();
+        return "Anthropic " + cauHinh.modelHoac(MO_HINH_MAC_DINH);
     }
 
     @Override
@@ -110,7 +129,7 @@ public class AnthropicLlmClient implements LlmClient, DisposableBean {
     static MessageCreateParams dungYeuCau(AssistantProperties.Llm cauHinh, String chiDanHeThong,
                                           List<LuotHoiThoai> lichSu, String cauHoi) {
         MessageCreateParams.Builder yeuCau = MessageCreateParams.builder()
-                .model(cauHinh.model())
+                .model(cauHinh.modelHoac(MO_HINH_MAC_DINH))
                 .maxTokens(cauHinh.maxTokens())
                 // Luật và dữ liệu nằm ở phần system, lời của khách nằm riêng ở messages,
                 // để khách không sửa được luật bằng cách viết khéo câu hỏi
@@ -131,7 +150,7 @@ public class AnthropicLlmClient implements LlmClient, DisposableBean {
         }
         yeuCau.addUserMessage(cauHoi);
 
-        if (hoTroDuPhongTuChoi(cauHinh.model())) {
+        if (hoTroDuPhongTuChoi(cauHinh.modelHoac(MO_HINH_MAC_DINH))) {
             yeuCau.putAdditionalHeader("anthropic-beta", BETA_DU_PHONG_TU_CHOI);
             yeuCau.putAdditionalBodyProperty("fallbacks", JsonValue.from("default"));
         }
