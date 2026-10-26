@@ -5,7 +5,7 @@
 #   kiem-thu-don-vi     189 kiểm thử đơn vị JUnit của backend. Chạy trên H2 trong bộ nhớ,
 #                       không cần cài thêm gì, xong trong vài phút.
 #
-#   kiem-thu-giao-dien  140 test case Selenium theo mô hình Page Object Model trên 16 luồng.
+#   kiem-thu-giao-dien  170 test case Selenium theo mô hình Page Object Model trên 19 luồng.
 #                       Phải dựng đủ MySQL, backend và giao diện rồi mới chạy được.
 #
 # Cố ý không cho công việc thứ hai phụ thuộc công việc thứ nhất. Đây là hai kết quả thực
@@ -148,8 +148,9 @@ jobs:
           # Dùng local chứ không dùng prod vì prod chặn không cho lộ thông điệp lỗi ra
           # ngoài, mà một số kịch bản lại kiểm đúng thông điệp lỗi hiện trên giao diện.
           SPRING_PROFILES_ACTIVE: local
-          # Hai dòng này chỉ hạ bớt lượng log. Profile local vốn in mọi câu lệnh SQL,
-          # chạy 140 kịch bản thì tệp log phình lên hàng trăm megabyte.
+          # Hồ sơ local đã tắt sẵn show-sql, khai lại ở đây để log vẫn gọn kể cả khi
+          # ai đó bật nó lên trong tệp cấu hình. Chạy 170 kịch bản mà in mọi câu lệnh
+          # SQL thì tệp log phình lên hàng trăm megabyte.
           SPRING_JPA_SHOW_SQL: 'false'
           LOGGING_LEVEL_VN_VUONSEN_FNB: INFO
           # Giao diện chạy ở cổng 4173 và gọi thẳng sang cổng 8080, tức khác nguồn,
@@ -212,7 +213,7 @@ jobs:
           tail -50 "$GITHUB_WORKSPACE/frontend.log" || true
           exit 1
 
-      - name: Chạy 140 test case Selenium
+      - name: Chạy 170 test case Selenium
         working-directory: kiemthu
         run: |
           mvn -B test \

@@ -73,10 +73,16 @@
       <artifactId>mysql-connector-j</artifactId>
       <scope>runtime</scope>
     </dependency>
+    <!--
+      H2 chỉ có mặt khi chạy kiểm thử, không nằm trong gói chạy thật.
+      Để phạm vi runtime thì ai lỡ gõ -Dspring-boot.run.profiles=dev vẫn khởi động được
+      bằng H2, rồi đặt đơn xong mở MySQL ra tìm lại không thấy. Đổi sang test thì máy chủ
+      không còn trình điều khiển H2 nữa: web chỉ chạy được bằng MySQL, không có đường lỡ.
+    -->
     <dependency>
       <groupId>com.h2database</groupId>
       <artifactId>h2</artifactId>
-      <scope>runtime</scope>
+      <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.flywaydb</groupId>
@@ -149,6 +155,18 @@
               <artifactId>lombok</artifactId>
             </exclude>
           </excludes>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <configuration>
+          <!-- Bài kiểm thử luôn chạy trên H2, không phụ thuộc hồ sơ mặc định của
+               application.yml. Thiếu dòng này thì "mvn test" sẽ nối vào MySQL thật
+               và ghi dữ liệu thử vào cơ sở dữ liệu đang dùng. -->
+          <systemPropertyVariables>
+            <spring.profiles.active>dev</spring.profiles.active>
+          </systemPropertyVariables>
         </configuration>
       </plugin>
       <plugin>

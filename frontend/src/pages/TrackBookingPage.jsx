@@ -97,7 +97,14 @@ export default function TrackBookingPage() {
           <div className="card">
             <div className="card-body">
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
-                <h3 data-test="result-code">{booking.code}</h3>
+                {/*
+                  Mã đơn để chữ không chân. Quy tắc chung cho h1-h3 là chữ có chân, nhưng
+                  mã đơn là dãy ký tự phải đọc rời từng chữ một, chữ có chân làm số 0 và
+                  chữ O khó phân biệt. Trang tra cứu đơn món cũng đang để không chân.
+                */}
+                <h3 data-test="result-code" style={{ fontFamily: 'var(--sans)' }}>
+                  {booking.code}
+                </h3>
                 <span className={`tag tag-${booking.status}`} data-test="result-status">
                   {nhan(booking.statusLabel, booking.statusLabelEn)}
                 </span>

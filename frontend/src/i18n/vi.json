@@ -283,6 +283,17 @@
     "status": "Trạng thái",
     "unit": "đơn"
   },
+  "myDishOrders": {
+    "title": "Đơn đặt món lẻ của tôi",
+    "empty": "Bạn chưa có đơn đặt món lẻ nào.",
+    "code": "Mã đơn",
+    "serveAt": "Thời điểm nhận",
+    "fulfillment": "Hình thức",
+    "dishes": "Số món",
+    "total": "Tổng tiền",
+    "status": "Trạng thái",
+    "unit": "đơn"
+  },
   "paymentResult": {
     "eyebrow": "Thanh toán",
     "title": "Kết quả giao dịch",

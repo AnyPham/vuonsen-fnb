@@ -39,10 +39,10 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer -> AbstractHttpConfigurer.disable())   // API không dùng session nên tắt CSRF
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .headers(h -> h.frameOptions(f -> f.sameOrigin()))                  // cho phép mở H2 console
+                .headers(h -> h.frameOptions(f -> f.sameOrigin()))                  // Swagger UI nhúng khung cùng nguồn
                 .authorizeHttpRequests(auth -> auth
-                        // Swagger và H2 console
-                        .requestMatchers("/api/auth/**", "/h2-console/**",
+                        // Đăng nhập, tài liệu API và điểm kiểm tra sống
+                        .requestMatchers("/api/auth/**",
                                 "/swagger-ui/**", "/swagger-ui.html", "/v3/api-docs/**",
                                 "/actuator/health").permitAll()
 

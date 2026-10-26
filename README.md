@@ -44,38 +44,89 @@ thực đơn, không gian, ngày lễ giảm giá và tài khoản người dùn
 |---|---|
 | Không gian sự kiện | 6 |
 | Món ăn trong thực đơn | 126 |
-| Gói tiệc | 3 |
+| Gói tiệc | 8 |
 | Module nghiệp vụ (backend) | 15 |
-| Controller | 24 |
 | Trang giao diện | 32 |
-| Migration cơ sở dữ liệu | 22 |
-| Kiểm thử đơn vị và tích hợp | 158 bài |
-| Kiểm thử giao diện (Selenium) | 130 test case / 15 luồng |
+| Migration cơ sở dữ liệu | 29 |
+| Kiểm thử đơn vị và tích hợp | 225 bài |
+| Kiểm thử giao diện (Selenium) | 170 test case / 19 luồng |
 
 ---
 
 ## 🚀 Bắt đầu nhanh
 
-Cách nhanh nhất để xem website chạy — **không cần cài MySQL**. Backend dùng H2 chạy trên RAM
-và tự nạp sẵn dữ liệu mẫu.
+Website **chỉ chạy được bằng MySQL trên máy bạn**. Không có chế độ chạy tạm trên bộ nhớ,
+nên mọi thứ bạn đặt, sửa hay xoá đều nằm trong cơ sở dữ liệu thật và **còn nguyên sau khi
+tắt máy chủ, tắt máy tính**.
 
-**Yêu cầu:** JDK 17+, Node.js 18+, Maven 3.9+
+**Cần có sẵn:** JDK 17+, Node.js 18+, Maven 3.9+, và MySQL 8 hoặc MariaDB 10.4+ (bản MySQL
+đi kèm XAMPP là đủ).
+
+Website gồm ba phần phải chạy **đúng thứ tự**, vì phần sau cần phần trước:
+
+```
+MySQL  ──►  Backend  ──►  Frontend  ──►  Bạn mở trình duyệt
+cổng 3306   cổng 8080     cổng 5173
+nơi chứa    xử lý nghiệp   trang web
+dữ liệu     vụ, đọc ghi    bạn nhìn thấy
+            vào MySQL
+```
+
+Bỏ qua một bước là đứt dây chuyền: thiếu MySQL thì backend không khởi động, thiếu backend
+thì trang web mở ra nhưng trống trơn và báo lỗi gọi API.
+
+---
+
+### Bước 0 — Tải mã nguồn về (chỉ làm một lần)
 
 ```bash
 git clone https://github.com/AnyPham/vuonsen-fnb.git
 cd vuonsen-fnb
 ```
 
-Mở **hai cửa sổ dòng lệnh**.
+### Bước 1 — Bật MySQL
 
-Cửa sổ 1 — backend:
+Mở **XAMPP Control Panel**, bấm **Start** ở dòng **MySQL**. Chờ tới khi dòng đó chuyển
+sang nền xanh.
+
+Không cần tạo cơ sở dữ liệu, không cần chạy tệp `.sql` nào. Lần chạy đầu backend tự tạo
+cơ sở dữ liệu `vuonsen_fnb`, dựng đủ bảng và nạp dữ liệu mẫu.
+
+Muốn chắc chắn MySQL đã lên thì chạy:
+
+```bash
+netstat -ano | findstr :3306
+```
+
+Có dòng `LISTENING` là được.
+
+> [!IMPORTANT]
+> Chưa bật MySQL thì backend **không khởi động được**. Đó là chủ ý, không phải lỗi: thà
+> báo ngay còn hơn chạy được rồi hôm sau mở ra mất sạch dữ liệu.
+
+### Bước 2 — Chạy backend
+
+Mở **cửa sổ dòng lệnh thứ nhất**:
 
 ```bash
 cd backend
 mvn spring-boot:run
 ```
 
-Cửa sổ 2 — frontend:
+Không cần truyền thêm cờ nào. Lần đầu mất khoảng một phút vì phải chạy 29 bản di trú và
+nạp dữ liệu mẫu; những lần sau nhanh hơn nhiều.
+
+Backend sẵn sàng khi thấy dòng:
+
+```
+Started FnbApplication in 12.345 seconds
+```
+
+**Để nguyên cửa sổ này, đừng đóng.** Đóng là tắt backend.
+
+### Bước 3 — Chạy frontend
+
+Mở **cửa sổ dòng lệnh thứ hai**, giữ nguyên cửa sổ thứ nhất:
 
 ```bash
 cd frontend
@@ -83,13 +134,24 @@ npm install
 npm run dev
 ```
 
-Mở trình duyệt vào **<http://localhost:5173>**. Xong.
+Lệnh `npm install` chỉ cần chạy lần đầu, hoặc khi ai đó thêm thư viện mới.
+
+Frontend sẵn sàng khi thấy:
+
+```
+VITE v5.4.21  ready in 4031 ms
+➜  Local:   http://localhost:5173/
+```
+
+### Bước 4 — Mở trình duyệt và dùng
+
+Vào **<http://localhost:5173>**. Xong.
 
 | Địa chỉ | Dùng để |
 |---|---|
 | <http://localhost:5173> | Website |
 | <http://localhost:8080/swagger-ui.html> | Tài liệu API, thử API trực tiếp |
-| <http://localhost:8080/h2-console> | Xem cơ sở dữ liệu — JDBC URL `jdbc:h2:mem:vuonsen`, user `sa`, bỏ trống mật khẩu |
+| <http://localhost/phpmyadmin> | Xem cơ sở dữ liệu `vuonsen_fnb` (nếu dùng XAMPP) |
 
 **Tài khoản quản trị mặc định:** `admin@vuonsen.vn` / `Admin@123`
 
@@ -97,49 +159,177 @@ Mở trình duyệt vào **<http://localhost:5173>**. Xong.
 > Mật khẩu này chỉ dành cho môi trường phát triển. Trước khi đưa website ra Internet,
 > đặt biến môi trường `ADMIN_PASSWORD` thành mật khẩu khác.
 
-Dữ liệu H2 nằm trên RAM nên tắt backend là mất. Muốn giữ lại dữ liệu thì dùng MySQL
-theo hướng dẫn bên dưới.
+### Khi muốn dừng
+
+Bấm `Ctrl+C` trong từng cửa sổ dòng lệnh. MySQL thì bấm **Stop** trong XAMPP, hoặc cứ để
+chạy cũng không sao.
+
+Dữ liệu nằm trong MySQL nên tắt hết rồi bật lại vẫn còn nguyên. Lần sau chỉ cần làm lại
+**bước 1 → 2 → 3**, không phải `git clone` hay `npm install` nữa.
+
+### Nếu tài khoản MySQL có mật khẩu
+
+Cấu hình mặc định dùng user `root` với mật khẩu để trống, đúng như XAMPP vừa cài xong.
+Máy nào đã đặt mật khẩu cho `root` thì khai báo khi chạy backend ở bước 2:
+
+```bash
+DB_PASSWORD=matkhaucuaban mvn spring-boot:run
+```
+
+### Cấu hình — clone về là chạy, không phải khai báo gì
+
+Đây là điều hay bị hỏi nhất, nên nói rõ: **bạn không cần tạo tệp cấu hình nào.** Không
+`.env`, không khóa API, không chỉnh `application.yml`. Tải mã nguồn về, bật MySQL, chạy
+hai lệnh ở bước 2 và 3 là xong.
+
+Toàn bộ giá trị mặc định đã nhắm sẵn vào một máy XAMPP vừa cài: MySQL ở `localhost:3306`,
+user `root`, mật khẩu để trống.
+
+Các tệp dưới đây **đều không bắt buộc**, chỉ cần khi bạn muốn bật thêm thứ gì:
+
+| Tệp | Khi nào cần | Thiếu thì sao |
+|---|---|---|
+| `backend/tro-ly-ai.properties` | Muốn trợ lý tư vấn trả lời bằng AI thật | Trợ lý vẫn chạy, trả lời dựa trên dữ liệu trong cơ sở dữ liệu |
+| `frontend/.env` | Muốn bật bản đồ Google hoặc đổi địa chỉ API | Bản đồ vẫn hiện bằng đường nhúng, API gọi qua proxy của Vite |
+| `.env` ở thư mục gốc | **Chỉ dùng cho Docker** | Chạy bằng Maven thì không đụng tới tệp này |
+
+Mỗi tệp đều có bản mẫu đi kèm (`tro-ly-ai.properties.example`, `.env.example`), chép ra
+rồi điền khi nào cần. Cả ba tệp thật đều nằm trong `.gitignore` nên không bao giờ bị đẩy
+lên kho mã nguồn.
+
+> [!NOTE]
+> Đã kiểm chứng bằng cách dựng một bản chỉ gồm các tệp có trong Git — không `.env`, không
+> `tro-ly-ai.properties` — rồi chạy trên cơ sở dữ liệu trắng. Backend khởi động trong 11
+> giây, tự tạo tài khoản quản trị và nạp đủ dữ liệu mẫu:
+>
+> ```
+> Started FnbApplication in 11.727 seconds
+> Đã tạo tài khoản quản trị mặc định: admin@vuonsen.vn
+> Trợ lý tư vấn: AI đang tắt trong cấu hình, trả lời bằng cơ chế dự phòng
+> ```
+
+### Làm sao biết chắc đang chạy MySQL chứ không phải bộ nhớ tạm
+
+Ba cách, chọn cách nào cũng được.
+
+**Cách 1 — đọc dòng log lúc khởi động.** Backend in ra hồ sơ đang dùng:
+
+```
+The following 1 profile is active: "local"
+```
+
+Phải là `local` hoặc `prod`. Cả hai đều nối vào MySQL.
+
+**Cách 2 — đếm trong cơ sở dữ liệu.** Mở phpMyAdmin xem bảng `vuonsen_fnb`, hoặc chạy:
+
+```bash
+mysql -u root -e "SELECT COUNT(*) FROM vuonsen_fnb.dishes;"
+```
+
+Ra 126 là dữ liệu đã nằm trong MySQL thật.
+
+**Cách 3 — thử tắt bật.** Đặt một đơn trên web, tắt backend bằng `Ctrl+C`, chạy lại, rồi
+vào **Đơn của tôi**. Đơn còn đó nghĩa là dữ liệu đã lưu xuống đĩa.
+
+> [!NOTE]
+> **Dự án không còn chế độ chạy trên bộ nhớ tạm.** Trước đây có hồ sơ `dev` dùng H2 giữ
+> dữ liệu trên RAM, tắt backend là mất sạch, và đã gây hiểu nhầm: có người đặt đơn xong mở
+> MySQL ra tìm lại không thấy. Nay trình điều khiển H2 chỉ còn trong phạm vi kiểm thử
+> (`<scope>test</scope>` ở `backend/pom.xml`), nên máy chủ **không thể** khởi động bằng
+> H2 nữa. Ai lỡ gõ `-Dspring-boot.run.profiles=dev` sẽ nhận lỗi dừng hẳn:
+>
+> ```
+> Cannot load driver class: org.h2.Driver
+> ```
+>
+> Đó là hàng rào cố ý, không phải hỏng hóc. Cứ bỏ cờ đó đi và chạy `mvn spring-boot:run`.
 
 ---
 
 ## 🛠 Cài đặt đầy đủ
 
-### Cách 1 — MySQL cài trên máy
+### Cách 1 — MySQL cài trên máy (mặc định)
 
-Phù hợp khi phát triển lâu dài và cần dữ liệu không mất sau mỗi lần khởi động lại.
+Trình tự chạy nằm ở phần [Bắt đầu nhanh](#-bắt-đầu-nhanh) bên trên. Mục này chỉ nói thêm
+mấy chi tiết mà phần đó lược bớt cho gọn.
 
-**Bước 1.** Tạo cơ sở dữ liệu rỗng. Flyway tự tạo toàn bộ bảng khi backend khởi động,
-không phải chạy script SQL nào bằng tay.
+**Cơ sở dữ liệu tự sinh.** Chuỗi kết nối có `createDatabaseIfNotExist=true` nên MySQL tự
+tạo `vuonsen_fnb` ở lần chạy đầu. Ai muốn tự tạo trước để chắc chắn bảng mã thì chạy:
 
 ```sql
 CREATE DATABASE vuonsen_fnb CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 ```
 
-**Bước 2.** Chạy backend với profile `local`. Profile này kết nối `localhost:3306`,
-user `root`, mật khẩu để trống — đúng cấu hình mặc định của XAMPP.
+**Dữ liệu mẫu Flyway nạp sẵn.** Ngay lần chạy đầu đã có: 6 không gian, 8 gói tiệc, 126
+món, 52 đơn đặt tiệc, 35 đơn đặt món, 19 đánh giá, 1 tài khoản quản trị và 5 khách hàng.
+
+**Đổi tài khoản kết nối.** Khai biến môi trường, đừng sửa tệp cấu hình — sửa tệp là lần
+sau kéo mã mới về sẽ xung đột:
 
 ```bash
-cd backend
-mvn spring-boot:run -Dspring-boot.run.profiles=local
+DB_USER=root DB_PASSWORD=matkhaucuaban mvn spring-boot:run
 ```
 
-Dùng user hoặc mật khẩu khác thì truyền biến môi trường, không sửa tệp cấu hình:
+**Kiểm tra dữ liệu đã vào MySQL chưa.** Mở phpMyAdmin hoặc chạy:
 
 ```bash
-DB_URL="jdbc:mysql://localhost:3306/vuonsen_fnb?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Ho_Chi_Minh" \
-DB_USER=root \
-DB_PASSWORD=matkhaucuaban \
-mvn spring-boot:run
+mysql -u root -e "SELECT COUNT(*) AS so_mon FROM vuonsen_fnb.dishes;"
 ```
 
-**Bước 3.** Chạy frontend như phần bắt đầu nhanh.
+Ra 126 là Flyway đã nạp xong.
 
-**Bước 4 — không bắt buộc.** Nạp bộ dữ liệu 24 tháng để xem hệ thống ở mức tải gần thực tế:
+**Bộ dữ liệu lớn — không bắt buộc.** Nạp bộ dữ liệu 24 tháng để xem hệ thống ở mức tải gần thực tế:
 khoảng 1.500 khách hàng, 1.600 đơn đặt tiệc, 1.500 đơn đặt món và 460 đánh giá.
 
 ```bash
 mysql -u root vuonsen_fnb < cong-cu/du-lieu-mau/du-lieu-lon.sql
 ```
+
+Bộ này còn thêm bốn tài khoản vai trò `STAFF` (`bao.tran@vuonsen.vn`,
+`hoang.long@vuonsen.vn`, `kim.loan@vuonsen.vn`, `quoc.khanh@vuonsen.vn`). Dữ liệu Flyway
+nạp sẵn chỉ có một tài khoản quản trị và năm khách hàng, nên ai cần đăng nhập bằng vai
+trò nhân viên thì nạp thêm bước này. Toàn bộ 170 test case Selenium không cần tới nó.
+
+### Khi MySQL không chịu nối
+
+Bốn lỗi hay gặp nhất, kèm cách nhận ra và cách chữa.
+
+**`Communications link failure` hoặc `Connection refused`** — MySQL chưa chạy. Mở XAMPP
+Control Panel bấm Start ở dòng MySQL. Kiểm tra lại bằng:
+
+```bash
+netstat -ano | findstr :3306
+```
+
+Có dòng `LISTENING` là MySQL đã sẵn sàng.
+
+**Đã bật MySQL mà vẫn báo không nối được** — nhiều máy cài sẵn MySQL Server riêng bên cạnh
+XAMPP, và bản đó có thể nghe **cổng khác 3306**. Xem cổng thật bằng:
+
+```bash
+netstat -ano | findstr "330"
+```
+
+Nếu MySQL của bạn nằm ở cổng khác, trỏ lại bằng biến môi trường thay vì sửa tệp cấu hình:
+
+```bash
+DB_URL="jdbc:mysql://localhost:3305/vuonsen_fnb?createDatabaseIfNotExist=true&useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Ho_Chi_Minh&allowPublicKeyRetrieval=true&useSSL=false" mvn spring-boot:run
+```
+
+**`Access denied for user 'root'@'localhost'`** — tài khoản `root` trên máy bạn có mật khẩu.
+Khai báo khi chạy:
+
+```bash
+DB_PASSWORD=matkhaucuaban mvn spring-boot:run
+```
+
+**`Cannot load driver class: org.h2.Driver`** — bạn đang truyền cờ `-Dspring-boot.run.profiles=dev`.
+Hồ sơ đó chỉ dành cho `mvn test`, website không chạy bằng nó. Bỏ cờ đi, gõ `mvn spring-boot:run`.
+
+**Đặt đơn trên web xong mở MySQL không thấy** — kiểm tra xem bạn có đang mở đúng cơ sở dữ
+liệu `vuonsen_fnb` trên đúng máy chủ MySQL mà backend đang nối tới không. Dòng log lúc
+khởi động cho biết hồ sơ đang dùng; chạy thêm `SELECT COUNT(*) FROM vuonsen_fnb.dish_orders;`
+trước và sau khi đặt đơn, con số phải tăng.
 
 ### Cách 2 — Docker
 
@@ -188,9 +378,24 @@ cp .env.example .env
 
 | Profile | Cơ sở dữ liệu | Dùng khi |
 |---|---|---|
-| `dev` *(mặc định)* | H2 trên RAM | Chạy thử, không cần cài gì thêm |
-| `local` | MySQL `localhost:3306` | Phát triển với dữ liệu lưu lại được |
+| `local` *(mặc định)* | MySQL `localhost:3306` | Chạy website hằng ngày. Không phải truyền cờ gì |
 | `prod` | MySQL qua biến môi trường | Chạy thật, dùng cho Docker |
+| `dev` | H2 trên RAM | **Chỉ dành cho `mvn test`.** Không khởi động được website |
+
+Hai hồ sơ chạy website đều nối vào MySQL. Không có lựa chọn nào khác, nên không có đường
+nào vô tình chạy vào bộ nhớ tạm.
+
+**Vì sao bài kiểm thử lại dùng H2?** Vì ba lý do, và không lý do nào ảnh hưởng tới dữ liệu
+thật của bạn:
+
+Thứ nhất, `mvn test` phải chạy được trên máy chưa cài MySQL, chẳng hạn máy của bạn cùng
+nhóm hoặc máy chủ tích hợp liên tục. Thứ hai, mỗi lần chạy cần một cơ sở dữ liệu trắng để
+kết quả không phụ thuộc dữ liệu còn sót từ lần trước. Thứ ba, và quan trọng nhất, bài kiểm
+thử tạo rồi xoá rất nhiều bản ghi — cho chúng đụng vào MySQL thật là hỏng dữ liệu đang dùng.
+
+`maven-surefire-plugin` trong `backend/pom.xml` ép `spring.profiles.active=dev` cho riêng
+lúc chạy kiểm thử, nên dù hồ sơ mặc định là `local` thì `mvn test` vẫn nằm gọn trên H2.
+Có thể tự kiểm chứng: đếm số dòng trong MySQL, chạy `mvn test`, đếm lại — con số không đổi.
 
 ---
 
@@ -212,23 +417,24 @@ dự phòng thay vì báo lỗi, nên tải mã nguồn về là chạy được
 
 ## 🧪 Kiểm thử
 
-### Kiểm thử phía máy chủ — 158 bài
+### Kiểm thử phía máy chủ — 225 bài
 
-Chạy trên H2 nên **không cần MySQL và không phải khởi động gì trước**.
+Chạy trên H2 nên **không cần MySQL và không phải khởi động gì trước**. Dữ liệu trong MySQL
+không bị chạm tới.
 
 ```bash
 cd backend
 mvn test
 ```
 
-### Kiểm thử giao diện bằng Selenium — 130 test case
+### Kiểm thử giao diện bằng Selenium — 170 test case
 
 Bộ kiểm thử điều khiển trình duyệt thật, nên **backend và frontend phải đang chạy**
 trước khi gọi lệnh. Cần cài sẵn Google Chrome.
 
 ```bash
 # Cửa sổ 1
-cd backend && mvn spring-boot:run -Dspring-boot.run.profiles=local
+cd backend && mvn spring-boot:run
 
 # Cửa sổ 2
 cd frontend && npm run dev
@@ -251,7 +457,7 @@ mvn test -Dbase.url=http://localhost:4173 -Dapi.url=http://localhost:8080
 ```
 
 <details>
-<summary><b>15 luồng nghiệp vụ được kiểm thử</b></summary>
+<summary><b>19 luồng nghiệp vụ được kiểm thử</b></summary>
 
 <br>
 
@@ -260,7 +466,7 @@ mvn test -Dbase.url=http://localhost:4173 -Dapi.url=http://localhost:8080
 | 1 | Đăng ký và đăng nhập | 10 |
 | 2 | Xem và lọc không gian | 8 |
 | 3 | Trang chi tiết không gian | 6 |
-| 4 | Thực đơn và chi tiết món | 8 |
+| 4 | Thực đơn và chi tiết món | 12 |
 | 5 | Đặt tiệc ba bước | 13 |
 | 6 | Ràng buộc khi đặt tiệc | 11 |
 | 7 | Tra cứu đơn đặt tiệc | 4 |
@@ -272,6 +478,10 @@ mvn test -Dbase.url=http://localhost:4173 -Dapi.url=http://localhost:8080
 | 13 | Quản trị đơn | 8 |
 | 14 | Giảm giá ngày lễ | 10 |
 | 15 | Quản trị ngày lễ | 12 |
+| 16 | Xem và lọc gói tiệc | 10 |
+| 17 | Lịch đặt chỗ quản trị | 10 |
+| 18 | Thông báo khuyến mãi trang chủ | 8 |
+| 19 | Đặt sảnh nhỏ, thực đơn tự chọn | 8 |
 
 </details>
 
@@ -334,7 +544,7 @@ kiemthu/src/test/java/vn/vuonsen/kiemthu/
 ├── thanhphan/    Khối lặp lại nhiều trang: thanh điều hướng, bảng tạm tính
 ├── trang/        Một lớp cho một trang, giấu hết locator bên trong
 ├── luong/        Chuỗi thao tác dùng lại: đăng nhập, báo giá tiệc
-└── kichban/      130 test case chia 15 luồng nghiệp vụ
+└── kichban/      170 test case chia 19 luồng nghiệp vụ
 ```
 
 Locator bắt theo thuộc tính `data-test` chứ không theo class CSS hay cấu trúc thẻ. Class CSS

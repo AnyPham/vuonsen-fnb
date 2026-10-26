@@ -283,6 +283,17 @@
     "status": "Status",
     "unit": "bookings"
   },
+  "myDishOrders": {
+    "title": "My à la carte orders",
+    "empty": "You have no à la carte orders yet.",
+    "code": "Order code",
+    "serveAt": "Serve time",
+    "fulfillment": "Fulfillment",
+    "dishes": "Dishes",
+    "total": "Total",
+    "status": "Status",
+    "unit": "orders"
+  },
   "paymentResult": {
     "eyebrow": "Payment",
     "title": "Transaction result",

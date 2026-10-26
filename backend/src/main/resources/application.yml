@@ -2,7 +2,12 @@ spring:
   application:
     name: fnb-backend
   profiles:
-    active: dev
+    # Website chỉ chạy bằng MySQL, để dữ liệu còn lại sau khi tắt máy chủ.
+    #
+    # Hồ sơ dev dùng H2 trên RAM chỉ dành riêng cho mvn test. Trình điều khiển H2 để
+    # phạm vi test trong pom.xml, nên truyền -Dspring-boot.run.profiles=dev sẽ dừng ngay
+    # với lỗi "Cannot load driver class: org.h2.Driver". Đó là hàng rào cố ý.
+    active: local
 
   config:
     # Khoa API doc tu tep rieng, khong nam trong git. Hai duong dan de chay duoc

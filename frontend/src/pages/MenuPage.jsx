@@ -51,17 +51,28 @@ export default function MenuPage() {
    *
    * Gọi ngay mỗi lần gõ thì tên món mười ký tự sinh ra mười lượt gọi, phần lớn là thừa.
    * Bộ lọc trong Redux đã bỏ qua kết quả về muộn nên không lo hiện nhầm kết quả cũ.
+   *
+   * Xóa hết từ khóa thì nạp lại ngay chứ không thoát sớm. Thoát sớm thì danh sách đứng
+   * im ở kết quả tìm lần trước: gõ "gỏi" còn bốn món, xóa đi vẫn bốn món đó. Nạp theo
+   * danh mục đang chọn chứ không phải lúc nào cũng toàn bộ thực đơn, để người đang xem
+   * tab "Khai vị" thì quay về khai vị chứ không bị văng ra tất cả món.
+   *
+   * Chỉ theo dõi tuKhoa. Nút danh mục và nút lọc chay đã tự gọi napMon trong onClick,
+   * thêm chúng vào đây thì mỗi lần bấm sẽ gọi máy chủ hai lượt giống hệt nhau.
    */
   useEffect(() => {
-    if (!tuKhoa) return undefined;
+    if (!tuKhoa) {
+      napMon(danhMuc, '', chiMonChay);
+      return undefined;
+    }
     const hen = setTimeout(() => napMon('', tuKhoa, chiMonChay), 350);
     return () => clearTimeout(hen);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [dispatch, tuKhoa, chiMonChay]);
+  }, [tuKhoa]);
 
+  // Lần đầu vào trang, effect bên trên đã nạp món theo từ khóa rỗng nên không gọi lại.
   useEffect(() => {
     dispatch(fetchCategories());
-    dispatch(fetchDishes({}));
     menuApi.bestSellers().then(setBestSellers).catch(() => setBestSellers([]));
   }, [dispatch]);
 

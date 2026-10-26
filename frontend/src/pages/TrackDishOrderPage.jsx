@@ -64,12 +64,18 @@ export default function TrackDishOrderPage() {
           }}
           style={{ display: 'flex', gap: 10, marginBottom: 20 }}
         >
+          {/*
+            Ô nhập nằm ngoài khối .fgroup nên không ăn định dạng chung của biểu mẫu.
+            Thiếu phần này thì trình duyệt vẽ theo mặc định: phông Arial cỡ 13px, không
+            đệm, viền xám chìm — lạc hẳn so với phần còn lại. Đặt giống hệt ô nhập bên
+            trang tra cứu đơn tiệc để hai trang nhìn như một.
+          */}
           <input
             value={ma}
             onChange={(e) => setMa(e.target.value)}
             placeholder={t('trackDish.placeholder')}
             data-test="track-code"
-            style={{ flex: 1 }}
+            style={{ flex: 1, padding: '12px 14px', border: '1px solid var(--line)', borderRadius: 10, font: 'inherit' }}
           />
           <button type="submit" className="btn btn-dark" disabled={loading} data-test="track-submit">
             {t('track.submit')}
