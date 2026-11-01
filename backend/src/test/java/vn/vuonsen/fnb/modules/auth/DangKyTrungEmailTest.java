@@ -38,10 +38,15 @@ class DangKyTrungEmailTest {
         when(userRepository.saveAndFlush(any())).thenThrow(new DataIntegrityViolationException(
                 "trùng", new RuntimeException("Duplicate entry 'khach@vuonsen.vn' for key 'uk_users_email'")));
 
-        AuthService service = new AuthService(userRepository, null, passwordEncoder, null, null, null);
+        /*
+         * Tham số cuối là dịch vụ xác thực email, để null được: lỗi trùng xảy ra ngay ở
+         * bước lưu, chưa tới lượt cấp mã nên dịch vụ đó không bị gọi.
+         */
+        AuthService service =
+                new AuthService(userRepository, null, passwordEncoder, null, null, null, null);
 
         assertThatThrownBy(() -> service.register(
-                new RegisterRequest("Tuấn Anh", "khach@vuonsen.vn", "0901234567", "matkhau123")))
+                new RegisterRequest("Tuấn Anh", "khach@vuonsen.vn", "0901234567", "Matkhau123")))
                 .isInstanceOf(BusinessException.class)
                 .hasMessage("Email này đã được đăng ký");
     }

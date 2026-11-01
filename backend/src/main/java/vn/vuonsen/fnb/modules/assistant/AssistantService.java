@@ -66,6 +66,7 @@ public class AssistantService {
             case QUY_TRINH_DAT -> traLoiQuyTrinh();
             case TRA_CUU_DON -> traLoiTraCuu();
             case LIEN_HE -> traLoiLienHe();
+            case SO_SANH -> traLoiSoSanh();
             case KHONG_HIEU -> khongHieu();
         };
     }
@@ -342,12 +343,84 @@ public class AssistantService {
         return new AnswerResponse(s, Intent.LIEN_HE, goiYMacDinh(), null, null);
     }
 
+    /*
+     * Khách so sánh Vườn Sen với nơi khác.
+     *
+     * Hệ thống không có giá của nhà hàng khác, nên câu trả lời trung thực duy nhất là nói
+     * thẳng điều đó rồi đưa ra con số của chính mình để khách tự đối chiếu. Không đi tìm
+     * số liệu bên ngoài, cũng không phỏng đoán "mình rẻ hơn mặt bằng chung" — đó là loại
+     * câu nghe thì xuôi tai nhưng không có gì chống lưng.
+     *
+     * Toàn bộ con số dưới đây đọc từ cơ sở dữ liệu ngay lúc hỏi, nên luôn khớp bảng giá
+     * thật và giải thích được nguồn gốc trước hội đồng.
+     */
+    private AnswerResponse traLoiSoSanh() {
+        List<PartyPackage> goi = packageRepository.findByActiveTrueOrderBySortOrderAsc();
+        BigDecimal goiReNhat = goi.stream().map(PartyPackage::getPricePerTable)
+                .min(BigDecimal::compareTo).orElse(BigDecimal.ZERO);
+        BigDecimal goiDatNhat = goi.stream().map(PartyPackage::getPricePerTable)
+                .max(BigDecimal::compareTo).orElse(BigDecimal.ZERO);
+
+        // search(null, null) trả mọi món đang phục vụ. Bỏ món tính giá theo cân vì
+        // chúng không có giá cố định, đưa vào thì khoảng giá sai lệch.
+        List<Dish> mon = dishRepository.search(null, null).stream()
+                .filter(d -> d.getPrice() != null && d.getPrice().signum() > 0)
+                .toList();
+        BigDecimal monReNhat = mon.stream().map(Dish::getPrice)
+                .min(BigDecimal::compareTo).orElse(BigDecimal.ZERO);
+        BigDecimal monDatNhat = mon.stream().map(Dish::getPrice)
+                .max(BigDecimal::compareTo).orElse(BigDecimal.ZERO);
+
+        String s = """
+                Mình chỉ có số liệu của Vườn Sen, không có bảng giá của nhà hàng khác nên không \
+                so sánh thay bạn được. Mình đưa con số của bên mình để bạn tự đối chiếu nhé:
+
+                • Gói tiệc: %s đến %s một mâm, mỗi mâm %d khách.
+                • Món lẻ: %s đến %s một phần, thực đơn %d món.
+                • Phí thuê không gian: tiền ăn đạt mức tối thiểu của sảnh thì miễn hoàn toàn, \
+                chưa đạt thì giảm theo tỉ lệ chứ không nhảy bậc.
+
+                Bạn vào trang đặt tiệc chọn thử không gian và số khách là ra bảng tạm tính đầy đủ, \
+                có sẵn con số để mang đi so."""
+                .formatted(tien(goiReNhat), tien(goiDatNhat), booking.guestsPerTable(),
+                        tien(monReNhat), tien(monDatNhat), mon.size());
+
+        return new AnswerResponse(s, Intent.SO_SANH,
+                List.of("Có gói tiệc nào?", "Chi phí đặt tiệc khoảng bao nhiêu?",
+                        "Có khuyến mãi gì không?"),
+                "/dat-tiec", "Xem báo giá cho tiệc của bạn");
+    }
+
+    /*
+     * Câu khách hỏi nằm ngoài những gì hệ thống biết.
+     *
+     * Bản trước mở đầu bằng "mình chưa hiểu ý bạn". Câu đó có hai cái dở. Một là nó đổ cái
+     * sai về phía khách, trong khi phần lớn trường hợp khách hỏi rất rõ ràng, chỉ là nhà
+     * hàng không có thứ đó — ví dụ "đặt bàn trên thuyền được không". Hai là nó không trả
+     * lời gì cả, khách đọc xong vẫn không biết Vườn Sen có gì.
+     *
+     * Bản này nói thẳng là mình chưa có thông tin, rồi đưa ngay con số thật của nhà hàng
+     * để khách tự xem có hợp không. Số đếm đọc từ cơ sở dữ liệu lúc trả lời nên luôn khớp
+     * với trang thực tế, không phải chép tay vào câu chữ rồi quên cập nhật.
+     */
     private AnswerResponse khongHieu() {
-        return new AnswerResponse(
-                "Xin lỗi, mình chưa hiểu ý bạn. Mình trả lời được về không gian, thực đơn, gói tiệc, "
-                        + "chi phí, đặt cọc, khuyến mãi và cách đặt tiệc. Bạn thử một trong các câu dưới đây, "
-                        + "hoặc gọi %s để gặp nhân viên tư vấn.".formatted(contact.phone()),
-                Intent.KHONG_HIEU, goiYMacDinh(), null, null);
+        int soKhongGian = spaceRepository.findByActiveTrueOrderBySortOrderAsc().size();
+        int soGoi = packageRepository.findByActiveTrueOrderBySortOrderAsc().size();
+        int soMon = dishRepository.search(null, null).size();
+
+        String s = """
+                Mình chưa có thông tin về điều bạn hỏi. Có thể Vườn Sen chưa phục vụ việc đó, \
+                cũng có thể mình chưa được cập nhật.
+
+                Những gì mình nắm chắc và trả lời được ngay: %d không gian tổ chức tiệc, \
+                %d gói tiệc trọn gói, thực đơn %d món, cách tính chi phí, mức đặt cọc, \
+                chính sách hoàn cọc, khuyến mãi đang có và quy trình đặt tiệc.
+
+                Bạn thử một trong các câu dưới đây, hoặc gọi %s để gặp nhân viên — có những \
+                yêu cầu riêng mà nói chuyện trực tiếp sẽ nhanh hơn."""
+                .formatted(soKhongGian, soGoi, soMon, contact.phone());
+
+        return new AnswerResponse(s, Intent.KHONG_HIEU, goiYMacDinh(), null, null);
     }
 
     // ---------------- Tiện ích ----------------

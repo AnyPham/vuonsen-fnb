@@ -5,6 +5,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import java.util.Map;
@@ -12,7 +13,9 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import vn.vuonsen.fnb.modules.payment.dto.KetQuaVnPay;
 import vn.vuonsen.fnb.modules.payment.dto.PaymentResponse;
 import vn.vuonsen.fnb.modules.payment.dto.TaoThanhToanRequest;
 import vn.vuonsen.fnb.modules.payment.dto.TinhHinhThanhToanResponse;
@@ -24,6 +27,7 @@ import vn.vuonsen.fnb.modules.payment.dto.TinhHinhThanhToanResponse;
  * Đường dẫn này chỉ đọc tình hình và tạo phiếu chờ đối soát, không tự cộng tiền vào đơn,
  * nên biết mã đơn cũng không tự làm đơn thành đã thanh toán được.
  */
+@Slf4j
 @RestController
 @RequestMapping("/api/v1/payments")
 @RequiredArgsConstructor
@@ -77,6 +81,27 @@ public class PaymentController {
     @Operation(summary = "Kiểm chữ ký kết quả VNPay và ghi nhận khoản đã thu")
     public ResponseEntity<PaymentResponse> xacNhanVnPay(@RequestBody Map<String, String> thamSo) {
         return ResponseEntity.ok(paymentService.xacNhanVnPay(thamSo));
+    }
+
+    /*
+     * VNPay tự gọi về báo kết quả, không đi qua trình duyệt của khách.
+     *
+     * Đây mới là đường tin cậy: khách trả xong rồi đóng trình duyệt thì trang quay về không
+     * bao giờ chạy, nhưng IPN vẫn tới nên đơn vẫn được ghi nhận. Luôn trả HTTP 200 kèm mã của
+     * VNPay, vì máy của họ đọc mã trong nội dung chứ không đọc mã HTTP.
+     */
+    @GetMapping("/vnpay/ipn")
+    @Operation(summary = "VNPay gọi về báo kết quả giao dịch, trả về mã RspCode theo quy định của cổng")
+    public ResponseEntity<Map<String, String>> ipnVnPay(@RequestParam Map<String, String> thamSo) {
+        KetQuaVnPay kq;
+        try {
+            kq = paymentService.xuLyKetQuaVnPay(thamSo);
+        } catch (RuntimeException e) {
+            // Tiền đã trừ mà chưa ghi được, trả 99 để VNPay gọi lại và để lại dấu vết cho nhân viên
+            log.error("Không ghi nhận được kết quả VNPay, mã giao dịch {}", thamSo.get("vnp_TxnRef"), e);
+            kq = KetQuaVnPay.of(KetQuaVnPay.LOI_KHAC, "Unknown error");
+        }
+        return ResponseEntity.ok(Map.of("RspCode", kq.rspCode(), "Message", kq.message()));
     }
 
     @GetMapping("/vnpay/trang-thai")

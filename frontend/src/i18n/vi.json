@@ -122,8 +122,8 @@
     "best": "Best",
     "vegetarian": "Món chay",
     "vegetarianOnly": "Chỉ hiện món chay",
-    "noMatch": "Không tìm thấy món nào khớp \"{{tuKhoa}}\".",
-    "emptyCategory": "Danh mục này chưa có món."
+    "noMatch": "Không có món nào tên giống \"{{tuKhoa}}\". Thử gõ ngắn hơn, ví dụ \"gỏi\" thay vì \"gỏi cuốn tôm thịt\", hoặc xóa ô tìm để xem lại toàn bộ thực đơn.",
+    "emptyCategory": "Danh mục này chưa có món nào đang phục vụ. Bạn xem các danh mục khác nhé."
   },
   "dish": {
     "loading": "Đang tải thông tin món…",
@@ -220,10 +220,17 @@
     "fullName": "Họ và tên *",
     "email": "Email *",
     "phone": "Số điện thoại",
-    "password": "Mật khẩu * (tối thiểu 6 ký tự)",
+    "password": "Mật khẩu * (tối thiểu 8 ký tự)",
     "submit": "Đăng ký",
     "haveAccount": "Đã có tài khoản?",
-    "login": "Đăng nhập"
+    "login": "Đăng nhập",
+    "passwordRule": "Từ 8 ký tự, có chữ hoa, chữ thường và số."
+  },
+  "verify": {
+    "title": "Xác nhận email",
+    "code": "Mã xác nhận (6 chữ số)",
+    "submit": "Xác nhận và vào tài khoản",
+    "resend": "Không nhận được mã? Gửi lại"
   },
   "forgot": {
     "title": "Quên mật khẩu",
@@ -247,7 +254,7 @@
     "doneTitle": "Đã đổi mật khẩu",
     "doneNote": "Mật khẩu mới đã có hiệu lực. Đang đưa bạn về trang đăng nhập…",
     "newPassword": "Mật khẩu mới",
-    "minChars": "Ít nhất 6 ký tự",
+    "minChars": "Ít nhất 8 ký tự",
     "repeatPassword": "Nhập lại mật khẩu mới",
     "saving": "Đang lưu…",
     "submit": "Đặt mật khẩu mới"
@@ -302,6 +309,7 @@
     "verifying": "Đang kiểm chứng kết quả với máy chủ…",
     "success": "Thanh toán thành công",
     "failed": "Giao dịch không thành công",
+    "review": "Giao dịch đang chờ kiểm tra",
     "receiptCode": "Mã phiếu",
     "order": "Đơn hàng",
     "purpose": "Khoản",
@@ -309,6 +317,7 @@
     "reference": "Mã giao dịch",
     "successNote": "Nhà hàng đã ghi nhận khoản tiền này, bạn không cần làm gì thêm.",
     "failedNote": "Chưa có khoản tiền nào bị trừ. Bạn có thể thử lại hoặc chọn cách thanh toán khác.",
+    "reviewNote": "Nhà hàng sẽ kiểm tra khoản này với VNPay và liên hệ với bạn. Bạn chưa cần thanh toán lại.",
     "viewStatus": "Xem tình hình thanh toán"
   },
   "pagination": {
@@ -624,5 +633,8 @@
     "khongHoTro": "Trình duyệt này chưa hỗ trợ thông báo.",
     "mayChuChuaBat": "Nhà hàng chưa bật tính năng này.",
     "loi": "Chưa bật được, thử lại sau nhé."
+  },
+  "auth": {
+    "needLoginToOrder": "Bạn cần đăng nhập để gửi đơn. Đăng nhập xong hệ thống đưa bạn về đúng chỗ đang dở, thông tin vừa điền vẫn còn."
   }
 }

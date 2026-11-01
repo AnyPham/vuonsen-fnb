@@ -37,11 +37,22 @@ public final class LuongDangNhap {
         return dangNhap(driver, CauHinh.EMAIL_QUAN_TRI, CauHinh.MAT_KHAU_QUAN_TRI);
     }
 
+    /*
+     * Mật khẩu dùng cho mọi tài khoản khách do bộ kiểm thử tạo ra.
+     *
+     * Khai một chỗ vì luật đặt mật khẩu của hệ thống có thể siết thêm về sau. Trước đây
+     * giá trị "matkhau123" nằm rải rác ở bốn tệp; tới lúc luật đòi thêm chữ hoa thì phải
+     * dò sửa từng chỗ, sót một chỗ là kịch bản đỏ mà nhìn vào tưởng website hỏng.
+     *
+     * Giá trị hiện tại thỏa luật: từ 8 ký tự, có chữ hoa, chữ thường và số.
+     */
+    public static final String MAT_KHAU_KHACH = "Matkhau123";
+
     /** Tạo tài khoản khách mới qua API, chưa đăng nhập trên trình duyệt. */
     public static TaiKhoan taoKhachMoi() {
         String email = "khach." + System.nanoTime() + "@vuonsen.vn";
-        String matKhau = "matkhau123";
-        return new TaiKhoan(email, matKhau, GoiApi.dangKyKhach("Khách Kiểm Thử", email, matKhau));
+        return new TaiKhoan(email, MAT_KHAU_KHACH,
+                GoiApi.dangKyKhach("Khách Kiểm Thử", email, MAT_KHAU_KHACH));
     }
 
     /** Tạo tài khoản khách mới rồi đăng nhập tài khoản đó trên trình duyệt. */

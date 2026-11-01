@@ -4,6 +4,9 @@ import axiosClient from './axiosClient';
 export const authApi = {
   register: (body) => axiosClient.post('/api/auth/register', body),
   login: (body) => axiosClient.post('/api/auth/login', body),
+  // Nhập mã gửi về email để kích hoạt tài khoản, trả về token luôn
+  xacThucEmail: (body) => axiosClient.post('/api/auth/verify-email', body),
+  guiLaiMa: (body) => axiosClient.post('/api/auth/resend-code', body),
   logout: () => axiosClient.post('/api/auth/logout'),
   me: () => axiosClient.get('/api/v1/me'),
   updateProfile: (body) => axiosClient.put('/api/v1/me', body),

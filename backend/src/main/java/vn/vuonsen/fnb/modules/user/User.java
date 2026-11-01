@@ -12,6 +12,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import vn.vuonsen.fnb.common.entity.BaseEntity;
 
+import java.time.LocalDateTime;
+
 // Tài khoản khách hàng và nhân viên, mật khẩu lưu dạng băm BCrypt
 @Entity
 @Table(name = "users")
@@ -45,4 +47,23 @@ public class User extends BaseEntity {
     @Column(nullable = false)
     @Builder.Default
     private boolean enabled = true;
+
+    /*
+     * Mã xác nhận email, chỉ có giá trị trong lúc tài khoản còn chờ xác thực.
+     *
+     * Xác thực xong thì xóa cả hai cột về rỗng. Giữ lại mã đã dùng không được lợi gì, mà
+     * còn để một chuỗi bí mật nằm trong cơ sở dữ liệu lâu hơn mức cần thiết.
+     */
+    @Column(name = "verification_code", length = 10)
+    private String verificationCode;
+
+    @Column(name = "verification_expires_at")
+    private LocalDateTime verificationExpiresAt;
+
+    /** Mã còn hạn dùng hay không. Chưa cấp mã hoặc đã xác thực xong đều tính là không. */
+    public boolean maXacThucConHan(LocalDateTime bayGio) {
+        return verificationCode != null
+                && verificationExpiresAt != null
+                && bayGio.isBefore(verificationExpiresAt);
+    }
 }

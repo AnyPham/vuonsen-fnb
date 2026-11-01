@@ -113,7 +113,7 @@ class KiemThuRangBuocDatTiec extends KiemThuCoSo {
     @DisplayName("TC-BOOKV-08 Trùng lịch với đơn đã xác nhận thì bị từ chối")
     void tcBookv08_trungLich() {
         LocalDate ngay = GoiApi.ngayChuaDung();
-        Map<String, Object> donCo = GoiApi.taoDonTiec(null, "sanh-sen-vang", "Gói Đồng Quê", ngay, "EVENING", 200);
+        Map<String, Object> donCo = GoiApi.taoDonTiec(GoiApi.tokenKhach(), "sanh-sen-vang", "Gói Đồng Quê", ngay, "EVENING", 200);
         GoiApi.doiTrangThaiDonTiec(GoiApi.so(donCo, "id"), "CONFIRMED");
 
         TrangDatTiec trang = denBuoc3(200, ngay, "Gói Sen Vàng");

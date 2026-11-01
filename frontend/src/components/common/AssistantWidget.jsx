@@ -25,7 +25,8 @@ const LOI_CHAO = {
  * không, khỏi phải mở nhật ký máy chủ ra dò.
  */
 const NHAN_NGUON = {
-  MO_HINH_NGON_NGU: 'Trả lời bằng mô hình ngôn ngữ, dựa trên dữ liệu nhà hàng',
+  NGAN_HANG_CAU_HOI: 'Trả lời sẵn từ dữ liệu nhà hàng',
+  MO_HINH_NGON_NGU: 'Mô hình ngôn ngữ diễn đạt, số liệu lấy từ dữ liệu nhà hàng',
   DU_PHONG: 'Trả lời từ dữ liệu nhà hàng',
 };
 

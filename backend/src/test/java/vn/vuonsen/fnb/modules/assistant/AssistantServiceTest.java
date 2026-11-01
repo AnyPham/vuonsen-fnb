@@ -105,14 +105,19 @@ class AssistantServiceTest {
     }
 
     @Test
-    @DisplayName("Câu ngoài phạm vi thì nhận là không hiểu và gợi ý câu hỏi khác")
+    @DisplayName("Câu ngoài phạm vi thì nói rõ chưa có thông tin và gợi ý câu hỏi khác")
     void offersSuggestionsWhenQuestionIsOutOfScope() {
         var kq = assistantService.answer("Hôm nay trời đẹp nhỉ");
 
         assertThat(kq.intent()).isEqualTo(Intent.KHONG_HIEU);
         assertThat(kq.suggestions()).isNotEmpty();
-        // Không bịa câu trả lời, mà chỉ ra số điện thoại để gặp người thật
-        assertThat(kq.answer()).contains("chưa hiểu");
+        /*
+         * Không bịa câu trả lời, nhưng cũng không đổ lỗi cho khách. Nói thẳng là chưa có
+         * thông tin, kèm số điện thoại để gặp người thật khi cần.
+         */
+        assertThat(kq.answer())
+                .contains("chưa có thông tin")
+                .doesNotContain("chưa hiểu ý bạn");
     }
 
     @Test

@@ -1,0 +1,591 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Bảng chấm điểm khảo sát website</title>
+<!--
+  Bảng chấm điểm khảo sát so sánh website, dùng cho tiểu luận Vườn Sen.
+
+  Bấm đúp vào tệp này là mở, không cần chạy lệnh, không cần máy chủ, không cần mạng.
+  Mọi tính toán chạy ngay trong trang. Điểm nhập vào được nhớ lại trong trình duyệt,
+  nên đóng trang rồi mở lại vẫn còn.
+
+  Cùng công thức với do-tuong-dong.js trong cùng thư mục. Tệp đó dành cho ai muốn chạy
+  bằng dòng lệnh, tệp này dành cho lúc ngồi khảo sát thật.
+-->
+<style>
+  :root {
+    --nen: #ffffff;
+    --nen-phu: #f6f7f9;
+    --chu: #1a1c1e;
+    --chu-nhat: #5c6269;
+    --vien: #d9dde2;
+    --nhan: #0b5fa5;
+    --tot: #0d7a4f;
+    --xau: #b3261e;
+    --vang: #8a6100;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --nen: #16181b;
+      --nen-phu: #1e2125;
+      --chu: #e6e8ea;
+      --chu-nhat: #9aa1a9;
+      --vien: #313640;
+      --nhan: #6cb0f0;
+      --tot: #5ed09a;
+      --xau: #f2928c;
+      --vang: #e0b44a;
+    }
+  }
+  :root[data-theme="dark"] {
+    --nen: #16181b; --nen-phu: #1e2125; --chu: #e6e8ea; --chu-nhat: #9aa1a9;
+    --vien: #313640; --nhan: #6cb0f0; --tot: #5ed09a; --xau: #f2928c; --vang: #e0b44a;
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; padding: 24px 16px 64px;
+    background: var(--nen); color: var(--chu);
+    font: 15px/1.6 "Segoe UI", system-ui, -apple-system, sans-serif;
+  }
+  .khung { max-width: 1060px; margin: 0 auto; }
+  h1 { font-size: 22px; margin: 0 0 4px; }
+  h2 { font-size: 17px; margin: 36px 0 10px; padding-bottom: 6px; border-bottom: 2px solid var(--vien); }
+  .dan { color: var(--chu-nhat); margin: 0 0 24px; }
+
+  table { border-collapse: collapse; width: 100%; margin-bottom: 8px; }
+  th, td { border: 1px solid var(--vien); padding: 7px 9px; text-align: center; }
+  th { background: var(--nen-phu); font-weight: 600; }
+  th.tc, td.tc { text-align: left; white-space: nowrap; }
+  tbody tr:hover td { background: var(--nen-phu); }
+
+  select {
+    width: 52px; padding: 3px; text-align: center;
+    background: var(--nen); color: var(--chu);
+    border: 1px solid var(--vien); border-radius: 4px;
+    font: inherit; font-size: 14px;
+  }
+  select:focus { outline: 2px solid var(--nhan); outline-offset: 1px; }
+  select.chua { color: var(--chu-nhat); }
+
+  .goc { background: color-mix(in srgb, var(--nhan) 10%, transparent); }
+
+  input.ten {
+    width: 100%; min-width: 92px; padding: 3px 5px; text-align: center;
+    background: transparent; color: inherit; font: inherit; font-weight: 600;
+    border: 1px solid transparent; border-radius: 4px;
+  }
+  input.ten:hover { border-color: var(--vien); }
+  input.ten:focus { border-color: var(--nhan); outline: none; background: var(--nen); }
+
+  .nut {
+    padding: 7px 14px; margin: 0 6px 6px 0;
+    background: var(--nen-phu); color: var(--chu);
+    border: 1px solid var(--vien); border-radius: 6px;
+    font: inherit; cursor: pointer;
+  }
+  .nut:hover { border-color: var(--nhan); color: var(--nhan); }
+  .xoa {
+    background: none; border: none; color: var(--chu-nhat);
+    cursor: pointer; font-size: 15px; padding: 0 4px; line-height: 1;
+  }
+  .xoa:hover { color: var(--xau); }
+
+  .hon { color: var(--tot); }
+  .kem { color: var(--xau); }
+  .bang { color: var(--chu-nhat); }
+
+  .hop {
+    background: var(--nen-phu); border: 1px solid var(--vien);
+    border-left: 3px solid var(--nhan);
+    border-radius: 0 6px 6px 0; padding: 12px 16px; margin: 12px 0;
+  }
+  .hop.canh { border-left-color: var(--vang); }
+  .hop.manh { border-left-color: var(--tot); }
+  .hop p { margin: 4px 0; }
+  .hop b { display: block; margin-bottom: 4px; }
+
+  .ct {
+    font-family: "Cascadia Mono", Consolas, monospace;
+    background: var(--nen-phu); border: 1px solid var(--vien);
+    border-radius: 6px; padding: 12px 16px; margin: 10px 0;
+    font-size: 14px; overflow-x: auto;
+  }
+  .nguon { color: var(--chu-nhat); font-size: 13.5px; }
+  .canhbao {
+    color: var(--xau); font-size: 13.5px;
+    background: color-mix(in srgb, var(--xau) 9%, transparent);
+    border: 1px solid color-mix(in srgb, var(--xau) 35%, transparent);
+    border-radius: 6px; padding: 9px 12px;
+  }
+  .nguon code, .canhbao code {
+    background: var(--nen-phu); border: 1px solid var(--vien);
+    border-radius: 3px; padding: 1px 4px; font-size: 12.5px;
+  }
+  textarea.ma {
+    width: 100%; margin: 4px 0 14px; padding: 10px 12px;
+    background: var(--nen-phu); color: var(--chu);
+    border: 1px solid var(--vien); border-radius: 6px;
+    font-family: "Cascadia Mono", Consolas, monospace; font-size: 13px;
+    line-height: 1.5; white-space: pre; resize: vertical;
+  }
+  .thang { color: var(--chu-nhat); font-size: 13.5px; margin: 10px 0 18px; }
+  .thang b { color: var(--chu); }
+
+  @media print {
+    body { padding: 0; }
+    .khongin { display: none !important; }
+    h2 { page-break-after: avoid; }
+    table { page-break-inside: avoid; }
+    select { border: none; appearance: none; -webkit-appearance: none; }
+    input.ten { border: none; }
+  }
+</style>
+</head>
+<body>
+<div class="khung">
+
+  <h1>Bảng chấm điểm khảo sát website</h1>
+  <p class="dan">
+    Mở từng website, làm đủ bốn việc bên dưới, rồi chấm mười tiêu chí.
+    Mọi con số tự tính lại ngay khi bạn đổi điểm.
+  </p>
+
+  <div class="hop">
+    <b>Chuỗi việc phải làm giống hệt nhau trên mọi website</b>
+    <p>1. Tìm không gian hoặc bàn phù hợp với số khách của mình</p>
+    <p>2. Xem cho ra giá, không phải để lại số điện thoại</p>
+    <p>3. Đặt một đơn tới bước cuối cùng</p>
+    <p>4. Tra lại đơn vừa đặt</p>
+  </div>
+
+  <p class="thang">
+    <b>Thang điểm</b> &nbsp;
+    <b>1</b> không có, hoặc có mà không dùng được &nbsp;·&nbsp;
+    <b>3</b> có nhưng hạn chế: thiếu bước, phải làm thủ công, hoặc khó tìm &nbsp;·&nbsp;
+    <b>5</b> làm trọn vẹn ngay trên web, không cần gọi điện hay chờ phản hồi
+    <br>Mức 2 và 4 dành cho trường hợp nằm giữa.
+  </p>
+
+  <h2>Nhập điểm</h2>
+  <div id="bangNhap"></div>
+  <div class="khongin">
+    <button class="nut" id="themTrang">Thêm website</button>
+    <button class="nut" id="xuatSo">Xuất số liệu ra mã</button>
+    <button class="nut" id="veMacDinh">Khôi phục số liệu gốc</button>
+    <button class="nut" id="inRa">In hoặc lưu PDF</button>
+    <p id="trangThaiLuu" class="nguon"></p>
+  </div>
+
+  <div id="khoXuat" class="khongin" hidden>
+    <div class="hop canh">
+      <b>Điểm bạn chấm chỉ nằm trong trình duyệt, không nằm trong tệp</b>
+      <p>Trình duyệt lưu theo từng địa chỉ. Mở trang này qua
+        <code>localhost</code> rồi lần sau mở bằng cách bấm đúp tệp
+        (<code>file:///</code>) là hai địa chỉ khác nhau, điểm đã chấm sẽ không thấy nữa.
+        Xoá dữ liệu duyệt web cũng mất.</p>
+      <p>Muốn giữ lại vĩnh viễn thì chép hai khối dưới đây vào mã nguồn. Chép xong là số
+        liệu nằm trong tệp, đẩy lên git được, máy khác mở cũng thấy.</p>
+    </div>
+    <p class="nguon">Dán khối này vào <b>bang-cham-diem.html</b>, thay cho khối
+      <code>var GOC_MAC_DINH = [ ... ];</code></p>
+    <textarea id="maHtml" class="ma" readonly rows="8"></textarea>
+    <p class="nguon">Dán khối này vào <b>do-tuong-dong.js</b>, thay cho phần bên trong
+      <code>const DIEM = { ... };</code></p>
+    <textarea id="maJs" class="ma" readonly rows="8"></textarea>
+    <button class="nut" id="chepMa">Chép cả hai</button>
+    <span id="baoChep" class="nguon"></span>
+  </div>
+
+  <h2>Phân tích khoảng trống</h2>
+  <p class="dan">Phần này chỉ là phép đếm, không dùng công thức nào, nên không có giả
+    định ngầm để bắt bẻ. Đây là phần nên đưa vào tiểu luận làm kết luận.</p>
+  <div id="bangTrong"></div>
+  <div id="nhanXet"></div>
+
+  <h2>Chênh lệch từng tiêu chí</h2>
+  <div id="bangChenh"></div>
+
+  <h2>Độ tương đồng</h2>
+  <div class="ct">
+    S = 1 − ( tổng |điểm họ − điểm mình| ) ÷ ( số tiêu chí × 4 )
+  </div>
+  <p class="nguon">
+    Hệ số tương đồng Gower cho biến định lượng. Nguồn:
+    Gower, J. C. (1971). <i>"A General Coefficient of Similarity and Some of Its
+    Properties"</i>. Biometrics, 27(4), tr. 857–871. DOI 10.2307/2528823
+  </p>
+  <div id="bangGiong"></div>
+  <div class="hop canh">
+    <b>Đọc con số này cẩn thận</b>
+    <p>Một website chấm ngẫu nhiên trung bình đã đạt <b>61%</b>, còn một trang rỗng hoàn
+      toàn vẫn đạt <b>25%</b>. Thang không bắt đầu từ 0, và vì công thức lấy trị tuyệt đối
+      nên nó không phân biệt được "giống nhau" với "hơn hẳn".</p>
+    <p>Dùng làm tham khảo. Kết luận thì lấy từ bảng khoảng trống ở trên.</p>
+  </div>
+
+</div>
+
+<script>
+/* ------------------------------------------------------------------ dữ liệu */
+
+var TIEU_CHI = [
+  'Tìm kiếm và lọc', 'Minh bạch giá', 'Đặt trực tuyến trọn vẹn',
+  'Xem tình trạng còn trống', 'Ưu đãi', 'Đánh giá của khách',
+  'Tài khoản và tra cứu đơn', 'Thanh toán trực tuyến',
+  'Nội dung và SEO', 'Hỗ trợ tức thì'
+];
+
+/* Số liệu khảo sát ngày 27/09/2026, lấy từ Bảng 1 của tiểu luận. Trang đầu tiên trong
+   danh sách luôn là trang gốc, mọi so sánh đều quy về nó. */
+var GOC_MAC_DINH = [
+  { ten: 'Vườn Sen',         diem: [4, 5, 5, 4, 4, 4, 5, 2, 3, 4] },
+  { ten: "Pizza 4P's",       diem: [3, 4, 5, 5, 3, 2, 3, 4, 5, 2] },
+  { ten: 'Riverside Palace', diem: [1, 1, 1, 1, 4, 2, 1, 1, 4, 3] },
+  { ten: 'PasGo',            diem: [5, 3, 4, 3, 5, 5, 4, 3, 5, 4] }
+];
+
+var CHENH_TOI_DA = 4;   /* thang 1 đến 5 thì chênh nhiều nhất là 4 */
+var NGUONG_CUNG_MUC = 1;
+var NGUONG_MANH = 4;
+var MOC_NGAU_NHIEN = 61;
+var KHOA_LUU = 'vuonsen-bang-cham-diem';
+
+var trang = napTuBoNho() || sao(GOC_MAC_DINH);
+
+/* Trình duyệt có thể chặn bộ nhớ cục bộ khi mở bằng file://, nên mọi lần đọc ghi đều
+   bọc try/catch; hỏng thì trang vẫn chạy, chỉ là không nhớ được giữa các lần mở. */
+function napTuBoNho() {
+  try {
+    var s = localStorage.getItem(KHOA_LUU);
+    if (!s) return null;
+    var d = JSON.parse(s);
+    return (d && d.length && d[0].diem && d[0].diem.length === TIEU_CHI.length) ? d : null;
+  } catch (e) { return null; }
+}
+/* Lưu xong thì báo ra màn hình. Không có dòng báo này thì người dùng không biết điểm
+   mình chấm có được giữ lại hay không, mà chỉ phát hiện ra lúc mở lại thấy mất trắng. */
+function luuVaoBoNho() {
+  var o = document.getElementById('trangThaiLuu');
+  try {
+    localStorage.setItem(KHOA_LUU, JSON.stringify(trang));
+    if (o) {
+      var g = new Date();
+      var hai = function (n) { return (n < 10 ? '0' : '') + n; };
+      o.innerHTML = 'Đã lưu lúc ' + hai(g.getHours()) + ':' + hai(g.getMinutes())
+        + ':' + hai(g.getSeconds()) + ' — kho của địa chỉ <code>'
+        + thoat(location.origin === 'null' ? 'file:// (tệp cục bộ)' : location.origin)
+        + '</code>. Mở lại trang bằng đúng địa chỉ này thì điểm còn nguyên.';
+      o.className = 'nguon';
+    }
+  } catch (e) {
+    if (o) {
+      o.innerHTML = '<b>Trình duyệt không cho lưu.</b> Đóng tab là mất hết điểm đang chấm. '
+        + 'Chấm xong tiêu chí nào thì bấm <b>Xuất số liệu ra mã</b> và dán vào mã nguồn ngay.';
+      o.className = 'canhbao';
+    }
+  }
+}
+function sao(x) { return JSON.parse(JSON.stringify(x)); }
+
+/* ------------------------------------------------------------------ tính toán */
+
+function daCham(t) { return t.diem.every(function (d) { return d !== null; }); }
+function tong(t) { return t.diem.reduce(function (a, b) { return a + (b || 0); }, 0); }
+
+function chenhTong(t) {
+  var g = trang[0].diem;
+  return t.diem.reduce(function (s, x, i) { return s + Math.abs(x - g[i]); }, 0);
+}
+function tuongDong(t) {
+  return (1 - chenhTong(t) / (TIEU_CHI.length * CHENH_TOI_DA)) * 100;
+}
+
+/* ------------------------------------------------------------------ vẽ bảng */
+
+function veTatCa() {
+  veBangNhap();
+  veKhoangTrong();
+  veChenhLech();
+  veTuongDong();
+  luuVaoBoNho();
+}
+
+function veBangNhap() {
+  var h = '<table><thead><tr><th class="tc">Tiêu chí</th>';
+  trang.forEach(function (t, c) {
+    h += '<th' + (c === 0 ? ' class="goc"' : '') + '>'
+       + '<input class="ten" value="' + thoat(t.ten) + '" data-cot="' + c + '">';
+    if (c > 0) h += '<button class="xoa khongin" data-xoa="' + c + '" title="Bỏ trang này">×</button>';
+    h += (c === 0 ? '<div class="nguon">trang gốc</div>' : '') + '</th>';
+  });
+  h += '</tr></thead><tbody>';
+
+  TIEU_CHI.forEach(function (tc, i) {
+    h += '<tr><td class="tc">' + tc + '</td>';
+    trang.forEach(function (t, c) {
+      var v = t.diem[i];
+      h += '<td' + (c === 0 ? ' class="goc"' : '') + '><select data-cot="' + c
+         + '" data-hang="' + i + '"' + (v === null ? ' class="chua"' : '') + '>';
+      h += '<option value=""' + (v === null ? ' selected' : '') + '>–</option>';
+      for (var d = 1; d <= 5; d++) {
+        h += '<option value="' + d + '"' + (v === d ? ' selected' : '') + '>' + d + '</option>';
+      }
+      h += '</select></td>';
+    });
+    h += '</tr>';
+  });
+
+  h += '<tr><td class="tc"><b>Tổng điểm</b></td>';
+  trang.forEach(function (t, c) {
+    h += '<td' + (c === 0 ? ' class="goc"' : '') + '><b>'
+       + (daCham(t) ? tong(t) + '/' + TIEU_CHI.length * 5 : '–') + '</b></td>';
+  });
+  h += '</tr></tbody></table>';
+
+  document.getElementById('bangNhap').innerHTML = h;
+}
+
+function veKhoangTrong() {
+  var g = trang[0];
+  var khac = trang.slice(1).filter(daCham);
+  if (!khac.length) {
+    document.getElementById('bangTrong').innerHTML =
+      '<p class="dan">Chưa có website nào chấm xong.</p>';
+    document.getElementById('nhanXet').innerHTML = '';
+    return;
+  }
+
+  var h = '<table><thead><tr><th class="tc">Trang</th><th>Cùng mức</th>'
+        + '<th>' + thoat(g.ten) + ' hơn</th><th>' + thoat(g.ten) + ' kém</th>'
+        + '<th>Tổng điểm</th></tr></thead><tbody>';
+
+  khac.forEach(function (t) {
+    var cung = 0, hon = 0, kem = 0;
+    t.diem.forEach(function (v, i) {
+      if (Math.abs(v - g.diem[i]) <= NGUONG_CUNG_MUC) cung++;
+      if (g.diem[i] > v) hon++;
+      if (g.diem[i] < v) kem++;
+    });
+    h += '<tr><td class="tc">' + thoat(t.ten) + '</td>'
+       + '<td>' + cung + '/' + TIEU_CHI.length + '</td>'
+       + '<td class="hon">' + hon + '</td><td class="kem">' + kem + '</td>'
+       + '<td>' + tong(t) + '/' + TIEU_CHI.length * 5 + '</td></tr>';
+  });
+  h += '<tr class="goc"><td class="tc"><b>' + thoat(g.ten) + '</b></td>'
+     + '<td class="bang">—</td><td class="bang">—</td><td class="bang">—</td>'
+     + '<td><b>' + (daCham(g) ? tong(g) + '/' + TIEU_CHI.length * 5 : '–') + '</b></td></tr>';
+  h += '</tbody></table>';
+  document.getElementById('bangTrong').innerHTML = h;
+
+  /* Tiêu chí mọi đối thủ đều làm tốt mà mình thì không, và ngược lại. */
+  var n = '';
+  var yeu = TIEU_CHI.filter(function (_, i) {
+    return daCham(g) && g.diem[i] < NGUONG_MANH
+      && khac.every(function (t) { return t.diem[i] >= NGUONG_MANH; });
+  });
+  if (yeu.length) {
+    n += '<div class="hop canh"><b>Mọi đối thủ đều hơn mình ở</b>';
+    yeu.forEach(function (t) {
+      n += '<p>' + t + ' — mình ' + g.diem[TIEU_CHI.indexOf(t)] + ' điểm</p>';
+    });
+    n += '<p>Đây là hạn chế thật. Nêu trước trong tiểu luận, đừng chờ bị hỏi.</p></div>';
+  }
+
+  var manh = TIEU_CHI.filter(function (_, i) {
+    return daCham(g) && g.diem[i] >= NGUONG_MANH
+      && khac.every(function (t) { return t.diem[i] < NGUONG_MANH; });
+  });
+  if (manh.length) {
+    n += '<div class="hop manh"><b>Không đối thủ nào làm được, mình làm được</b>';
+    manh.forEach(function (t) {
+      n += '<p>' + t + ' — mình ' + g.diem[TIEU_CHI.indexOf(t)] + ' điểm</p>';
+    });
+    n += '<p>Đây là đóng góp của đề tài. Nhấn mạnh phần này khi bảo vệ.</p></div>';
+  } else if (daCham(g)) {
+    n += '<div class="hop"><b>Không có tiêu chí nào mình mạnh mà cả nhóm đối thủ đều yếu</b>'
+       + '<p>Nghĩa là đóng góp của đề tài không nằm ở một tính năng riêng lẻ, mà ở chỗ gom '
+       + 'đủ cả mười tiêu chí trong một hệ thống. Lập luận theo hướng đó, đừng nói có tính '
+       + 'năng độc nhất — chỉ cần hội đồng mở một trang đối thủ ra là hỏng.</p></div>';
+  }
+  document.getElementById('nhanXet').innerHTML = n;
+}
+
+function veChenhLech() {
+  var g = trang[0];
+  var khac = trang.slice(1).filter(daCham);
+  if (!khac.length || !daCham(g)) {
+    document.getElementById('bangChenh').innerHTML = '';
+    return;
+  }
+  var h = '<table><thead><tr><th class="tc">Tiêu chí</th><th class="goc">'
+        + thoat(g.ten) + '</th>';
+  khac.forEach(function (t) { h += '<th>' + thoat(t.ten) + '</th>'; });
+  h += '</tr></thead><tbody>';
+
+  TIEU_CHI.forEach(function (tc, i) {
+    h += '<tr><td class="tc">' + tc + '</td><td class="goc"><b>' + g.diem[i] + '</b></td>';
+    khac.forEach(function (t) {
+      var d = t.diem[i] - g.diem[i];
+      var lop = d > 0 ? 'kem' : (d < 0 ? 'hon' : 'bang');
+      h += '<td>' + t.diem[i] + ' <span class="' + lop + '">('
+         + (d > 0 ? '+' : '') + d + ')</span></td>';
+    });
+    h += '</tr>';
+  });
+  h += '</tbody></table><p class="nguon">Số trong ngoặc là chênh so với '
+     + thoat(g.ten) + '. Màu đỏ kèm dấu cộng là họ hơn mình.</p>';
+  document.getElementById('bangChenh').innerHTML = h;
+}
+
+function veTuongDong() {
+  var khac = trang.slice(1).filter(daCham);
+  if (!khac.length || !daCham(trang[0])) {
+    document.getElementById('bangGiong').innerHTML = '';
+    return;
+  }
+  var h = '<table><thead><tr><th class="tc">Trang</th><th>Tổng chênh</th>'
+        + '<th>Độ tương đồng</th><th class="tc">Ghi chú</th></tr></thead><tbody>';
+  khac.slice().sort(function (a, b) { return tuongDong(b) - tuongDong(a); })
+    .forEach(function (t) {
+      var pt = tuongDong(t);
+      h += '<tr><td class="tc">' + thoat(t.ten) + '</td>'
+         + '<td>' + chenhTong(t) + '/' + TIEU_CHI.length * CHENH_TOI_DA + '</td>'
+         + '<td><b>' + pt.toFixed(1) + '%</b></td>'
+         + '<td class="tc">' + (pt < MOC_NGAU_NHIEN
+             ? '<span class="kem">dưới mức ngẫu nhiên</span>' : '') + '</td></tr>';
+    });
+  h += '</tbody></table>';
+  document.getElementById('bangGiong').innerHTML = h;
+}
+
+function thoat(s) {
+  return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+
+/* ------------------------------------------------------------------ tương tác */
+
+document.addEventListener('change', function (e) {
+  var o = e.target;
+  if (o.tagName !== 'SELECT') return;
+  trang[+o.dataset.cot].diem[+o.dataset.hang] = o.value === '' ? null : +o.value;
+  veTatCa();
+});
+
+/* Tên gõ tới đâu cập nhật tới đó, nhưng không vẽ lại cả bảng vì làm vậy sẽ cướp con trỏ
+   khỏi ô đang gõ. Các bảng kết quả vẽ lại khi rời ô. */
+document.addEventListener('input', function (e) {
+  if (!e.target.classList.contains('ten')) return;
+  trang[+e.target.dataset.cot].ten = e.target.value;
+  luuVaoBoNho();
+});
+document.addEventListener('blur', function (e) {
+  if (e.target.classList && e.target.classList.contains('ten')) veTatCa();
+}, true);
+
+document.addEventListener('click', function (e) {
+  var c = e.target.dataset && e.target.dataset.xoa;
+  if (!c) return;
+  if (confirm('Bỏ "' + trang[+c].ten + '" khỏi bảng?')) {
+    trang.splice(+c, 1);
+    veTatCa();
+  }
+});
+
+document.getElementById('themTrang').addEventListener('click', function () {
+  trang.push({ ten: 'Website mới', diem: TIEU_CHI.map(function () { return null; }) });
+  veTatCa();
+});
+
+document.getElementById('veMacDinh').addEventListener('click', function () {
+  if (confirm('Xoá hết điểm đang nhập và quay về số liệu khảo sát 27/09/2026?')) {
+    trang = sao(GOC_MAC_DINH);
+    veTatCa();
+  }
+});
+
+document.getElementById('inRa').addEventListener('click', function () { window.print(); });
+
+/* ------------------------------------------------------- xuất số liệu ra mã
+
+   Điểm chấm chỉ sống trong bộ nhớ trình duyệt, mà bộ nhớ đó gắn với địa chỉ mở trang:
+   mở qua localhost và mở bằng file:// là hai kho khác nhau. Nên phải có đường đưa số
+   liệu trở lại mã nguồn, chỗ duy nhất giữ được lâu dài và đẩy lên git được. */
+
+/* Tên trang có thể chứa dấu nháy đơn, như Pizza 4P's, nên chọn kiểu nháy theo nội dung. */
+function nhay(s) {
+  return s.indexOf("'") >= 0 ? '"' + s + '"' : "'" + s + "'";
+}
+
+function xuatMaHtml() {
+  var ten = trang.map(function (t) { return nhay(t.ten) + ','; });
+  var rong = Math.max.apply(null, ten.map(function (s) { return s.length; }));
+  var d = ['var GOC_MAC_DINH = ['];
+  trang.forEach(function (t, i) {
+    var so = t.diem.map(function (v) { return v === null ? 'null' : v; }).join(', ');
+    d.push('  { ten: ' + dem(ten[i], rong) + ' diem: [' + so + '] }'
+      + (i < trang.length - 1 ? ',' : ''));
+  });
+  d.push('];');
+  return d.join('\n');
+}
+
+function xuatMaJs() {
+  var ten = trang.map(function (t) { return nhay(t.ten) + ':'; });
+  var rong = Math.max.apply(null, ten.map(function (s) { return s.length; }));
+  /* Dòng chú thích đầu bảng chỉ để biết cột nào là tiêu chí nào, nên cắt tên còn 4 ký tự
+     và xếp đúng bề rộng của cột số: mỗi ô số rộng 4, ngăn nhau bằng một ký tự. */
+  var d = ['  //' + dem('', rong - 2) + ' [' + TIEU_CHI.map(function (t) {
+    return t.slice(0, 4).padStart(4);
+  }).join(' ') + '  ]'];
+  trang.forEach(function (t) {
+    var so = t.diem.map(function (v) {
+      return (v === null ? 'null' : String(v)).padStart(4);
+    }).join(',');
+    d.push('  ' + dem(ten.shift(), rong) + ' [' + so + ' ],');
+  });
+  return d.join('\n');
+}
+
+function dem(s, rong) {
+  while (s.length < rong) s += ' ';
+  return s;
+}
+
+document.getElementById('xuatSo').addEventListener('click', function () {
+  var kho = document.getElementById('khoXuat');
+  kho.hidden = !kho.hidden;
+  if (kho.hidden) return;
+  document.getElementById('maHtml').value = xuatMaHtml();
+  document.getElementById('maJs').value = xuatMaJs();
+  kho.scrollIntoView({ behavior: 'smooth', block: 'start' });
+});
+
+document.getElementById('chepMa').addEventListener('click', function () {
+  var t = '/* Dán vào bang-cham-diem.html */\n' + xuatMaHtml()
+        + '\n\n/* Dán vào do-tuong-dong.js, bên trong const DIEM */\n' + xuatMaJs();
+  var bao = document.getElementById('baoChep');
+  /* navigator.clipboard chỉ chạy ở ngữ cảnh an toàn, mà file:// thì không phải, nên
+     luôn có đường lui bằng cách chọn sẵn chữ cho người dùng tự bấm Ctrl+C. */
+  function lui() {
+    var o = document.getElementById('maHtml');
+    o.focus(); o.select();
+    bao.textContent = 'Trình duyệt không cho chép tự động. Bấm Ctrl+C để chép ô đang chọn.';
+  }
+  try {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(t).then(function () {
+        bao.textContent = 'Đã chép. Dán vào mã nguồn rồi lưu lại.';
+        setTimeout(function () { bao.textContent = ''; }, 4000);
+      }, lui);
+    } else { lui(); }
+  } catch (e) { lui(); }
+});
+
+veTatCa();
+</script>
+</body>
+</html>

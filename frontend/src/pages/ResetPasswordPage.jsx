@@ -86,11 +86,14 @@ export default function ResetPasswordPage() {
                   data-test="reset-password"
                   type="password"
                   required
-                  minLength={6}
+                  minLength={8}
                   value={matKhau}
                   placeholder={t('reset.minChars')}
                   onChange={(e) => setMatKhau(e.target.value)}
                 />
+                <small className="muted" data-test="password-rule">
+                  {t('register.passwordRule')}
+                </small>
               </div>
 
               <div className="fgroup">
@@ -100,7 +103,7 @@ export default function ResetPasswordPage() {
                   data-test="reset-password-again"
                   type="password"
                   required
-                  minLength={6}
+                  minLength={8}
                   value={nhapLai}
                   onChange={(e) => setNhapLai(e.target.value)}
                 />

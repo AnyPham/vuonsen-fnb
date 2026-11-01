@@ -61,7 +61,7 @@ class KiemThuPhanQuyen extends KiemThuCoSo {
     @DisplayName("TC-PERM-05 Khách hàng không thấy menu quản trị")
     void tcPerm05_khongThayMenuQuanTri() {
         ThanhDieuHuong thanhDieuHuong = LuongDangNhap.dangNhap(driver(),
-                LuongDangNhap.taoKhachMoi().email(), "matkhau123");
+                LuongDangNhap.taoKhachMoi().email(), LuongDangNhap.MAT_KHAU_KHACH);
 
         assertThat(thanhDieuHuong.coMenuQuanTri()).isFalse();
         assertThat(thanhDieuHuong.coMucDonCuaToi()).isTrue();

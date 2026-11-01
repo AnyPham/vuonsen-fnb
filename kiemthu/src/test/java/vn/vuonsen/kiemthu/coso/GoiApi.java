@@ -42,6 +42,16 @@ public final class GoiApi {
 
     private static String tokenQuanTri;
 
+    /*
+     * Token của một tài khoản khách, dùng chung cho mọi bước chuẩn bị dữ liệu.
+     *
+     * Từ khi gửi đơn bắt buộc đăng nhập, rất nhiều bước dựng dữ liệu cần một token khách.
+     * Tạo tài khoản mới cho từng lần gọi thì mỗi lượt chạy đẻ ra hàng trăm tài khoản rác.
+     */
+    private static String tokenKhach;
+
+    private static final String MAT_KHAU_KHACH_CHUNG = "Matkhau123";
+
     private GoiApi() {
     }
 
@@ -133,10 +143,33 @@ public final class GoiApi {
         return tokenQuanTri;
     }
 
-    /** Đăng ký tài khoản khách mới, trả về access token của tài khoản đó. */
+    /*
+     * Tạo tài khoản khách dùng được ngay, trả về access token của tài khoản đó.
+     *
+     * Không đi qua /api/auth/register được nữa. Từ khi có bước xác nhận email, đăng ký chỉ
+     * gửi mã về hộp thư rồi để tài khoản ở trạng thái chờ; bộ kiểm thử không đọc được hộp
+     * thư nên không lấy được mã.
+     *
+     * Đi qua đường quản trị tạo tài khoản, vì tài khoản sinh ra đã bật sẵn — đúng trạng
+     * thái mà phần lớn kịch bản cần. Chính màn đăng ký trên giao diện vẫn được kiểm riêng
+     * ở luồng 1, nên bước xác nhận email không bị bỏ sót.
+     */
     public static String dangKyKhach(String hoTen, String email, String matKhau) {
-        return (String) doiTuong(goi("POST", "/api/auth/register",
-                Map.of("fullName", hoTen, "email", email, "password", matKhau), null)).get("accessToken");
+        goi("POST", "/api/v1/admin/users", Map.of(
+                "fullName", hoTen,
+                "email", email,
+                "password", matKhau,
+                "role", "CUSTOMER"), tokenQuanTri());
+        return dangNhap(email, matKhau);
+    }
+
+    /** Token khách dùng chung cho các bước chỉ cần "có người đăng nhập". */
+    public static synchronized String tokenKhach() {
+        if (tokenKhach == null) {
+            tokenKhach = dangKyKhach("Khách Dữ Liệu Thử",
+                    "khach.chung." + System.nanoTime() + "@vuonsen.vn", MAT_KHAU_KHACH_CHUNG);
+        }
+        return tokenKhach;
     }
 
     // ---------------- Không gian và gói tiệc ----------------
@@ -174,9 +207,16 @@ public final class GoiApi {
         return doiTuong(goi("POST", "/api/v1/bookings", thanDonTiec(slug, tenGoi, ngay, buoi, soKhach), token));
     }
 
-    /** Thử tạo đơn đặt tiệc mà không ném lỗi, để kiểm tra trường hợp bị từ chối. */
+    /*
+     * Thử tạo đơn mà không ném lỗi, để kiểm tra trường hợp bị từ chối.
+     *
+     * Gửi kèm token khách vì nếu để trống thì máy chủ trả 401 ngay từ cổng bảo mật, kịch
+     * bản sẽ không chạm được tới luật nghiệp vụ mà nó muốn kiểm — ví dụ trùng lịch sảnh
+     * hay số khách vượt sức chứa.
+     */
     public static KetQua thuTaoDonTiec(String slug, String tenGoi, LocalDate ngay, String buoi, int soKhach) {
-        return goiThu("POST", "/api/v1/bookings", thanDonTiec(slug, tenGoi, ngay, buoi, soKhach), null);
+        return goiThu("POST", "/api/v1/bookings",
+                thanDonTiec(slug, tenGoi, ngay, buoi, soKhach), tokenKhach());
     }
 
     public static void doiTrangThaiDonTiec(long id, String trangThai) {
@@ -186,7 +226,8 @@ public final class GoiApi {
 
     /** Một đơn đã tổ chức xong, đủ điều kiện để khách gửi đánh giá. */
     public static Map<String, Object> taoDonTiecDaHoanThanh() {
-        Map<String, Object> don = taoDonTiec(null, "sanh-sen-vang", "Gói Đồng Quê", ngayChuaDung(), "EVENING", 200);
+        Map<String, Object> don = taoDonTiec(tokenKhach(), "sanh-sen-vang", "Gói Đồng Quê",
+                ngayChuaDung(), "EVENING", 200);
         doiTrangThaiDonTiec(so(don, "id"), "CONFIRMED");
         doiTrangThaiDonTiec(so(don, "id"), "COMPLETED");
         return don;
@@ -400,7 +441,7 @@ public final class GoiApi {
         than.put("deliveryAddress", "1 Đường Kiểm Thử, Bình Thạnh");
         than.put("serveAt", nhanLuc.format(GIO_PHUT));
         than.put("items", List.of(Map.of("dishId", idMon, "quantity", soLuong)));
-        return doiTuong(goi("POST", "/api/v1/dish-orders", than, null));
+        return doiTuong(goi("POST", "/api/v1/dish-orders", than, tokenKhach()));
     }
 
     // ---------------- Giảm giá ngày lễ ----------------

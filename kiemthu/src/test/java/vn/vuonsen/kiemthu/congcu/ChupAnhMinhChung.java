@@ -325,7 +325,7 @@ class ChupAnhMinhChung extends KiemThuCoSo {
         than.put("customerName", hoTen);
         than.put("customerPhone", soDienThoai);
 
-        GoiApi.KetQua kq = GoiApi.goiThu("POST", "/api/v1/bookings", than, null);
+        GoiApi.KetQua kq = GoiApi.goiThu("POST", "/api/v1/bookings", than, GoiApi.tokenKhach());
         if (kq.ma() >= 400) {
             throw new IllegalStateException("Gửi đơn của " + hoTen + " thất bại: HTTP " + kq.ma() + " " + kq.than());
         }

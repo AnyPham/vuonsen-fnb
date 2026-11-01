@@ -48,7 +48,7 @@ thực đơn, không gian, ngày lễ giảm giá và tài khoản người dùn
 | Module nghiệp vụ (backend) | 15 |
 | Trang giao diện | 32 |
 | Migration cơ sở dữ liệu | 29 |
-| Kiểm thử đơn vị và tích hợp | 225 bài |
+| Kiểm thử đơn vị và tích hợp | 254 bài |
 | Kiểm thử giao diện (Selenium) | 170 test case / 19 luồng |
 
 ---
@@ -413,11 +413,43 @@ dự phòng thay vì báo lỗi, nên tải mã nguồn về là chạy được
 | Trợ lý tư vấn AI | `ASSISTANT_LLM_PROVIDER`, `ASSISTANT_LLM_API_KEY` | Dựng câu trả lời từ dữ liệu thật trong cơ sở dữ liệu — xem [Trợ lý tư vấn](#-trợ-lý-tư-vấn) |
 | Bản đồ Google | `VITE_GOOGLE_MAPS_API_KEY` | Hiện bản đồ bằng đường nhúng không cần khoá |
 
+### Bật thanh toán VNPay sandbox
+
+Sandbox là môi trường thử của VNPay, không mất tiền thật và không tốn phí.
+
+1. Đăng ký tài khoản thử tại [sandbox.vnpayment.vn/devreg](https://sandbox.vnpayment.vn/devreg/)
+   để nhận hai giá trị `vnp_TmnCode` và `vnp_HashSecret`.
+2. Thêm hai dòng này vào `backend/tro-ly-ai.properties` (tệp đã nằm trong `.gitignore`, xem mẫu
+   ở `tro-ly-ai.properties.example`). Không ghi vào `application.yml`, vì tệp đó nằm trong kho mã nguồn.
+
+   ```properties
+   app.vnpay.tmn-code=MA_CUA_BAN
+   app.vnpay.hash-secret=KHOA_CUA_BAN
+   ```
+
+3. Khởi động lại backend. Trang `/thanh-toan` sẽ hiện nút **Thanh toán qua VNPay**.
+4. Trên trang của VNPay, chọn ngân hàng NCB và nhập thẻ thử do VNPay công bố:
+
+   | Số thẻ | Chủ thẻ | Ngày phát hành | OTP |
+   |---|---|---|---|
+   | `9704198526191432198` | `NGUYEN VAN A` | `07/15` | `123456` |
+
+**Hai đường báo kết quả.** VNPay báo qua hai đường, và hệ thống xử lý chung một hàm nên gửi lặp
+hay gửi đồng thời thì tiền vẫn chỉ cộng một lần:
+
+| Đường | Ai gọi | Khi nào cần |
+|---|---|---|
+| Trang quay về `/thanh-toan/ket-qua` | Trình duyệt của khách | Luôn có; chạy trên máy cá nhân thì đây là đường duy nhất |
+| IPN `GET /api/v1/payments/vnpay/ipn` | Máy chủ VNPay | Bắt buộc khi chạy thật, để khách đóng trình duyệt vẫn ghi nhận được tiền |
+
+VNPay không gọi được vào `localhost`, và tài liệu của họ yêu cầu IPN dùng HTTPS. Muốn thử IPN trên
+máy cá nhân thì cần một đường hầm HTTPS công khai trỏ vào cổng 8080, rồi khai báo địa chỉ đó với VNPay.
+
 ---
 
 ## 🧪 Kiểm thử
 
-### Kiểm thử phía máy chủ — 225 bài
+### Kiểm thử phía máy chủ — 254 bài
 
 Chạy trên H2 nên **không cần MySQL và không phải khởi động gì trước**. Dữ liệu trong MySQL
 không bị chạm tới.
@@ -596,7 +628,9 @@ Tài liệu đầy đủ và thử trực tiếp tại **<http://localhost:8080/
 | `GET` | `/api/v1/dish-orders/track/{code}` | Công khai |
 | `GET` | `/api/v1/payments/order/{maDon}` — tình hình thanh toán | Công khai |
 | `POST` | `/api/v1/payments` — tạo yêu cầu, trả về mã VietQR | Công khai |
-| `POST` | `/api/v1/payments/vnpay` | Công khai |
+| `POST` | `/api/v1/payments/vnpay` — tạo giao dịch, trả về địa chỉ cổng | Công khai |
+| `POST` | `/api/v1/payments/vnpay/verify` — kiểm kết quả khi khách quay về | Công khai, kiểm chữ ký |
+| `GET` | `/api/v1/payments/vnpay/ipn` — VNPay gọi về báo kết quả | Công khai, kiểm chữ ký |
 | `GET` | `/api/v1/bookings/my`, `/api/v1/dish-orders/my`, `/api/v1/me` | Cần đăng nhập |
 | `GET` | `/api/v1/admin/bookings`, `/api/v1/admin/dish-orders` | ADMIN, STAFF |
 | `GET` | `/api/v1/admin/payments`, `/api/v1/admin/statistics` | ADMIN, STAFF |

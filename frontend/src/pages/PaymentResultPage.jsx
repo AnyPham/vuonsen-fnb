@@ -45,6 +45,8 @@ export default function PaymentResultPage() {
   }, [thamSo]);
 
   const daNhanTien = ketQua?.status === 'CONFIRMED';
+  // Mã 07 của VNPay: tiền đã trừ nhưng cần kiểm tra, phiếu vẫn chờ nên không được báo là chưa mất tiền
+  const choKiemTra = ketQua?.status === 'PENDING';
 
   return (
     <section className="section">
@@ -60,12 +62,12 @@ export default function PaymentResultPage() {
         {ketQua && (
           <div className="card" data-test="vnpay-result">
             <div className="card-body">
-              <span className={`tag tag-${daNhanTien ? 'COMPLETED' : 'CANCELLED'}`} data-test="vnpay-status">
+              <span className={`tag tag-${daNhanTien ? 'COMPLETED' : choKiemTra ? 'PENDING' : 'CANCELLED'}`} data-test="vnpay-status">
                 {lang === 'en' ? ketQua.statusLabelEn || ketQua.statusLabel : ketQua.statusLabel}
               </span>
 
               <h3 style={{ marginTop: 14 }}>
-                {daNhanTien ? t('paymentResult.success') : t('paymentResult.failed')}
+                {daNhanTien ? t('paymentResult.success') : choKiemTra ? t('paymentResult.review') : t('paymentResult.failed')}
               </h3>
 
               <table style={{ marginTop: 16 }}>
@@ -95,8 +97,15 @@ export default function PaymentResultPage() {
                 </tbody>
               </table>
 
+              {/* Lý do do máy chủ ghi bằng tiếng Việt, bản tiếng Anh dùng câu chung bên dưới */}
+              {!daNhanTien && lang !== 'en' && ketQua.note && (
+                <p style={{ fontSize: '0.9rem', marginTop: 16 }} data-test="vnpay-reason">{ketQua.note}</p>
+              )}
+
               <p className="muted" style={{ fontSize: '0.9rem', marginTop: 16 }}>
-                {daNhanTien ? t('paymentResult.successNote') : t('paymentResult.failedNote')}
+                {daNhanTien
+                  ? t('paymentResult.successNote')
+                  : choKiemTra ? t('paymentResult.reviewNote') : t('paymentResult.failedNote')}
               </p>
 
               <div style={{ display: 'flex', gap: 10, marginTop: 18, flexWrap: 'wrap' }}>

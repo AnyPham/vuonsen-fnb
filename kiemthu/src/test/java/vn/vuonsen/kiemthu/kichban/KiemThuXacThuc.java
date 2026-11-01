@@ -4,6 +4,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import vn.vuonsen.kiemthu.coso.CauHinh;
 import vn.vuonsen.kiemthu.coso.KiemThuCoSo;
+import vn.vuonsen.kiemthu.luong.LuongDangNhap;
 import vn.vuonsen.kiemthu.thanhphan.ThanhDieuHuong;
 import vn.vuonsen.kiemthu.trang.TrangDangKy;
 import vn.vuonsen.kiemthu.trang.TrangDangNhap;
@@ -37,7 +38,7 @@ class KiemThuXacThuc extends KiemThuCoSo {
     void tcAuth01_dangKyTaiKhoanMoiHopLe() {
         TrangDangKy trang = new TrangDangKy(driver()).mo();
 
-        ThanhDieuHuong thanhDieuHuong = trang.dangKy("Khách Kiểm Thử", emailMoi(), "0901234567", "matkhau123");
+        ThanhDieuHuong thanhDieuHuong = trang.dangKy("Khách Kiểm Thử", emailMoi(), "0901234567", LuongDangNhap.MAT_KHAU_KHACH);
 
         assertThat(thanhDieuHuong.coChuyenSangDaDangNhap())
                 .as("Đăng ký thành công thì phải tự đăng nhập").isTrue();
@@ -51,7 +52,7 @@ class KiemThuXacThuc extends KiemThuCoSo {
         TrangDangKy trang = new TrangDangKy(driver()).mo();
 
         ThanhDieuHuong thanhDieuHuong = trang.dangKy(
-                "Khách Trùng Email", CauHinh.EMAIL_QUAN_TRI, null, "matkhau123");
+                "Khách Trùng Email", CauHinh.EMAIL_QUAN_TRI, null, LuongDangNhap.MAT_KHAU_KHACH);
 
         assertThat(trang.thongBaoLoi()).isEqualTo("Email này đã được đăng ký");
         assertThat(thanhDieuHuong.daDangNhap()).as("Không được đăng nhập").isFalse();
@@ -80,7 +81,7 @@ class KiemThuXacThuc extends KiemThuCoSo {
     void tcAuth04_tuChoiSoDienThoaiSaiDinhDang() {
         TrangDangKy trang = new TrangDangKy(driver()).mo();
 
-        ThanhDieuHuong thanhDieuHuong = trang.dangKy("Khách Sai Số", emailMoi(), "1234567", "matkhau123");
+        ThanhDieuHuong thanhDieuHuong = trang.dangKy("Khách Sai Số", emailMoi(), "1234567", LuongDangNhap.MAT_KHAU_KHACH);
 
         assertThat(trang.thongBaoLoi()).contains("Số điện thoại không hợp lệ");
         assertThat(thanhDieuHuong.daDangNhap()).as("Không được đăng nhập").isFalse();
@@ -91,7 +92,7 @@ class KiemThuXacThuc extends KiemThuCoSo {
     void tcAuth05_tuChoiEmailSaiDinhDang() {
         TrangDangKy trang = new TrangDangKy(driver()).mo();
 
-        ThanhDieuHuong thanhDieuHuong = trang.dangKy("Khách Sai Email", "abc@", null, "matkhau123");
+        ThanhDieuHuong thanhDieuHuong = trang.dangKy("Khách Sai Email", "abc@", null, LuongDangNhap.MAT_KHAU_KHACH);
 
         assertThat(trang.loiTrinhDuyetOEmail()).as("Ô email phải có câu nhắc lỗi").isNotBlank();
         assertThat(thanhDieuHuong.daDangNhap()).as("Không được đăng nhập").isFalse();
@@ -128,7 +129,7 @@ class KiemThuXacThuc extends KiemThuCoSo {
     void tcAuth08_tuChoiEmailChuaDangKy() {
         TrangDangNhap trang = new TrangDangNhap(driver()).mo();
 
-        ThanhDieuHuong thanhDieuHuong = trang.dangNhap(emailMoi(), "matkhau123");
+        ThanhDieuHuong thanhDieuHuong = trang.dangNhap(emailMoi(), LuongDangNhap.MAT_KHAU_KHACH);
 
         // Phải trùng khít câu báo của trường hợp sai mật khẩu. Khác đi dù một chữ là kẻ xấu
         // dò được email nào đã có tài khoản.

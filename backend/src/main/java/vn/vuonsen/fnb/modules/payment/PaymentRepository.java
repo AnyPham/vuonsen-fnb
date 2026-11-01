@@ -1,8 +1,10 @@
 package vn.vuonsen.fnb.modules.payment;
 
+import jakarta.persistence.LockModeType;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -12,6 +14,16 @@ import java.util.Optional;
 public interface PaymentRepository extends JpaRepository<Payment, Long> {
 
     Optional<Payment> findByCode(String code);
+
+    /*
+     * Đọc phiếu và khóa dòng đó tới hết giao dịch.
+     *
+     * VNPay gọi IPN gần như cùng lúc với lúc khách quay về trang kết quả. Không khóa thì cả
+     * hai cùng thấy phiếu đang chờ, và tiền bị cộng vào đơn hai lần.
+     */
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    @Query("select p from Payment p where p.id = :id")
+    Optional<Payment> findByIdForUpdate(@Param("id") Long id);
 
     boolean existsByCode(String code);
 

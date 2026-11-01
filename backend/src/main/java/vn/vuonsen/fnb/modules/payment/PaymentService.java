@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import vn.vuonsen.fnb.common.exception.BusinessException;
 import vn.vuonsen.fnb.common.exception.ResourceNotFoundException;
+import vn.vuonsen.fnb.config.props.MailProperties;
 import vn.vuonsen.fnb.config.props.PaymentProperties;
 import vn.vuonsen.fnb.modules.booking.Booking;
 import vn.vuonsen.fnb.modules.booking.BookingRepository;
@@ -15,6 +16,8 @@ import vn.vuonsen.fnb.modules.booking.BookingStatus;
 import vn.vuonsen.fnb.modules.dishorder.DishOrder;
 import vn.vuonsen.fnb.modules.dishorder.DishOrderRepository;
 import vn.vuonsen.fnb.modules.dishorder.DishOrderStatus;
+import vn.vuonsen.fnb.modules.notification.EmailService;
+import vn.vuonsen.fnb.modules.payment.dto.KetQuaVnPay;
 import vn.vuonsen.fnb.modules.payment.dto.PaymentResponse;
 import vn.vuonsen.fnb.modules.payment.dto.TinhHinhThanhToanResponse;
 
@@ -43,12 +46,16 @@ import java.util.Optional;
 public class PaymentService {
 
     private static final DateTimeFormatter NGAY_MA = DateTimeFormatter.ofPattern("yyyyMMdd");
+    private static final DateTimeFormatter GIO_HOA_DON =
+            DateTimeFormatter.ofPattern("HH:mm dd/MM/yyyy");
 
     private final PaymentRepository paymentRepository;
     private final BookingRepository bookingRepository;
     private final DishOrderRepository dishOrderRepository;
     private final PaymentProperties properties;
     private final VnPayService vnPayService;
+    private final EmailService emailService;
+    private final MailProperties mailProperties;
 
     // ---------------------------------------------------------------- tra cứu
 
@@ -106,6 +113,8 @@ public class PaymentService {
         Optional<Payment> dangCho = paymentRepository
                 .findFirstByBookingIdAndPurposeAndStatus(booking.getId(), purpose, PaymentStatus.PENDING);
         if (dangCho.isPresent() && dangCho.get().getAmount().compareTo(soTien) == 0) {
+            // Khách bỏ dở VNPay rồi quay sang quét mã thì phiếu phải ghi đúng cách trả mới
+            dangCho.get().setMethod(PaymentMethod.VIETQR);
             return;
         }
         dangCho.ifPresent(cu -> cu.setStatus(PaymentStatus.CANCELLED));
@@ -135,6 +144,7 @@ public class PaymentService {
         Optional<Payment> dangCho = paymentRepository.findFirstByDishOrderIdAndPurposeAndStatus(
                 order.getId(), PaymentPurpose.FULL, PaymentStatus.PENDING);
         if (dangCho.isPresent() && dangCho.get().getAmount().compareTo(soTien) == 0) {
+            dangCho.get().setMethod(PaymentMethod.VIETQR);
             return;
         }
         dangCho.ifPresent(cu -> cu.setStatus(PaymentStatus.CANCELLED));
@@ -215,7 +225,105 @@ public class PaymentService {
 
         log.info("Xác nhận phiếu thu {} của đơn {} số tiền {} bởi {}",
                 phieu.getCode(), phieu.maDon(), phieu.getAmount(), nguoiXacNhan);
+
+        guiHoaDon(phieu);
         return PaymentResponse.from(phieu);
+    }
+
+    /*
+     * Gửi hóa đơn về email của khách ngay sau khi tiền được ghi nhận.
+     *
+     * Đặt ở đây chứ không đặt trong từng đường thanh toán, vì xacNhan là chỗ duy nhất mọi
+     * đường đều đi qua: trang kết quả VNPay, thông báo IPN của VNPay, và nhân viên bấm xác
+     * nhận phiếu VietQR hay tiền mặt. Rải ra từng chỗ thì sớm muộn thêm một đường mới mà
+     * quên gửi thư.
+     *
+     * Lỗi gửi thư được nuốt tại chỗ. Tiền đã vào rồi, không có lý gì để cả giao dịch hỏng
+     * chỉ vì máy chủ thư đang trục trặc. Chưa cấu hình SMTP thì EmailService tự ghi toàn
+     * văn vào bảng email_logs, vẫn kiểm chứng được là thư đã được dựng đúng.
+     */
+    private void guiHoaDon(Payment phieu) {
+        try {
+            String nguoiNhan = emailCuaKhach(phieu);
+            if (nguoiNhan == null || nguoiNhan.isBlank()) {
+                log.info("Phiếu {} không có email khách, bỏ qua bước gửi hóa đơn", phieu.getCode());
+                return;
+            }
+            emailService.gui(nguoiNhan,
+                    "Vườn Sen đã nhận thanh toán đơn %s".formatted(phieu.maDon()),
+                    noiDungHoaDon(phieu),
+                    "HOA_DON");
+        } catch (Exception e) {
+            log.warn("Không gửi được hóa đơn cho phiếu {}: {}", phieu.getCode(), e.toString());
+        }
+    }
+
+    /*
+     * Email nhận hóa đơn.
+     *
+     * Ưu tiên email ghi trên đơn vì đó là nơi khách tự điền, có thể khác email tài khoản
+     * khi khách đặt giúp người nhà. Đơn không ghi email thì lùi về email của tài khoản
+     * đã đặt, nếu đơn đó gắn tài khoản.
+     */
+    private String emailCuaKhach(Payment phieu) {
+        if (phieu.getOrderType() == OrderType.BOOKING) {
+            Booking b = phieu.getBooking();
+            if (b.getCustomerEmail() != null && !b.getCustomerEmail().isBlank()) {
+                return b.getCustomerEmail();
+            }
+            return b.getUser() == null ? null : b.getUser().getEmail();
+        }
+        DishOrder o = phieu.getDishOrder();
+        if (o.getCustomerEmail() != null && !o.getCustomerEmail().isBlank()) {
+            return o.getCustomerEmail();
+        }
+        return o.getUser() == null ? null : o.getUser().getEmail();
+    }
+
+    private String noiDungHoaDon(Payment phieu) {
+        boolean laTiec = phieu.getOrderType() == OrderType.BOOKING;
+        String tenKhach = laTiec
+                ? phieu.getBooking().getCustomerName() : phieu.getDishOrder().getCustomerName();
+        BigDecimal tongDon = laTiec
+                ? phieu.getBooking().getTotalAmount() : phieu.getDishOrder().getTotal();
+        BigDecimal daThu = laTiec
+                ? phieu.getBooking().getDepositPaid() : phieu.getDishOrder().getPaidAmount();
+        BigDecimal conLai = tongDon.subtract(daThu).max(BigDecimal.ZERO);
+        String duongTraCuu = laTiec
+                ? "%s/tra-cuu?code=%s".formatted(mailProperties.baseUrl(), phieu.maDon())
+                : "%s/tra-cuu-mon?ma=%s".formatted(mailProperties.baseUrl(), phieu.maDon());
+
+        return """
+                Chào %s,
+
+                Vườn Sen đã nhận được thanh toán của bạn. Thư này là xác nhận đã thu tiền,
+                không phải hóa đơn giá trị gia tăng.
+
+                Mã đơn: %s (%s)
+                Mã phiếu thu: %s
+                Hình thức: %s
+                Số tiền lần này: %s đồng
+                Thời điểm: %s
+
+                Tổng tiền đơn: %s đồng
+                Đã thanh toán: %s đồng
+                Còn phải trả: %s đồng
+
+                Tra cứu đơn bất cứ lúc nào tại: %s
+                Đã đăng nhập thì xem ở mục Đơn của tôi.
+
+                Vườn Sen
+                """.formatted(
+                        tenKhach,
+                        phieu.maDon(), laTiec ? "đơn đặt tiệc" : "đơn đặt món lẻ",
+                        phieu.getCode(),
+                        phieu.getMethod().getLabel(),
+                        phieu.getAmount().toPlainString(),
+                        phieu.getConfirmedAt().format(GIO_HOA_DON),
+                        tongDon.toPlainString(),
+                        daThu.toPlainString(),
+                        conLai.toPlainString(),
+                        duongTraCuu);
     }
 
     @Transactional
@@ -369,38 +477,93 @@ public class PaymentService {
         // Đánh dấu phiếu đi qua cổng, để lúc đối soát biết khoản này không nằm trong sao kê ngân hàng
         paymentRepository.findById(phieu.id()).ifPresent(p -> p.setMethod(PaymentMethod.VNPAY));
 
-        return vnPayService.dungDuongDanThanhToan(phieu.code(), phieu.amount(),
+        return vnPayService.dungDuongDanThanhToan(vnPayService.sinhMaGiaoDich(phieu.id()), phieu.amount(),
                 "Thanh toan don " + maDon, ipKhach);
     }
 
     /*
-     * Nhận kết quả VNPay trả về sau khi khách thanh toán xong.
+     * Khách quay về từ VNPay: giao diện gửi nguyên tham số sang đây.
      *
-     * Kiểm chữ ký trước tiên, trước cả khi đọc bất kỳ tham số nào khác. Tin vào số tiền hay
-     * mã phiếu trong tham số rồi mới kiểm chữ ký là bỏ luôn tác dụng bảo vệ: ai cũng sửa được
-     * tham số trên thanh địa chỉ.
+     * Trả về phiếu để giao diện hiện kết quả. Những trường hợp không có phiếu nào để hiện thì
+     * báo lỗi cho khách thấy, thay vì trả mã dành cho máy của VNPay.
      */
     @Transactional
     public PaymentResponse xacNhanVnPay(Map<String, String> thamSo) {
+        KetQuaVnPay kq = xuLyKetQuaVnPay(thamSo);
+        return switch (kq.rspCode()) {
+            case KetQuaVnPay.SAI_CHU_KY ->
+                    throw new BusinessException("Chữ ký của kết quả thanh toán không hợp lệ");
+            case KetQuaVnPay.KHONG_THAY_PHIEU ->
+                    throw ResourceNotFoundException.of("phiếu thu", thamSo.get("vnp_TxnRef"));
+            case KetQuaVnPay.SAI_SO_TIEN ->
+                    throw new BusinessException("Số tiền VNPay báo về không khớp với phiếu thu");
+            default -> kq.phieu();
+        };
+    }
+
+    /*
+     * Xử lý kết quả VNPay, dùng chung cho IPN và trang quay về.
+     *
+     * Thứ tự kiểm theo đúng tài liệu của VNPay: chữ ký, phiếu, số tiền, trạng thái, rồi mới
+     * ghi. Chữ ký phải đứng đầu vì mọi tham số khác đều có thể bị sửa trên thanh địa chỉ.
+     *
+     * Tài liệu khuyên chỉ ghi nhận ở IPN, còn trang quay về chỉ hiện kết quả. Ở đây trang
+     * quay về cũng ghi được, vì chạy trên máy cá nhân thì VNPay không gọi được vào localhost
+     * và IPN không bao giờ tới. Làm vậy không mất an toàn: cả hai đường đều đã kiểm chữ ký,
+     * và khóa dòng cộng với kiểm trạng thái khiến gọi bao nhiêu lần tiền cũng chỉ cộng một lần.
+     */
+    @Transactional
+    public KetQuaVnPay xuLyKetQuaVnPay(Map<String, String> thamSo) {
         if (!vnPayService.chuKyHopLe(thamSo)) {
-            throw new BusinessException("Chữ ký của kết quả thanh toán không hợp lệ");
+            log.warn("Kết quả VNPay sai chữ ký, mã giao dịch {}", thamSo.get("vnp_TxnRef"));
+            return KetQuaVnPay.of(KetQuaVnPay.SAI_CHU_KY, "Invalid Checksum");
         }
 
-        String maPhieu = thamSo.get("vnp_TxnRef");
-        Payment phieu = paymentRepository.findByCode(maPhieu)
-                .orElseThrow(() -> ResourceNotFoundException.of("phiếu thu", maPhieu));
+        Optional<Payment> timThay = vnPayService.idPhieu(thamSo.get("vnp_TxnRef"))
+                .flatMap(paymentRepository::findByIdForUpdate);
+        if (timThay.isEmpty()) {
+            return KetQuaVnPay.of(KetQuaVnPay.KHONG_THAY_PHIEU, "Order not found");
+        }
+
+        Payment phieu = timThay.get();
+        if (!vnPayService.dungSoTien(thamSo, phieu.getAmount())) {
+            log.warn("VNPay báo {} cho phiếu {} số tiền {}",
+                    thamSo.get("vnp_Amount"), phieu.getCode(), phieu.getAmount());
+            return KetQuaVnPay.of(KetQuaVnPay.SAI_SO_TIEN, "Invalid Amount");
+        }
+
+        if (phieu.getStatus() == PaymentStatus.CONFIRMED) {
+            return KetQuaVnPay.of(KetQuaVnPay.DA_XU_LY, "Order already confirmed", phieu);
+        }
 
         if (!vnPayService.thanhCong(thamSo)) {
-            log.info("VNPay báo giao dịch {} không thành công, mã {}",
-                    maPhieu, thamSo.get("vnp_ResponseCode"));
-            if (phieu.getStatus() == PaymentStatus.PENDING) {
-                phieu.setStatus(PaymentStatus.CANCELLED);
-                phieu.setNote("VNPay báo không thành công, mã " + thamSo.get("vnp_ResponseCode"));
-            }
-            return PaymentResponse.from(phieu);
+            return ghiGiaoDichKhongThanh(phieu, thamSo);
         }
 
-        return xacNhan(phieu.getId(), "vnpay", thamSo.get("vnp_TransactionNo"));
+        // Phiếu đã hủy mà VNPay vẫn báo trả xong: tiền đã trừ thật nên phải ghi nhận, không được bỏ
+        if (phieu.getStatus() == PaymentStatus.CANCELLED) {
+            log.warn("Phiếu {} đã hủy nhưng VNPay báo trả thành công, mở lại để ghi nhận", phieu.getCode());
+            phieu.setStatus(PaymentStatus.PENDING);
+        }
+
+        phieu.setMethod(PaymentMethod.VNPAY);
+        phieu.setNote(null);
+        xacNhan(phieu.getId(), "vnpay", thamSo.get("vnp_TransactionNo"));
+        return KetQuaVnPay.of(KetQuaVnPay.THANH_CONG, "Confirm Success", phieu);
+    }
+
+    private KetQuaVnPay ghiGiaoDichKhongThanh(Payment phieu, Map<String, String> thamSo) {
+        log.info("VNPay báo phiếu {} không thành công, mã {}",
+                phieu.getCode(), thamSo.get("vnp_ResponseCode"));
+
+        if (phieu.getStatus() == PaymentStatus.CANCELLED) {
+            return KetQuaVnPay.of(KetQuaVnPay.DA_XU_LY, "Order already confirmed", phieu);
+        }
+        if (!vnPayService.canKiemTra(thamSo)) {
+            phieu.setStatus(PaymentStatus.CANCELLED);
+        }
+        phieu.setNote(vnPayService.lyDoThatBai(thamSo));
+        return KetQuaVnPay.of(KetQuaVnPay.THANH_CONG, "Confirm Success", phieu);
     }
 
     /*

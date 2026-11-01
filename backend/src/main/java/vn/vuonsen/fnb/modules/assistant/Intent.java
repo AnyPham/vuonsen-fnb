@@ -18,5 +18,23 @@ public enum Intent {
     QUY_TRINH_DAT,
     TRA_CUU_DON,
     LIEN_HE,
-    KHONG_HIEU
+    /*
+     * Khách so sánh Vườn Sen với nơi khác, ví dụ "giá ở đây có rẻ hơn nhà hàng khác không".
+     *
+     * Tách riêng vì đây là loại câu duy nhất mà ngân hàng câu trả lời không đáp được trọn
+     * vẹn: muốn so thì phải có số liệu của nơi khác, mà hệ thống chỉ có số liệu của chính
+     * mình. Xếp cùng nhánh với KHONG_HIEU để mô hình ngôn ngữ diễn đạt, nhưng vẫn chỉ được
+     * dùng dữ liệu đã nạp, tuyệt đối không bịa giá của nhà hàng khác.
+     */
+    SO_SANH,
+    KHONG_HIEU;
+
+    /*
+     * Câu đã có sẵn lời đáp dựng từ cơ sở dữ liệu, không cần tới mô hình ngôn ngữ.
+     *
+     * Dùng để chia hai hướng xử lý trong AssistantFacade.
+     */
+    public boolean coSanTrongNganHang() {
+        return this != SO_SANH && this != KHONG_HIEU;
+    }
 }

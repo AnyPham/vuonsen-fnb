@@ -44,4 +44,15 @@ public record AnswerResponse(
         return new AnswerResponse(loiVan, intent, suggestions, link, linkLabel,
                 AnswerSource.MO_HINH_NGON_NGU);
     }
+
+    /*
+     * Đánh dấu câu này lấy thẳng từ ngân hàng, không qua mô hình ngôn ngữ.
+     *
+     * Giữ nguyên mọi thứ khác, chỉ đổi nguồn, để giao diện và hội đồng nhìn vào là biết
+     * lượt hỏi này đã đi theo hướng nào trong hai hướng.
+     */
+    public AnswerResponse danhDauLayTuNganHang() {
+        return new AnswerResponse(answer, intent, suggestions, link, linkLabel,
+                AnswerSource.NGAN_HANG_CAU_HOI);
+    }
 }

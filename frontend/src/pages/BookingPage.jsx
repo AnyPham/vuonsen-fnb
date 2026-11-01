@@ -11,6 +11,9 @@ import {
   updateForm, doiSoPhanMon,
 } from '@/features/booking/bookingSlice';
 import { fetchPackages, fetchSpaces, selectPackages, selectSpaces } from '@/features/catalog/catalogSlice';
+import { selectUser } from '@/features/auth/authSlice';
+import useTuDienThongTinKhach from '@/features/auth/useTuDienThongTinKhach';
+import CanDangNhap from '@/components/common/CanDangNhap';
 import { bookingApi } from '@/api/endpoints';
 import ChonMonTuChon from '@/components/booking/ChonMonTuChon';
 import { useI18n } from '@/i18n';
@@ -87,6 +90,7 @@ export default function BookingPage() {
   const dispatch = useDispatch();
   const { step, form, options, quote, quoteStatus, submitStatus, result, error, fieldErrors } =
     useSelector(selectBooking);
+  const nguoiDung = useSelector(selectUser);
   const spaces = useSelector(selectSpaces);
   const [thamSo] = useSearchParams();
   const { t } = useI18n();
@@ -165,6 +169,9 @@ export default function BookingPage() {
   }, [form.eventDate]);
 
   const set = (patch) => dispatch(updateForm(patch));
+
+  // Khách đã đăng nhập thì khỏi gõ lại tên, số điện thoại và email
+  useTuDienThongTinKhach(form, set);
 
   // Chỉ báo lỗi sau khi khách bấm Tiếp tục, tránh vừa mở form đã thấy chữ đỏ
   const [showErrors, setShowErrors] = useState(false);
@@ -263,12 +270,19 @@ export default function BookingPage() {
                     <button type="button" className="btn btn-dark" onClick={next} data-test="next-step">
                       {t('booking.next')}
                     </button>
-                  ) : (
+                  ) : nguoiDung ? (
                     <button type="submit" className="btn btn-gold" disabled={submitStatus === 'loading'} data-test="submit-booking">
                       {submitStatus === 'loading' ? t('booking.sending') : t('booking.submit')}
                     </button>
-                  )}
+                  ) : null}
                 </div>
+
+                {/*
+                  Chặn ở bước ba, không chặn ngay từ bước một.
+                  Khách vẫn được chọn không gian, gói tiệc và xem bảng tạm tính rồi mới
+                  phải đăng nhập — đó là lúc họ đã thấy giá và có lý do để lập tài khoản.
+                */}
+                {step === 3 && !nguoiDung && <CanDangNhap />}
               </form>
             </div>
           </div>

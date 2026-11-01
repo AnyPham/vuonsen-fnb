@@ -34,7 +34,20 @@ class LlmAssistantTest {
     @Autowired
     private SystemContextBuilder contextBuilder;
 
-    private static final String CAU_HOI = "Sảnh nào chứa được 300 khách?";
+    /*
+     * Câu hỏi dùng cho các bài kiểm tra nhánh mô hình ngôn ngữ.
+     *
+     * Phải là câu NGOÀI ngân hàng thì mới tới lượt mô hình. Từ khi trợ lý chia hai hướng,
+     * câu nằm trong ngân hàng như "Sảnh nào chứa được 300 khách?" được trả thẳng, không
+     * gọi mô hình lần nào — đó là chủ đích, nên bài kiểm tra phải theo.
+     *
+     * Chọn câu so sánh với nơi khác vì nó là ví dụ rõ nhất của hướng hai: ngân hàng không
+     * đáp trọn được, mà mô hình cũng chỉ được dùng dữ liệu đã nạp.
+     */
+    private static final String CAU_HOI = "Giá ở đây có rẻ hơn nhà hàng khác không?";
+
+    // Câu nằm trong ngân hàng, dùng để kiểm tra hướng một
+    private static final String CAU_TRONG_NGAN_HANG = "Sảnh nào chứa được 300 khách?";
 
     // ---------------- Bản giả của dịch vụ ngoài ----------------
 
@@ -102,7 +115,109 @@ class LlmAssistantTest {
         AnswerResponse kq = troLy.answer(CAU_HOI);
 
         assertThat(kq.source()).isEqualTo(AnswerSource.DU_PHONG);
-        assertThat(kq.answer()).contains("Sảnh Ven Sông");
+        assertThat(kq.answer()).contains("chỉ có số liệu của Vườn Sen");
+    }
+
+    // ---------------- Hai hướng xử lý ----------------
+
+    /*
+     * Đây là bài quan trọng nhất của việc chia hai hướng.
+     *
+     * Mô hình được bật và sẵn sàng, bản giả sẽ trả về một câu nếu bị gọi. Câu hỏi nằm
+     * trong ngân hàng nên nó phải KHÔNG bị gọi lần nào. Dùng cờ daGoi để chứng minh,
+     * thay vì chỉ nhìn vào lời đáp cuối.
+     */
+    @Test
+    @DisplayName("Câu trong ngân hàng thì trả lời sẵn, không gọi mô hình lần nào")
+    void cauTrongNganHangKhongGoiMoHinh() {
+        var daGoi = new java.util.concurrent.atomic.AtomicBoolean(false);
+        LlmClient theoDoi = new LlmClient() {
+            @Override
+            public String hoi(String chiDanHeThong, List<LuotHoiThoai> lichSu, String cauHoi) {
+                daGoi.set(true);
+                return "lẽ ra không được gọi";
+            }
+
+            @Override
+            public String tenDichVu() {
+                return "dich-vu-theo-doi";
+            }
+        };
+        var troLy = dungTroLy(true, "khoa-that", theoDoi);
+
+        AnswerResponse kq = troLy.answer(CAU_TRONG_NGAN_HANG);
+
+        assertThat(daGoi).isFalse();
+        assertThat(kq.source()).isEqualTo(AnswerSource.NGAN_HANG_CAU_HOI);
+        assertThat(kq.intent()).isEqualTo(Intent.KHONG_GIAN);
+        assertThat(kq.answer()).contains("Sảnh Ven Sông", "Sảnh Sen Vàng");
+    }
+
+    @Test
+    @DisplayName("Câu so sánh với nơi khác thì mới chuyển sang mô hình")
+    void cauSoSanhChuyenSangMoHinh() {
+        var troLy = dungTroLy(true, "khoa-that",
+                new ClientGia("Bên mình có gói từ 1.800.000đ một mâm ạ.", null));
+
+        AnswerResponse kq = troLy.answer(CAU_HOI);
+
+        assertThat(kq.intent()).isEqualTo(Intent.SO_SANH);
+        assertThat(kq.source()).isEqualTo(AnswerSource.MO_HINH_NGON_NGU);
+    }
+
+    /*
+     * Mô hình tắt thì câu so sánh vẫn phải có lời đáp tử tế, dựng từ cơ sở dữ liệu, chứ
+     * không rơi về câu dành cho câu hỏi ngoài phạm vi. Đây là điều phân biệt SO_SANH với
+     * KHONG_HIEU: cùng đi hướng hai, nhưng SO_SANH có sẵn lời đáp nền.
+     */
+    @Test
+    @DisplayName("Mô hình tắt thì câu so sánh vẫn trả lời bằng số liệu của chính mình")
+    void cauSoSanhCoLoiDapNenTuCoSoDuLieu() {
+        var troLy = dungTroLy(false, "khoa-that", new ClientGia("lẽ ra không được gọi", null));
+
+        AnswerResponse kq = troLy.answer(CAU_HOI);
+
+        assertThat(kq.source()).isEqualTo(AnswerSource.DU_PHONG);
+        assertThat(kq.intent()).isEqualTo(Intent.SO_SANH);
+        assertThat(kq.answer())
+                .contains("chỉ có số liệu của Vườn Sen")
+                .contains("Gói tiệc:")
+                .doesNotContain("chưa có thông tin về điều bạn hỏi");
+    }
+
+    /*
+     * Câu ngoài phạm vi không được đổ lỗi cho khách.
+     *
+     * "Đặt bàn trên thuyền" là câu hỏi rõ ràng, chỉ là nhà hàng không có dịch vụ đó. Đáp
+     * lại bằng "mình chưa hiểu ý bạn" vừa sai vừa không giúp được gì. Phải nói thẳng là
+     * chưa có thông tin, rồi đưa con số thật để khách biết nhà hàng có gì.
+     */
+    @Test
+    @DisplayName("Câu ngoài phạm vi nói rõ chưa có thông tin, kèm số liệu thật")
+    void cauNgoaiPhamViKhongDoLoiChoKhach() {
+        var troLy = dungTroLy(false, "", new ClientGia("lẽ ra không được gọi", null));
+
+        AnswerResponse kq = troLy.answer("Đặt bàn trên thuyền được không?");
+
+        assertThat(kq.intent()).isEqualTo(Intent.KHONG_HIEU);
+        assertThat(kq.answer())
+                .doesNotContain("chưa hiểu ý bạn")
+                .contains("chưa có thông tin")
+                .contains("không gian")
+                .contains("gói tiệc");
+        assertThat(kq.suggestions()).isNotEmpty();
+    }
+
+    /*
+     * Chỉ dẫn gửi mô hình phải cấm nêu số liệu của nơi khác. Không kiểm được mô hình
+     * thật có nghe lời hay không, nhưng kiểm được là luật đã nằm trong chỉ dẫn.
+     */
+    @Test
+    @DisplayName("Chỉ dẫn hệ thống cấm nêu giá của nhà hàng khác")
+    void chiDanCamNeuSoLieuNoiKhac() {
+        assertThat(contextBuilder.dungChiDan())
+                .contains("chỉ có số liệu của Vườn Sen")
+                .contains("Tuyệt đối không nêu giá");
     }
 
     /*
@@ -138,9 +253,9 @@ class LlmAssistantTest {
 
         // Điều quan trọng nhất: không ném lỗi ra ngoài, không trả về câu rỗng
         assertThat(kq.source()).isEqualTo(AnswerSource.DU_PHONG);
-        assertThat(kq.answer()).contains("Sảnh Ven Sông", "Sảnh Sen Vàng");
-        assertThat(kq.intent()).isEqualTo(Intent.KHONG_GIAN);
-        assertThat(kq.link()).isEqualTo("/khong-gian");
+        assertThat(kq.intent()).isEqualTo(Intent.SO_SANH);
+        assertThat(kq.answer()).contains("chỉ có số liệu của Vườn Sen");
+        assertThat(kq.link()).isEqualTo("/dat-tiec");
     }
 
     @Test
@@ -211,7 +326,8 @@ class LlmAssistantTest {
         };
         var troLy = dungTroLy(true, "khoa-that", ghiLai);
 
-        troLy.answer("Gói nào rẻ nhất?", List.of(
+        // Phải hỏi câu ngoài ngân hàng, vì câu trong ngân hàng không đi qua mô hình
+        troLy.answer(CAU_HOI, List.of(
                 new AskRequest.LuotHoi("user", "Có những gói tiệc nào?"),
                 new AskRequest.LuotHoi("assistant", "Dạ có ba gói ạ."),
                 new AskRequest.LuotHoi("vai-la", "bị bỏ qua")));

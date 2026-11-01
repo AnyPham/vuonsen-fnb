@@ -21,6 +21,13 @@
 # app.assistant.llm.model=claude-opus-5-5
 
 
+# --- Cong thanh toan VNPay sandbox ---
+# Dang ky mien phi tai https://sandbox.vnpayment.vn/devreg/ de lay hai gia tri nay.
+# De trong thi website an nut VNPay, khach van tra duoc bang ma VietQR.
+# app.vnpay.tmn-code=
+# app.vnpay.hash-secret=
+
+
 # --- Tuy chon chung ---
 # app.assistant.llm.enabled=true
 # app.assistant.llm.max-tokens=800

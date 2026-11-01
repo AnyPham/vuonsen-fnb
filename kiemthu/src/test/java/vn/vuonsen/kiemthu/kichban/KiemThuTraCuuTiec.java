@@ -16,7 +16,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 class KiemThuTraCuuTiec extends KiemThuCoSo {
 
     private static String taoDonMoi() {
-        return (String) GoiApi.taoDonTiec(null, "sanh-sen-vang", "Gói Đồng Quê",
+        return (String) GoiApi.taoDonTiec(GoiApi.tokenKhach(), "sanh-sen-vang", "Gói Đồng Quê",
                 GoiApi.ngayChuaDung(), "EVENING", 200).get("code");
     }
 

@@ -12,12 +12,17 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import vn.vuonsen.fnb.modules.auth.dto.AuthResponse;
+import vn.vuonsen.fnb.modules.auth.dto.DangKyResponse;
+import vn.vuonsen.fnb.modules.auth.dto.GuiLaiMaRequest;
+import vn.vuonsen.fnb.modules.auth.dto.XacThucEmailRequest;
 import vn.vuonsen.fnb.modules.auth.dto.DatLaiMatKhauRequest;
 import vn.vuonsen.fnb.modules.auth.dto.LoginRequest;
 import vn.vuonsen.fnb.modules.auth.dto.QuenMatKhauRequest;
 import vn.vuonsen.fnb.modules.auth.dto.RefreshRequest;
 import vn.vuonsen.fnb.modules.auth.dto.RegisterRequest;
 import vn.vuonsen.fnb.security.AppUserDetails;
+
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -27,11 +32,32 @@ public class AuthController {
 
     private final AuthService authService;
     private final PasswordResetService passwordResetService;
+    private final XacThucEmailService xacThucEmailService;
 
     @PostMapping("/register")
-    @Operation(summary = "Đăng ký tài khoản khách hàng")
-    public ResponseEntity<AuthResponse> register(@Valid @RequestBody RegisterRequest request) {
+    @Operation(summary = "Đăng ký tài khoản khách, gửi mã xác nhận về email")
+    public ResponseEntity<DangKyResponse> register(@Valid @RequestBody RegisterRequest request) {
         return ResponseEntity.status(HttpStatus.CREATED).body(authService.register(request));
+    }
+
+    @PostMapping("/verify-email")
+    @Operation(summary = "Nhập mã xác nhận để kích hoạt tài khoản, trả về token luôn")
+    public ResponseEntity<AuthResponse> xacThucEmail(@Valid @RequestBody XacThucEmailRequest request) {
+        return ResponseEntity.ok(authService.xacThucEmail(request.email(), request.code()));
+    }
+
+    /*
+     * Gửi lại mã xác nhận.
+     *
+     * Luôn trả cùng một câu, kể cả khi email chưa đăng ký hoặc đã xác thực rồi. Trả lời
+     * khác nhau thì người lạ gõ thử từng email là dò ra email nào có tài khoản ở đây.
+     */
+    @PostMapping("/resend-code")
+    @Operation(summary = "Gửi lại mã xác nhận email")
+    public ResponseEntity<Map<String, String>> guiLaiMa(@Valid @RequestBody GuiLaiMaRequest request) {
+        xacThucEmailService.guiLaiMa(request.email());
+        return ResponseEntity.ok(Map.of("message",
+                "Nếu địa chỉ này đang chờ xác nhận, mình đã gửi lại mã. Nhớ xem cả hộp thư rác."));
     }
 
     @PostMapping("/login")

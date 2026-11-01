@@ -84,7 +84,7 @@ class KiemThuQuanTriLich extends KiemThuCoSo {
     void tcCal05_donTiecHienDungO() {
         /* 120 khách là 12 mâm, dưới ngưỡng 20 mâm nên chỉ cần báo trước 3 ngày. */
         LocalDate ngay = GoiApi.ngayChuaDung();
-        GoiApi.taoDonTiec(null, "sanh-sen-vang", "Gói Đồng Quê", ngay, "EVENING", 120);
+        GoiApi.taoDonTiec(GoiApi.tokenKhach(), "sanh-sen-vang", "Gói Đồng Quê", ngay, "EVENING", 120);
 
         TrangQuanTriLich lich = moLichBangQuanTri().moThangCua(ngay);
 
@@ -96,7 +96,7 @@ class KiemThuQuanTriLich extends KiemThuCoSo {
     @DisplayName("TC-CAL-06 Dòng tóm tắt đếm đúng số đơn trong khoảng đang xem")
     void tcCal06_tomTatDemDung() {
         LocalDate ngay = GoiApi.ngayChuaDung();
-        GoiApi.taoDonTiec(null, "sanh-sen-vang", "Gói Đồng Quê", ngay, "NOON", 120);
+        GoiApi.taoDonTiec(GoiApi.tokenKhach(), "sanh-sen-vang", "Gói Đồng Quê", ngay, "NOON", 120);
 
         TrangQuanTriLich lich = moLichBangQuanTri().moThangCua(ngay);
 
@@ -125,7 +125,7 @@ class KiemThuQuanTriLich extends KiemThuCoSo {
     @DisplayName("TC-CAL-08 Bấm một ô có đơn thì chuyển sang xem ngày và liệt kê đơn đó")
     void tcCal08_bamOMoChiTiet() {
         LocalDate ngay = GoiApi.ngayChuaDung();
-        Map<String, Object> don = GoiApi.taoDonTiec(null, "sanh-sen-vang", "Gói Đồng Quê", ngay, "EVENING", 120);
+        Map<String, Object> don = GoiApi.taoDonTiec(GoiApi.tokenKhach(), "sanh-sen-vang", "Gói Đồng Quê", ngay, "EVENING", 120);
         String maDon = String.valueOf(don.get("code"));
 
         TrangQuanTriLich lich = moLichBangQuanTri().moThangCua(ngay).bamO(ngay.format(ISO));
@@ -151,7 +151,7 @@ class KiemThuQuanTriLich extends KiemThuCoSo {
     @DisplayName("TC-CAL-10 Đơn tiệc trên lịch hiện đúng trạng thái đang chờ xác nhận")
     void tcCal10_hienDungTrangThai() {
         LocalDate ngay = GoiApi.ngayChuaDung();
-        GoiApi.taoDonTiec(null, "sanh-sen-vang", "Gói Đồng Quê", ngay, "MORNING", 120);
+        GoiApi.taoDonTiec(GoiApi.tokenKhach(), "sanh-sen-vang", "Gói Đồng Quê", ngay, "MORNING", 120);
 
         TrangQuanTriLich lich = moLichBangQuanTri().xemNgay().chonNgay(ngay.format(ISO));
 

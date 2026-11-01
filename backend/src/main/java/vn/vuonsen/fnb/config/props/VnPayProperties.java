@@ -9,9 +9,9 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
  * bằng mã VietQR, chỉ không hiện lựa chọn trả qua VNPay.
  *
  * Lấy mã thử nghiệm ở đâu: đăng ký tài khoản sandbox miễn phí tại sandbox.vnpayment.vn, hệ
- * thống sẽ cấp vnp_TmnCode và vnp_HashSecret. Dán hai giá trị đó vào biến môi trường
- * VNPAY_TMN_CODE và VNPAY_HASH_SECRET, tuyệt đối không ghi vào tệp cấu hình vì tệp nằm trong
- * kho mã nguồn.
+ * thống sẽ cấp vnp_TmnCode và vnp_HashSecret. Dán hai giá trị đó vào tệp tro-ly-ai.properties
+ * (đã nằm trong .gitignore) hoặc biến môi trường VNPAY_TMN_CODE và VNPAY_HASH_SECRET, tuyệt
+ * đối không ghi vào application.yml vì tệp đó nằm trong kho mã nguồn.
  *
  * @param payUrl        địa chỉ trang thanh toán, mặc định trỏ vào môi trường thử nghiệm
  * @param returnUrl     nơi VNPay đưa khách quay lại sau khi trả xong

@@ -9,6 +9,16 @@ package vn.vuonsen.fnb.modules.assistant;
  */
 public enum AnswerSource {
 
+    /*
+     * Câu hỏi nằm trong ngân hàng: hệ thống nhận ra ý định rồi dựng lời đáp từ cơ sở dữ
+     * liệu, không gọi mô hình ngôn ngữ lần nào.
+     *
+     * Đây là hướng mặc định và chiếm phần lớn lượt hỏi. Chọn như vậy vì ba lẽ: câu trả
+     * lời giống hệt nhau qua mọi lần hỏi, mọi con số truy được về đúng bảng nào trong cơ
+     * sở dữ liệu, và không tốn một lượt gọi dịch vụ ngoài nào.
+     */
+    NGAN_HANG_CAU_HOI,
+
     // Mô hình ngôn ngữ ngoài trả lời, trên nền dữ liệu hệ thống gửi kèm
     MO_HINH_NGON_NGU,
 

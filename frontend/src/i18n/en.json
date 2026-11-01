@@ -122,8 +122,8 @@
     "best": "Best",
     "vegetarian": "Vegetarian",
     "vegetarianOnly": "Vegetarian only",
-    "noMatch": "No dish matches \"{{tuKhoa}}\".",
-    "emptyCategory": "Nothing in this category yet."
+    "noMatch": "No dish matches \"{{tuKhoa}}\". Try a shorter word, or clear the search box to see the whole menu.",
+    "emptyCategory": "No dish is being served in this category. Please try another one."
   },
   "dish": {
     "loading": "Loading the dish…",
@@ -220,10 +220,17 @@
     "fullName": "Full name *",
     "email": "Email *",
     "phone": "Phone number",
-    "password": "Password * (at least 6 characters)",
+    "password": "Password * (at least 8 characters)",
     "submit": "Register",
     "haveAccount": "Already have an account?",
-    "login": "Sign in"
+    "login": "Sign in",
+    "passwordRule": "At least 8 characters, with upper case, lower case and a digit."
+  },
+  "verify": {
+    "title": "Verify your email",
+    "code": "Verification code (6 digits)",
+    "submit": "Verify and sign in",
+    "resend": "Did not get the code? Resend"
   },
   "forgot": {
     "title": "Forgotten password",
@@ -247,7 +254,7 @@
     "doneTitle": "Password changed",
     "doneNote": "Your new password is active. Taking you back to the sign-in page…",
     "newPassword": "New password",
-    "minChars": "At least 6 characters",
+    "minChars": "At least 8 characters",
     "repeatPassword": "Repeat the new password",
     "saving": "Saving…",
     "submit": "Set the new password"
@@ -302,6 +309,7 @@
     "verifying": "Verifying the result with the server…",
     "success": "Payment successful",
     "failed": "The transaction did not go through",
+    "review": "This transaction is being reviewed",
     "receiptCode": "Receipt number",
     "order": "Order",
     "purpose": "For",
@@ -309,6 +317,7 @@
     "reference": "Transaction reference",
     "successNote": "The restaurant has recorded this payment; there is nothing more for you to do.",
     "failedNote": "Nothing has been charged. You can try again or choose another way to pay.",
+    "reviewNote": "The restaurant will check this payment with VNPay and contact you. You do not need to pay again yet.",
     "viewStatus": "View the payment status"
   },
   "pagination": {
@@ -624,5 +633,8 @@
     "khongHoTro": "This browser does not support notifications.",
     "mayChuChuaBat": "The restaurant has not enabled this yet.",
     "loi": "Could not turn it on, please try again."
+  },
+  "auth": {
+    "needLoginToOrder": "Please sign in to place this order. You will come back to this page and keep what you have filled in."
   }
 }

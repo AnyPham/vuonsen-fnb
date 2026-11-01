@@ -26,6 +26,22 @@ public class IntentDetector {
      * nhóm gói tiệc, ưu tiên chi phí vì đó mới là điều khách muốn biết.
      */
     private static final List<Map.Entry<Intent, List<String>>> TU_KHOA = List.of(
+            /*
+             * So sánh đứng đầu bảng.
+             *
+             * Câu "giá ở đây có rẻ hơn nhà hàng khác không" nếu để các nhóm sau xét trước
+             * thì rơi vào nhóm chi phí, rồi khách nhận lại bảng giá của chính Vườn Sen mà
+             * không ai trả lời câu họ thật sự hỏi. Nhóm này phải chặn trước.
+             *
+             * Từ khóa chọn loại có tham chiếu ra bên ngoài như "noi khac", "nha hang khac".
+             * Cố ý không lấy "re hon" hay "dat hon" đứng một mình, vì câu hỏi nối tiếp
+             * "còn gói nào rẻ hơn" là hỏi trong phạm vi Vườn Sen, ngân hàng đáp được.
+             */
+            Map.entry(Intent.SO_SANH, List.of(
+                    "so sanh", "so voi", "noi khac", "cho khac", "quan khac", "nha hang khac",
+                    "tiem khac", "doi thu", "ben ngoai", "thi truong", "dat hon o dau",
+                    "re hon o dau", "hon nha hang", "hon cho khac", "hon noi khac")),
+
             Map.entry(Intent.CHAO_HOI, List.of(
                     "xin chao", "chao ban", "chao shop", "hello", "alo", "hi", "chao")),
 

@@ -9,19 +9,40 @@ import vn.vuonsen.fnb.modules.assistant.llm.LuotHoiThoai;
 import java.util.List;
 
 /*
- * Cửa vào duy nhất của trợ lý, nối hai nhánh trả lời lại với nhau.
+ * Cửa vào duy nhất của trợ lý, chia lượt hỏi thành hai hướng xử lý.
  *
- * Thứ tự ở đây là cố ý: dựng câu trả lời dự phòng trước, rồi mới hỏi mô hình ngôn
- * ngữ. Nghe thì ngược, vì làm vậy tốn thêm mấy câu truy vấn cả khi mô hình sẽ trả
- * lời. Nhưng đổi lại, đến lúc mô hình hỏng thì đã có sẵn câu trả lời trong tay,
- * không phải chạy đi dựng lại giữa lúc đang lỗi. Cơ chế dự phòng chỉ đáng tin khi
- * nó không cần thêm điều kiện gì mới chạy được.
+ * HƯỚNG MỘT — câu nằm trong ngân hàng.
+ * Bộ nhận dạng ý định bắt được câu hỏi thuộc một trong các nhóm quen thuộc như không
+ * gian, thực đơn, chi phí, đặt cọc. Những câu này có lời đáp dựng sẵn từ cơ sở dữ liệu
+ * nên trả thẳng, không gọi mô hình ngôn ngữ lần nào.
  *
- * Mấy câu truy vấn đó đều là đọc bảng nhỏ và đã có sẵn trong bộ nhớ đệm của tầng
- * dữ liệu, nên cái giá phải trả là không đáng kể.
+ * HƯỚNG HAI — câu ngoài ngân hàng, gồm cả câu so sánh với nơi khác.
+ * Ngân hàng không có lời đáp đúng ý, lúc đó mới nhờ mô hình ngôn ngữ diễn đạt. Nhưng
+ * mô hình chỉ được đọc phần DỮ LIỆU mà SystemContextBuilder nạp sẵn từ cơ sở dữ liệu,
+ * không nối vào cơ sở dữ liệu và không được lấy số liệu từ đâu khác.
  *
- * Đề cương yêu cầu "xây dựng cơ chế dự phòng khi không kết nối được dịch vụ AI
- * bên ngoài". Chỗ này chính là cơ chế đó.
+ * Vì sao phải chia hai hướng thay vì đưa hết cho mô hình:
+ *
+ * Thứ nhất, câu trả lời cho cùng một câu hỏi phải giống nhau qua mọi lần hỏi. Khách hỏi
+ * giá hôm nay một kiểu, mai một kiểu thì không dùng được. Ngân hàng cho đúng điều đó,
+ * mô hình thì không hứa được.
+ *
+ * Thứ hai, mỗi con số trong lời đáp phải truy được về đúng bảng nào trong cơ sở dữ liệu.
+ * Đây là điều phải giải thích trước hội đồng, mà đi qua mô hình thì không chứng minh nổi.
+ *
+ * Thứ ba, phần lớn lượt hỏi rơi vào ngân hàng, nên không phải gọi dịch vụ ngoài. Nhanh
+ * hơn, không tốn hạn mức, và không phụ thuộc đường mạng.
+ *
+ * Thứ tự dựng câu cũng là cố ý: dựng lời đáp từ ngân hàng trước, rồi mới xét có cần mô
+ * hình không. Nghe thì ngược vì tốn thêm mấy câu truy vấn cả khi mô hình sẽ trả lời.
+ * Đổi lại, đến lúc mô hình hỏng thì đã có sẵn câu trả lời trong tay, không phải chạy đi
+ * dựng lại giữa lúc đang lỗi. Cơ chế dự phòng chỉ đáng tin khi nó không cần thêm điều
+ * kiện gì mới chạy được. Mấy câu truy vấn đó đều đọc bảng nhỏ và đã nằm trong bộ nhớ
+ * đệm của tầng dữ liệu, nên cái giá phải trả không đáng kể.
+ *
+ * Đề cương yêu cầu "xây dựng cơ chế dự phòng khi không kết nối được dịch vụ AI bên
+ * ngoài". Hướng một chính là cơ chế đó, và nó còn là đường đi mặc định chứ không chỉ
+ * là phương án chữa cháy.
  */
 @Service
 @RequiredArgsConstructor
@@ -42,8 +63,26 @@ public class AssistantFacade {
      * mô hình ngôn ngữ dùng thêm lịch sử để hiểu câu hỏi nối tiếp.
      */
     public AnswerResponse answer(String cauHoi, List<AskRequest.LuotHoi> lichSu) {
-        AnswerResponse traLoiDuPhong = duPhong.answer(cauHoi);
-        return moHinh.traLoi(cauHoi, chuanHoa(lichSu), traLoiDuPhong).orElse(traLoiDuPhong);
+        AnswerResponse tuNganHang = duPhong.answer(cauHoi);
+
+        /*
+         * Hướng một: câu đã có lời đáp dựng sẵn thì dừng ở đây.
+         *
+         * Không gọi mô hình kể cả khi mô hình đang bật và sẵn sàng. Để mô hình viết lại
+         * một câu vốn đã đúng và đã đủ thì chỉ đổi được cách hành văn, mà đánh mất tính
+         * lặp lại được và khiến con số không còn truy nguồn được nữa.
+         */
+        if (tuNganHang.intent().coSanTrongNganHang()) {
+            return tuNganHang.danhDauLayTuNganHang();
+        }
+
+        /*
+         * Hướng hai: câu ngoài ngân hàng hoặc câu so sánh với nơi khác.
+         *
+         * Mô hình hỏng, chưa bật hay trả về câu rỗng thì rơi lại lời đáp của ngân hàng,
+         * giữ nguyên nguồn DU_PHONG để nhìn vào biết là nhánh dự phòng đã chạy.
+         */
+        return moHinh.traLoi(cauHoi, chuanHoa(lichSu), tuNganHang).orElse(tuNganHang);
     }
 
     /*

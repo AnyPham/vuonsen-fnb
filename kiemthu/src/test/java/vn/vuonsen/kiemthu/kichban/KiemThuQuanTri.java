@@ -27,7 +27,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 class KiemThuQuanTri extends KiemThuCoSo {
 
     private static Map<String, Object> donMoi(LocalDate ngay) {
-        return GoiApi.taoDonTiec(null, "sanh-sen-vang", "Gói Đồng Quê", ngay, "EVENING", 200);
+        return GoiApi.taoDonTiec(GoiApi.tokenKhach(), "sanh-sen-vang", "Gói Đồng Quê", ngay, "EVENING", 200);
     }
 
     private TrangQuanTriDon moQuanTriDon(String maDon) {

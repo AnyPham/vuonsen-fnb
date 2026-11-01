@@ -51,8 +51,16 @@ public class SecurityConfig {
                                 "/api/v1/spaces/**", "/api/v1/menu/**", "/api/v1/packages/**",
                                 "/api/v1/reviews/**", "/api/v1/gallery/**").permitAll()
 
-                        // khách chưa đăng nhập vẫn đặt tiệc và hỏi trợ lý được
-                        .requestMatchers(HttpMethod.POST, "/api/v1/bookings", "/api/v1/bookings/quote",
+                        /*
+                         * Báo giá, gợi ý và hỏi trợ lý vẫn mở cho khách chưa đăng nhập.
+                         *
+                         * Ba đường này chỉ đọc và tính toán, không tạo ra bản ghi nào. Khách
+                         * phải xem được giá trước khi quyết định có lập tài khoản hay không;
+                         * bắt đăng nhập mới cho xem giá thì mất khách ngay từ bước tìm hiểu.
+                         *
+                         * Riêng POST /api/v1/bookings đã chuyển xuống nhóm bắt buộc đăng nhập.
+                         */
+                        .requestMatchers(HttpMethod.POST, "/api/v1/bookings/quote",
                                 "/api/v1/recommendations", "/api/v1/assistant/ask").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/v1/bookings/options",
                                 "/api/v1/bookings/track/**",
@@ -75,10 +83,23 @@ public class SecurityConfig {
                         // đánh giá còn phải qua bước quản trị duyệt mới hiện công khai
                         .requestMatchers(HttpMethod.POST, "/api/v1/reviews").permitAll()
 
-                        // Đặt món lẻ cũng không bắt đăng nhập, giống đặt tiệc
-                        .requestMatchers(HttpMethod.POST, "/api/v1/dish-orders",
-                                "/api/v1/dish-orders/quote").permitAll()
+                        // Tính tiền giỏ món thì mở, còn gửi đơn phải đăng nhập
+                        .requestMatchers(HttpMethod.POST, "/api/v1/dish-orders/quote").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/v1/dish-orders/track/**").permitAll()
+
+                        /*
+                         * Gửi đơn thì bắt buộc đăng nhập.
+                         *
+                         * Trước đây khách vãng lai đặt được, nên đơn không gắn tài khoản nào:
+                         * trong cơ sở dữ liệu hiện có 70 đơn như vậy. Hệ quả là chính người
+                         * đặt cũng không xem lại được đơn của mình ở mục Đơn của tôi, và
+                         * không có cách nào xác minh địa chỉ email họ khai là thật.
+                         *
+                         * Đặt ngay trước quy tắc chung để không bị dòng permitAll nào ở trên
+                         * cướp mất; thứ tự trong chuỗi này quyết định quy tắc nào thắng.
+                         */
+                        .requestMatchers(HttpMethod.POST, "/api/v1/bookings", "/api/v1/dish-orders")
+                        .authenticated()
 
                         // Thanh toán không bắt đăng nhập, giống tra cứu đơn: có mã đơn là đủ.
                         // Hai đường dẫn này chỉ đọc tình hình và tạo phiếu chờ đối soát,
@@ -87,7 +108,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/api/v1/payments").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/v1/payments/sandbox/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/v1/payments/vnpay", "/api/v1/payments/vnpay/verify").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/v1/payments/vnpay/trang-thai").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/v1/payments/vnpay/trang-thai", "/api/v1/payments/vnpay/ipn").permitAll()
 
                         // Khu vực quản trị
                         .requestMatchers("/api/v1/admin/**")

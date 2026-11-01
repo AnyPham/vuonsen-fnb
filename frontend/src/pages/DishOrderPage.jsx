@@ -2,10 +2,13 @@ import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { dishOrderApi } from '@/api/endpoints';
+import { selectUser } from '@/features/auth/authSlice';
+import useTuDienThongTinKhach from '@/features/auth/useTuDienThongTinKhach';
 import { useI18n } from '@/i18n';
 import { useDinhDang } from '@/i18n/dinhDang';
 import { ErrorBlock } from '@/components/common/StateBlock';
 import Thumb from '@/components/common/Thumb';
+import CanDangNhap from '@/components/common/CanDangNhap';
 import {
   boMon, chonGioMon, chonHinhThuc, doiHinhThuc, doiSoLuong, xoaGio,
 } from '@/features/dishorder/cartSlice';
@@ -26,6 +29,7 @@ function gioMacDinh() {
  * luôn là con số máy chủ sẽ tính, không phải ước lượng phía trình duyệt.
  */
 export default function DishOrderPage() {
+  const nguoiDung = useSelector(selectUser);
   const gio = useSelector(chonGioMon);
   const hinhThuc = useSelector(chonHinhThuc);
   const dispatch = useDispatch();
@@ -89,6 +93,9 @@ export default function DishOrderPage() {
     setForm((p) => ({ ...p, ...patch }));
     setLoiGui(null);
   };
+
+  // Khách đã đăng nhập thì khỏi gõ lại tên, số điện thoại và email
+  useTuDienThongTinKhach(form, set);
 
   const gui = async (e) => {
     e.preventDefault();
@@ -300,18 +307,25 @@ export default function DishOrderPage() {
 
               {loiGui && <ErrorBlock message={loiGui} />}
 
-              <button
-                type="submit"
-                className="btn btn-dark"
-                style={{ width: '100%', marginTop: 8 }}
-                disabled={dangGui || !tamTinh}
-                data-test="submit-order"
-              >
-                {dangGui ? t('order.sending') : t('order.submit')}
-              </button>
-              <p className="muted" style={{ fontSize: '0.82rem', marginTop: 8 }}>
-                {t('order.afterSubmit')}
-              </p>
+              {/* Chưa đăng nhập thì không hiện nút gửi, mời lập phiên trước */}
+              {!nguoiDung ? (
+                <CanDangNhap />
+              ) : (
+                <>
+                  <button
+                    type="submit"
+                    className="btn btn-dark"
+                    style={{ width: '100%', marginTop: 8 }}
+                    disabled={dangGui || !tamTinh}
+                    data-test="submit-order"
+                  >
+                    {dangGui ? t('order.sending') : t('order.submit')}
+                  </button>
+                  <p className="muted" style={{ fontSize: '0.82rem', marginTop: 8 }}>
+                    {t('order.afterSubmit')}
+                  </p>
+                </>
+              )}
             </form>
           </div>
 
