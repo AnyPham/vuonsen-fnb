@@ -5,6 +5,7 @@ import { fetchPackages, fetchSpaces, selectPackages, selectSpaces } from '@/feat
 import { galleryApi, menuApi, reviewApi } from '@/api/endpoints';
 import Thumb from '@/components/common/Thumb';
 import ThongBaoKhuyenMai from '@/components/common/ThongBaoKhuyenMai';
+import GoiYTrangChu from '@/components/common/GoiYTrangChu';
 import { useI18n } from '@/i18n';
 import { useDinhDang } from '@/i18n/dinhDang';
 
@@ -84,6 +85,12 @@ export default function HomePage() {
           </div>
         </div>
       </section>
+
+      {/*
+        Gợi ý thông minh đặt ngay dưới ảnh bìa, là thứ đầu tiên khách thấy khi cuộn xuống:
+        khách đã có hồ sơ thấy sảnh và món hợp với mình, khách mới thấy thứ được đặt nhiều nhất.
+      */}
+      <GoiYTrangChu />
 
       <section className="section">
         <div className="wrap">

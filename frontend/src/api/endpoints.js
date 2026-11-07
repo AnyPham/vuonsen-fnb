@@ -44,6 +44,13 @@ export const recommendationApi = {
   suggest: (body) => axiosClient.post('/api/v1/recommendations', body),
 };
 
+// Gợi ý thông minh trên trang chủ và sở thích khách tự khai trong trang hồ sơ
+export const goiYApi = {
+  trangChu: () => axiosClient.get('/api/v1/recommendations/ca-nhan'),
+  soThich: () => axiosClient.get('/api/v1/me/so-thich'),
+  luuSoThich: (body) => axiosClient.put('/api/v1/me/so-thich', body),
+};
+
 export const assistantApi = {
   // history: các lượt trước dạng { role: 'user' | 'assistant', content }, cũ trước mới sau
   ask: (question, history = []) => axiosClient.post('/api/v1/assistant/ask', { question, history }),

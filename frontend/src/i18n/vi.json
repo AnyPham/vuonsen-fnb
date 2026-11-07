@@ -640,5 +640,76 @@
   },
   "auth": {
     "needLoginToOrder": "Bạn cần đăng nhập để gửi đơn. Đăng nhập xong hệ thống đưa bạn về đúng chỗ đang dở, thông tin vừa điền vẫn còn."
+  },
+  "goiY": {
+    "eyebrowCaNhan": "Dành riêng cho bạn",
+    "eyebrowNoiBat": "Được chọn nhiều nhất",
+    "tieuDeCaNhan": "Những sảnh phù hợp với nhu cầu của bạn",
+    "tieuDeNoiBat": "Sảnh nổi bật",
+    "moTaNoiBat": "Những sảnh được khách đặt nhiều nhất tại Vườn Sen.",
+    "canCu": {
+      "mo": "Gợi ý dựa trên {{ds}}.",
+      "noi": ", ",
+      "soTiec": "{{n}} tiệc bạn đã đặt",
+      "soSanhDaXem": "{{n}} sảnh bạn xem nhiều lần",
+      "soThich": "sở thích bạn khai trong hồ sơ",
+      "va": " và "
+    },
+    "daDat": "Bạn đã đặt {{n}} lần",
+    "sucChua": "Sức chứa {{min}}–{{max}} khách",
+    "sucChuaTu": "Từ {{min}} khách",
+    "chay": "Món chay",
+    "monCaNhan": "Món có thể bạn sẽ thích",
+    "monNoiBat": "Món được gọi nhiều nhất",
+    "monCanCu": "Dựa trên {{n}} món bạn đã gọi và sở thích của bạn, không lặp lại món đã gọi.",
+    "monMoTaNoiBat": "Những món khách gọi nhiều nhất tại Vườn Sen.",
+    "moiKhaiSoThich": "Khai sở thích trong hồ sơ để nhận gợi ý riêng cho bạn.",
+    "diToiHoSo": "Khai sở thích",
+    "moiDangNhap": "Đăng nhập để nhận gợi ý theo những gì bạn đã đặt và đã xem.",
+    "dangNhap": "Đăng nhập",
+    "lyDo": {
+      "LOAI_TIEC": "Hợp với {{loai}} bạn hay tổ chức",
+      "SO_KHACH": "Vừa khoảng {{dai}} khách như các tiệc của bạn",
+      "KIEU_KHONG_GIAN": "Không gian {{kieu}} bạn ưa thích",
+      "TAM_GIA": "Đúng tầm giá {{muc}} bạn hay chọn",
+      "KHACH_GIONG": "{{n}} khách có hồ sơ giống bạn đã đặt sảnh này",
+      "DA_XEM": "Bạn đã xem sảnh này {{n}} lần",
+      "SO_TIEC": "Đã có {{n}} tiệc đặt sảnh này",
+      "HAY_GOI_CUNG": "Khách gọi {{ten}} cũng hay gọi món này",
+      "CUNG_LOAI": "Cùng loại {{ten}} bạn hay gọi",
+      "MON_CHAY": "Món chay hợp khẩu vị của bạn",
+      "SO_LAN_GOI": "Có mặt trong {{n}} đơn"
+    },
+    "loaiTiec": {
+      "WEDDING": "tiệc cưới",
+      "CORPORATE": "tiệc công ty, hội nghị",
+      "BIRTHDAY": "sinh nhật, thôi nôi",
+      "FAMILY": "họp mặt gia đình",
+      "OTHER": "các loại tiệc khác"
+    },
+    "kieu": {
+      "TRONG_NHA": "trong nhà",
+      "NGOAI_TROI": "ngoài trời"
+    },
+    "tamGia": {
+      "TIET_KIEM": "tiết kiệm",
+      "VUA_PHAI": "vừa phải",
+      "CAO_CAP": "cao cấp"
+    }
+  },
+  "soThich": {
+    "tieuDe": "Sở thích của bạn",
+    "moTa": "Không bắt buộc. Khai càng rõ, trang chủ càng gợi ý đúng sảnh và món hợp với bạn.",
+    "loaiTiec": "Loại tiệc bạn hay tổ chức",
+    "soKhach": "Số khách thường mời",
+    "soKhachGoiY": "Ví dụ 150",
+    "tamGia": "Tầm giá",
+    "khongRo": "Chưa rõ",
+    "kieuKhongGian": "Không gian",
+    "khongQuanTrong": "Không quan trọng",
+    "anChay": "Ưu tiên món chay",
+    "luu": "Lưu sở thích",
+    "daLuu": "Đã lưu sở thích.",
+    "xemTrangChu": "Xem gợi ý trên trang chủ"
   }
 }

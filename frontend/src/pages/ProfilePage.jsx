@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { selectUser, updateProfile } from '@/features/auth/authSlice';
 import { ErrorBlock, Loading } from '@/components/common/StateBlock';
+import SoThichForm from '@/components/common/SoThichForm';
 import { useI18n } from '@/i18n';
 
 // Trang hồ sơ cá nhân, chỉ vào được khi đã đăng nhập
@@ -146,6 +147,9 @@ export default function ProfilePage() {
             </form>
           </div>
         </div>
+
+        {/* Sở thích tự khai, để trang chủ gợi ý sảnh và món sát hơn */}
+        <SoThichForm />
       </div>
     </section>
   );

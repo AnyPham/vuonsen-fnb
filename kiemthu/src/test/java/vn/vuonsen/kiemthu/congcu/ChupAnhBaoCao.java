@@ -342,7 +342,7 @@ class ChupAnhBaoCao extends KiemThuCoSo {
                 /* So do ly thuyet cho chuong 2 */
                 "lt-kim-tu-thap", "lt-kien-truc", "lt-spring-boot", "lt-dom-ao", "lt-rest",
                 "lt-jwt", "lt-selenium", "lt-pom", "lt-github-actions", "lt-goi-y",
-                "lt-rang-buoc-llm", "lt-tinh-gia").forEach(this::chupSoDo);
+                "lt-goi-y-tuong-dong", "lt-rang-buoc-llm", "lt-tinh-gia").forEach(this::chupSoDo);
     }
 
     // ---------------- Các lượt chụp ----------------

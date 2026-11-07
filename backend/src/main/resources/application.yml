@@ -108,6 +108,31 @@ app:
     top-n: 3                    # tra ve ba phuong an
     max-per-space: 1            # moi khong gian chi xuat hien mot lan
 
+  # Goi y thong minh tren trang chu, theo ho so khach. Giai thich tung tham so o
+  # GoiYCaNhanProperties; cac gia tri duoi day da chay qua danh gia ngoai tuyen
+  # DanhGiaGoiYKhongGianTest.
+  goi-y-ca-nhan:
+    trong-so-loai-tiec: 0.40      # bon nhom thuoc tinh cua sanh, tong bang 1
+    trong-so-so-khach: 0.30
+    trong-so-kieu-khong-gian: 0.10
+    trong-so-tam-gia: 0.20
+    alpha: 0.6                    # 60% loc theo noi dung, 40% loc cong tac
+    so-lang-gieng: 30
+    do-do: COSINE                 # COSINE, PEARSON hoac JACCARD
+    trong-so-don-cho: 0.5
+    trong-so-luot-xem: 0.2
+    so-ngay-luot-xem: 60
+    so-lan-xem-toi-thieu: 2
+    trong-so-so-thich: 1.0
+    so-ngay-noi-bat: 365
+    so-sanh: 3
+    trong-so-danh-muc-mon: 0.5
+    trong-so-chay-mon: 0.25
+    trong-so-tam-gia-mon: 0.25
+    alpha-mon: 0.5
+    so-mon: 3
+    giay-lam-moi: 60
+
   # Quy dinh nhan don dat mon le: giao tan nha hoac dat truoc roi toi an tai cho.
   # Day la nhung con so kinh doanh hay doi nen de o day, khong viet cung trong ma.
   dish-order:

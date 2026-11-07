@@ -73,7 +73,13 @@ public class SecurityConfig {
                                  * lọc JWT đã gắn danh tính vào ngữ cảnh trước khi tới đây, nên
                                  * controller vẫn đọc được principal và trả bản cá nhân hóa.
                                  */
-                                "/api/v1/assistant/loi-mo-dau").permitAll()
+                                "/api/v1/assistant/loi-mo-dau",
+                                /*
+                                 * Gợi ý thông minh trên trang chủ, cùng cách với lời mở đầu: khách
+                                 * chưa đăng nhập nhận sảnh và món nổi bật, khách đã đăng nhập nhận
+                                 * bản theo hồ sơ của mình.
+                                 */
+                                "/api/v1/recommendations/ca-nhan").permitAll()
                         /* Khách vãng lai cũng đăng ký nhận khuyến mãi được, không bắt tạo tài khoản. */
                         .requestMatchers(HttpMethod.GET, "/api/v1/push/khoa-cong-khai").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/v1/push/dang-ky").permitAll()
