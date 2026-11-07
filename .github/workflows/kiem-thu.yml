@@ -1,16 +1,20 @@
-# Chạy tự động hai bộ kiểm thử của đề tài trên máy chủ của GitHub.
+# Chạy tự động hai bộ kiểm thử của đề tài và chạy thử bản đóng gói Docker, trên máy chủ
+# của GitHub. Ba công việc riêng:
 #
-# Hai bộ kiểm thử khác hẳn nhau nên tách thành hai công việc riêng:
-#
-#   kiem-thu-don-vi     189 kiểm thử đơn vị JUnit của backend. Chạy trên H2 trong bộ nhớ,
+#   kiem-thu-don-vi     Kiểm thử đơn vị JUnit của backend. Chạy trên H2 trong bộ nhớ,
 #                       không cần cài thêm gì, xong trong vài phút.
 #
-#   kiem-thu-giao-dien  170 test case Selenium theo mô hình Page Object Model trên 19 luồng.
-#                       Phải dựng đủ MySQL, backend và giao diện rồi mới chạy được.
+#   kiem-thu-giao-dien  Test case Selenium theo mô hình Page Object Model. Phải dựng đủ
+#                       MySQL, backend và giao diện rồi mới chạy được.
 #
-# Cố ý không cho công việc thứ hai phụ thuộc công việc thứ nhất. Đây là hai kết quả thực
-# nghiệm riêng của đề tài; kiểm thử đơn vị trượt mà chặn luôn kiểm thử giao diện thì mất
-# số liệu của lần chạy đó, trong khi hai bộ không kiểm cùng một thứ.
+#   chay-thu-docker     Dựng hai ảnh Docker rồi chạy cả hệ thống bằng docker compose, đúng
+#                       lệnh ghi trong docker-compose.yml, xem ba dịch vụ có lên được và
+#                       trả lời được không. Đề cương yêu cầu triển khai bằng Docker; máy cá
+#                       nhân không cài Docker nên đây là nơi duy nhất kiểm chứng được việc đó.
+#
+# Không công việc nào phụ thuộc công việc khác. Đây là ba kết quả riêng của đề tài; một
+# công việc trượt mà chặn luôn công việc kia thì mất số liệu của lần chạy đó, trong khi
+# chúng không kiểm cùng một thứ.
 #
 # Ghim ubuntu-24.04 thay vì dùng ubuntu-latest. Hai lý do, đều vì đây là môi trường thực
 # nghiệm của một đề tài chứ không phải máy chủ dựng phần mềm thông thường: báo cáo có mục
@@ -54,7 +58,7 @@ jobs:
           distribution: temurin
           cache: maven
 
-      - name: Chạy 189 kiểm thử đơn vị
+      - name: Chạy kiểm thử đơn vị
         working-directory: backend
         run: mvn -B test
 
@@ -213,7 +217,7 @@ jobs:
           tail -50 "$GITHUB_WORKSPACE/frontend.log" || true
           exit 1
 
-      - name: Chạy 170 test case Selenium
+      - name: Chạy toàn bộ test case Selenium
         working-directory: kiemthu
         run: |
           mvn -B test \
@@ -249,3 +253,93 @@ jobs:
               kill "$(cat "$tep")" 2>/dev/null || true
             fi
           done
+
+  # ===========================================================================
+  #  Chạy thử bản đóng gói Docker: MySQL, backend, giao diện qua Nginx
+  # ===========================================================================
+  chay-thu-docker:
+    name: Chạy thử bằng Docker
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+
+    steps:
+      - name: Lấy mã nguồn
+        uses: actions/checkout@v7
+
+      # docker-compose.yml cố ý bắt buộc hai bí mật, thiếu là dừng ngay. Ở đây sinh giá trị
+      # ngẫu nhiên cho riêng lần chạy thử, không phải khóa thật nào, và mất đi khi máy chủ
+      # của GitHub tắt. Mật khẩu quản trị theo đúng luật mật khẩu của hệ thống: từ 8 ký tự,
+      # có chữ hoa, chữ thường và số.
+      - name: Tạo tệp .env cho lần chạy thử
+        run: |
+          {
+            echo "JWT_SECRET=$(openssl rand -hex 32)"
+            echo "ADMIN_PASSWORD=ChayThu$(openssl rand -hex 4)A1"
+          } > .env
+
+      - name: Dựng hai ảnh backend và giao diện
+        run: docker compose build
+
+      - name: Khởi động cả hệ thống
+        run: docker compose up -d
+
+      # Đi qua cổng 80 của Nginx chứ không gọi thẳng cổng 8080: đường này kiểm luôn cả việc
+      # Nginx chuyển tiếp /api/ sang backend trong mạng nội bộ của Docker, đúng như khi khách
+      # thật mở website. Backend chỉ khởi động sau khi MySQL qua phép kiểm tra sức khỏe, rồi
+      # Flyway còn phải tạo đủ bảng và nạp dữ liệu mẫu, nên cho chờ tới 4 phút.
+      - name: Chờ backend trả lời qua Nginx
+        run: |
+          for i in $(seq 1 120); do
+            if curl -fsS http://localhost/api/v1/spaces > /dev/null 2>&1; then
+              echo "Hệ thống sẵn sàng sau khoảng $((i * 2)) giây"
+              exit 0
+            fi
+            sleep 2
+          done
+          echo "Hệ thống không sẵn sàng trong 240 giây"
+          exit 1
+
+      - name: Kiểm tra dữ liệu và giao diện
+        run: |
+          # Flyway đã nạp đủ 6 không gian mẫu thì danh sách không gian phải có đúng 6 mục
+          SO_KHONG_GIAN=$(curl -fsS http://localhost/api/v1/spaces | python3 -c "import json,sys; d=json.load(sys.stdin); print(len(d['content'] if isinstance(d, dict) else d))")
+          echo "Số không gian: $SO_KHONG_GIAN"
+          test "$SO_KHONG_GIAN" -eq 6
+
+          # Trang chủ phải là bản dựng của React
+          curl -fsS http://localhost/ | grep -q '<div id="root">'
+
+          # Mở thẳng một đường dẫn con phải vẫn ra trang React chứ không ra 404 của Nginx,
+          # tức dòng try_files trong nginx.conf hoạt động
+          curl -fsS http://localhost/khong-gian | grep -q '<div id="root">'
+
+          # Đăng nhập được bằng tài khoản quản trị vừa khai, tức JWT_SECRET và ADMIN_PASSWORD
+          # đã vào được tới backend
+          MAT_KHAU=$(grep '^ADMIN_PASSWORD=' .env | cut -d= -f2)
+          curl -fsS -H 'Content-Type: application/json' \
+            -d "{\"email\":\"admin@vuonsen.vn\",\"password\":\"$MAT_KHAU\"}" \
+            http://localhost/api/auth/login | grep -q accessToken
+          echo "Đăng nhập quản trị qua Nginx: được"
+
+      # Ghi kích thước ảnh và trạng thái dịch vụ vào trang tóm tắt, lấy số liệu cho mục
+      # đóng gói Docker của báo cáo (ảnh nhiều giai đoạn nhẹ hơn ảnh dựng một giai đoạn).
+      - name: Ghi nhận kết quả
+        if: always()
+        run: |
+          {
+            echo "### Chạy thử bằng Docker"
+            echo ""
+            echo '```'
+            docker compose ps
+            echo ""
+            docker compose images
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: In nhật ký khi lỗi
+        if: failure()
+        run: docker compose logs --tail=200
+
+      - name: Dừng và xóa dữ liệu thử
+        if: always()
+        run: docker compose down -v
