@@ -26,14 +26,15 @@ const ketQuaChay = (thuMuc, mauTen = /^TEST-.*\.xml$/) => {
   if (!fs.existsSync(thuMuc)) return null;
   const cacTep = fs.readdirSync(thuMuc).filter((t) => mauTen.test(t));
   if (!cacTep.length) return null;
-  let bai = 0; let truot = 0; let loi = 0; let giay = 0; let luc = 0;
+  let bai = 0; let truot = 0; let loi = 0; let giay = 0; let luc = 0; let dau = Infinity;
   for (const t of cacTep) {
     const x = fs.readFileSync(`${thuMuc}/${t}`, 'utf8');
     const lay = (ten) => Number((x.match(new RegExp(`\\s${ten}="([\\d.]+)"`)) || [0, 0])[1]);
     bai += lay('tests'); truot += lay('failures'); loi += lay('errors'); giay += lay('time');
     luc = Math.max(luc, fs.statSync(`${thuMuc}/${t}`).mtimeMs);
+    dau = Math.min(dau, fs.statSync(`${thuMuc}/${t}`).mtimeMs);
   }
-  return { bai, truot, loi, dat: bai - truot - loi, giay: Math.round(giay), luc: new Date(luc) };
+  return { bai, truot, loi, dat: bai - truot - loi, giay: Math.round(giay), luc: new Date(luc), dau: new Date(dau) };
 };
 
 const git = (lenh) => {
@@ -65,12 +66,21 @@ const SL = {
   // Chỉ đếm lớp kịch bản; công cụ chụp ảnh minh chứng cũng ghi báo cáo Surefire nhưng không phải kiểm thử
   chaySelenium: ketQuaChay(`${DU_AN}/kiemthu/target/surefire-reports`, /^TEST-.*\.kichban\..*\.xml$/),
   thayDoi: git('git status --porcelain').split('\n').filter(Boolean).length,
-  commitCuoi: git('git log -1 --format=%h ngày %ad --date=format:%d/%m/%Y'),
+  commitCuoi: git('git log -1 --format="%h ngày %ad" --date=format:%d/%m/%Y'),
 };
 
-const moTaChay = (kq) => (kq
-  ? `đạt ${kq.dat} trên ${kq.bai} bài ở lần chạy ngày ${ngayVn(kq.luc)}, hết ${kq.giay} giây`
-  : 'chưa có kết quả lần chạy nào lưu trên máy');
+/*
+ * Báo cáo Surefire giữ kết quả mới nhất của từng lớp. Khi chỉ chạy lại vài lớp thì các lớp còn
+ * lại vẫn mang kết quả của lần chạy trước, nên phải nói rõ đây là tổng hợp nhiều ngày, không
+ * được viết như thể một lần chạy trọn vẹn.
+ */
+const moTaChay = (kq) => {
+  if (!kq) return 'chưa có kết quả lần chạy nào lưu trên máy';
+  if (ngayVn(kq.dau) === ngayVn(kq.luc)) {
+    return `đạt ${kq.dat} trên ${kq.bai} bài ở lần chạy ngày ${ngayVn(kq.luc)}, hết ${kq.giay} giây`;
+  }
+  return `đạt ${kq.dat} trên ${kq.bai} bài theo kết quả mới nhất của từng lớp, chạy từ ngày ${ngayVn(kq.dau)} tới ${ngayVn(kq.luc)}`;
+};
 const hoaDau = (chuoi) => chuoi.charAt(0).toUpperCase() + chuoi.slice(1);
 
 const W = 9026;
@@ -181,7 +191,7 @@ const doc = new Document({
       p('Giảng viên hướng dẫn: TS. Nguyễn Thị Phương Trâm', { center: true, size: 22, after: 50 }),
       p('Kho mã nguồn: https://github.com/AnyPham/vuonsen-fnb', { center: true, size: 22, after: 260 }),
 
-      p(`Ghi chú về trạng thái mã nguồn đến ngày ${SL.homNay}: nhánh chính trên GitHub đã hợp nhất tới Pull Request #13. Hai nhánh tro-ly-ai/goi-mo-hinh-ngon-ngu (1 commit) và dat-mon/anh-chi-tiet-va-dat-mon-le (4 commit) đã đẩy lên GitHub nhưng chưa hợp nhất. Mã nguồn từ Việc 25 trở đi mới nằm ở máy cá nhân, chưa commit, hiện là ${SL.thayDoi} thay đổi. Các tệp tài liệu báo cáo chỉ lưu ở máy cá nhân, không đưa lên kho mã nguồn.`, { italic: true, size: 21, after: 200 }),
+      p(`Ghi chú về trạng thái mã nguồn đến ngày ${SL.homNay}: nhánh chính trên GitHub đã hợp nhất tới Pull Request #13. Hai nhánh tro-ly-ai/goi-mo-hinh-ngon-ngu (1 commit) và dat-mon/anh-chi-tiet-va-dat-mon-le (4 commit) đã đẩy lên GitHub nhưng chưa hợp nhất. Mã nguồn từ Việc 25 tới Việc 66 đã commit ngày 02/11/2026, chia thành chín commit theo từng tính năng. Ở máy cá nhân hiện còn ${SL.thayDoi} thay đổi chưa commit. Các tệp tài liệu báo cáo chỉ lưu ở máy cá nhân, không đưa lên kho mã nguồn.`, { italic: true, size: 21, after: 200 }),
 
       // ---------------- 06/08 ----------------
       h1('Ngày 06/08/2026'),
@@ -1091,7 +1101,7 @@ const doc = new Document({
       khongAnh('hai việc này.'),
 
       h2('Việc 60 — Kiểm thử tải 100 và 1000 người dùng'),
-      p('Ngày 30/10/2026, tệp cong-cu/do-hieu-nang/do-tai.js, chưa commit.', { italic: true, size: 21 }),
+      p('Ngày 30/10/2026, tệp cong-cu/do-hieu-nang/do-tai.js, commit 02f623c.', { italic: true, size: 21 }),
       p('Giảng viên yêu cầu đo trên môi trường giả lập, ví dụ tải 100 rồi 1000 người dùng trong 1 phút, tăng dần số người dùng để xem thời gian phản hồi. Bộ đo tải cũ chỉ tới 100 người nên được bổ sung tham số chọn mức tải, kiểu rải đều người dùng trong 60 giây, cột trung bình, giới hạn 30 giây cho mỗi yêu cầu và phép đo độ trễ của chính máy đo. Sửa thêm lỗi lấy giá trị lớn nhất bằng toán tử trải mảng, có thể làm tràn ngăn xếp khi số mẫu quá lớn.'),
       p('Môi trường: backend, MariaDB và bộ đo chạy chung một laptop i5-11400H, 8 GB RAM. Backend bật bằng mvn spring-boot:run, dữ liệu quy mô lớn của Việc 54, mô hình ngôn ngữ của trợ lý đang tắt nên không gọi dịch vụ ngoài. Đo trực tiếp bốn API đọc dữ liệu, chưa gồm thời gian trình duyệt dựng trang.'),
       p('Rải đều 100 và 1000 người trong 60 giây, thời gian phản hồi trung bình:', { size: 23 }),
@@ -1109,7 +1119,7 @@ const doc = new Document({
       khongAnh('kết quả là bảng số trên dòng lệnh, đã chép vào mục này.'),
 
       h2('Việc 61 — Hoàn thiện thanh toán VNPay sandbox'),
-      p('Ngày 30/10/2026, chưa commit.', { italic: true, size: 21 }),
+      p('Ngày 30/10/2026, commit b2aed32.', { italic: true, size: 21 }),
       p('Khung VNPay đã có từ trước: ký HMAC-SHA512, nút trên trang thanh toán và trang kết quả. Đối chiếu với tài liệu chính thức của VNPay thì khung đó mới đi được đường thuận lợi và còn thiếu những phần quyết định tiền có ghi đúng hay không.'),
       fileTable([
         ['Thiếu IPN', 'Khách trả xong rồi đóng trình duyệt thì đơn không được ghi nhận. Thêm GET /api/v1/payments/vnpay/ipn, trả đúng các mã 00, 01, 02, 04, 97, 99 của VNPay.'],
@@ -1123,15 +1133,166 @@ const doc = new Document({
       p('Hạn chế: chưa chạy với cổng VNPay sandbox thật vì cần tài khoản đăng ký của chủ dự án, và chưa thử IPN qua mạng thật. Phiếu VNPay bị bỏ dở vẫn nằm ở trạng thái chờ đối soát cho tới khi nhân viên hủy.'),
       khongAnh('chưa có giao dịch thật trên sandbox để chụp.'),
 
+      h2('Việc 62 — Luật mật khẩu dùng chung cho cả ba nơi'),
+      p('Ngày 02/11/2026, commit a32757c.', { italic: true, size: 21 }),
+      p('Mật khẩu cũ chỉ cần sáu ký tự, không đòi chữ hoa hay chữ số, và mỗi nơi tự kiểm một kiểu: đăng ký kiểm một đằng, đặt lại mật khẩu kiểm một nẻo. Gom luật vào một lớp LuatMatKhau giữ biểu thức và câu thông báo, để ba nơi dùng chung. Luật mới: từ 8 ký tự, phải có chữ hoa, chữ thường và số.'),
+      p('Trần 72 ký tự lấy theo giới hạn của BCrypt. Chuỗi dài hơn 72 byte bị BCrypt cắt âm thầm, nên hai mật khẩu khác nhau ở phần đuôi vẫn đăng nhập được vào cùng tài khoản. Chặn ngay ở tầng kiểm tra thì không rơi vào trường hợp đó.'),
+      khongAnh('phần này là quy tắc kiểm tra phía máy chủ, không có màn hình riêng.'),
+
+      h2('Việc 63 — Xác thực email khi đăng ký'),
+      p('Ngày 02/11/2026, commit a32757c.', { italic: true, size: 21 }),
+      p('Trước đây đăng ký xong là vào thẳng tài khoản, nên không có gì bảo đảm địa chỉ email khai báo là thật. Hệ quả là hoá đơn và thư xác nhận đơn có thể gửi vào hư không. Nay tài khoản tạo ra ở trạng thái chưa kích hoạt, phải nhập mã sáu số gửi về email mới dùng được. Mã sinh bằng SecureRandom, hết hạn sau 15 phút, sai quá 5 lần thì huỷ và phải xin mã mới.'),
+      p('Một lỗi phát hiện nhờ kiểm thử: việc huỷ mã sau 5 lần sai bị giao dịch quay lui cuốn theo, nên mã vẫn sống và bộ đếm lại từ đầu, tức chặn như không chặn. Nguyên nhân là lệnh huỷ nằm chung giao dịch với lệnh ném lỗi. Thử sửa bằng noRollbackFor không ăn thua vì AuthService cũng mở giao dịch riêng của nó. Cách chạy được là tách phần huỷ mã ra bean riêng HuyMaXacThuc với propagation REQUIRES_NEW, để nó chạy trong giao dịch độc lập và sống sót khi giao dịch ngoài quay lui.'),
+      p('Migration V30 phải tách thành hai câu ALTER TABLE riêng, vì H2 dùng trong kiểm thử không nhận nhiều mệnh đề ADD COLUMN trong một câu, trong khi MySQL thì nhận.'),
+      khongAnh('màn nhập mã nằm trong luồng đăng ký, chưa chụp riêng.'),
+
+      h2('Việc 64 — Bắt đăng nhập mới gửi được đơn và tự điền thông tin đã lưu'),
+      p('Ngày 02/11/2026, commit 1e32a63.', { italic: true, size: 21 }),
+      p('Khách vãng lai đặt được đơn nên đơn không gắn tài khoản nào. Đếm trong cơ sở dữ liệu thấy 70 đơn như vậy. Hệ quả: chính người đặt cũng không xem lại được đơn của mình ở mục Đơn của tôi, và không có cách nào xác minh địa chỉ email họ khai.'),
+      p('Chặn ở hai lớp. Máy chủ chuyển POST /api/v1/bookings và POST /api/v1/dish-orders sang nhóm bắt buộc đăng nhập, đặt ngay trước quy tắc chung vì thứ tự trong chuỗi quyết định quy tắc nào thắng. Giao diện thay nút gửi bằng khối mời đăng nhập, để khách biết ngay chứ không điền hết ba bước rồi mới nhận lỗi 401. Chặn ở giao diện chỉ là lớp tiện lợi, chặn thật nằm ở máy chủ.'),
+      p('Hai đường báo giá vẫn để mở, vì chúng chỉ tính toán và không tạo bản ghi nào. Bắt đăng nhập mới cho xem giá thì mất khách ngay từ bước tìm hiểu.'),
+      p('Kèm theo: thông tin khách đã lưu được điền sẵn vào biểu mẫu đặt đơn, nhưng chỉ điền vào ô đang trống và chỉ một lần mỗi phiên, để không ghi đè thứ khách vừa sửa bằng tay.'),
+      khongAnh('thay đổi nằm ở quy tắc truy cập và khối mời đăng nhập, chưa chụp riêng.'),
+
+      h2('Việc 65 — Trợ lý trả lời theo hai hướng'),
+      p('Ngày 02/11/2026, commit 5ddc040.', { italic: true, size: 21 }),
+      p('Yêu cầu của giảng viên: câu hỏi đã có sẵn thì lấy câu trả lời soạn sẵn, câu hỏi ngoài thì vẫn trả lời được nhưng phải bám vào dữ liệu thật trong cơ sở dữ liệu, không thu thập lung tung rồi trả lời tầm bậy.'),
+      p('Cách làm: nhận diện ý định trước. Nếu câu hỏi khớp một ý định đã có trong ngân hàng thì trả thẳng câu soạn sẵn, không gọi mô hình, vì câu soạn sẵn chính xác hơn và không tốn lượt gọi. Nếu không khớp thì mới chuyển cho mô hình, kèm ngữ cảnh dựng từ dữ liệu thật đang có.'),
+      p('Thêm ý định SO_SANH cho những câu kiểu "so sánh giá ở đây với nơi khác", và đặt nhóm từ khoá này lên đầu chuỗi nhận diện. Lý do: câu so sánh chứa từ khoá của nhiều ý định khác như giá, không gian, thực đơn, nên xét sau sẽ bị nhận nhầm thành câu hỏi giá thông thường rồi trả về bảng giá thay vì so sánh.'),
+      p('Chín bài kiểm thử của trợ lý phải sửa lại sau thay đổi này: câu hỏi dùng trong bài kiểm vốn nằm sẵn trong ngân hàng nên không còn đi qua nhánh gọi mô hình nữa. Đổi sang câu so sánh, và thêm một hằng riêng cho câu chắc chắn nằm trong ngân hàng để kiểm nhánh còn lại.'),
+      khongAnh('thay đổi nằm ở luồng xử lý phía máy chủ.'),
+
+      h2('Việc 66 — Công cụ đo mức gần nhau giữa website'),
+      p('Ngày 02/11/2026, commit 7041145.', { italic: true, size: 21 }),
+      p('Tiểu luận cần số liệu so sánh Vườn Sen với các website cùng lĩnh vực. Không có phần mềm nào đo được việc này: công cụ so mã nguồn chỉ biết hai trang viết code giống nhau tới đâu, không biết khách đặt tiệc được hay không. Nên phải khảo sát bằng tay theo mười tiêu chí, còn công cụ lo phần tính toán.'),
+      p('Phần trăm tương đồng dùng hệ số Gower cho biến định lượng, trích từ Gower, J. C. (1971), "A General Coefficient of Similarity and Some of Its Properties", Biometrics 27(4), trang 857-871. Chọn công thức có nguồn thay vì tự nghĩ, để người khác kiểm chứng lại được.'),
+      p('Lấy khoảng biến thiên bằng 4 cho mọi tiêu chí thay vì khoảng quan sát như bài gốc. Khoảng quan sát phân biệt tốt hơn, nhưng nó phụ thuộc vào chính tập trang đang có, nên khảo sát thêm một website là điểm của các trang cũ đổi theo. Số liệu đã in vào tiểu luận mà tự đổi thì không bảo vệ được.'),
+      p('Kết quả chính không phải con số tương đồng mà là bảng phân tích khoảng trống. Lý do: quét hết 9.765.625 tổ hợp điểm có thể có cho thấy một trang rỗng hoàn toàn vẫn đạt 25%, và chấm ngẫu nhiên trung bình đã 61%. Thang không bắt đầu từ 0, lại vì công thức lấy trị tuyệt đối nên không phân biệt được "giống nhau" với "hơn hẳn". Bảng khoảng trống chỉ là phép đếm nên không có giả định ngầm nào để bắt bẻ.'),
+      p('Kèm một bảng chấm điểm mở bằng trình duyệt để nhập điểm lúc đi khảo sát, có nút xuất ngược số liệu ra mã nguồn vì bộ nhớ trình duyệt gắn với địa chỉ mở trang và mất khi đổi cách mở.'),
+      khongAnh('công cụ chạy trên dòng lệnh và trong trình duyệt, kết quả là bảng số.'),
+
+      h2('Việc 67 — Sửa lỗi đơn tự coi mình là đơn trùng khi xác nhận'),
+      p('Ngày 02/11/2026, chưa commit.', { italic: true, size: 21 }),
+      p('Bộ kiểm thử Selenium báo chín ca hỏng cùng một kiểu: bước quản trị xác nhận đơn trả lỗi 400 với câu "sảnh đã có tiệc vào buổi này", trong khi ngày đó không có đơn nào khác. Đây là lỗi thật của website: nhân viên không xác nhận được đơn vừa nhận, lại nhận một câu báo sai sự thật.'),
+      p('Nguyên nhân: đơn vừa gửi còn hạn giữ chỗ tạm nên được tính là đang chiếm buổi. Khi xác nhận, bước kiểm trùng lịch quét mọi đơn đang chiếm buổi của cùng sảnh cùng ngày và gặp chính đơn đang được xác nhận, tức đơn tự coi mình là đối thủ của mình. Cách sửa là loại chính đơn đang xét ra khỏi danh sách trước khi so trùng.'),
+      p('Lỗi này từng lọt qua vì chỉ xảy ra khi xác nhận trong lúc hạn giữ chỗ còn hiệu lực. Thao tác tay thường chậm, để quá hạn mới xác nhận thì đơn thôi chiếm buổi và mọi thứ chạy bình thường. Chỉ bộ kiểm thử tự động, tạo đơn rồi xác nhận ngay trong vài giây, mới chạm vào đúng khoảng thời gian đó. Đây là ví dụ cụ thể cho luận điểm kiểm thử tự động bắt được loại lỗi mà kiểm thử tay dễ bỏ sót.'),
+      p('Kiểm chứng theo cả hai chiều. Tái hiện bằng API thật: tạo đơn rồi xác nhận ngay thì nhận mã 400. Thêm kiểm thử đơn vị xacNhanDuocDonConHanGiuCho vào GiuChoTamTest: bỏ bản sửa thì bài này thất bại đúng câu lỗi trên, có bản sửa thì đạt. Toàn bộ kiểm thử phía máy chủ đạt 290/290. Sau khi khởi động lại máy chủ, tạo đơn rồi xác nhận ngay trên máy chủ đang chạy nhận mã 200.'),
+      p('Cùng đợt này, ca TC-ADMIN-06 của Selenium được viết lại. Ca này viết từ trước khi có giữ chỗ tạm, khẳng định đơn chờ xác nhận chưa chiếm buổi nên đặt trùng vẫn được. Từ khi có giữ chỗ tạm thì điều đó không còn đúng, và kiểm thử đơn vị GiuChoTamTest đã chốt luật mới. Ca được sửa cho khớp: đặt trùng bị từ chối cả lúc đơn còn giữ chỗ lẫn sau khi đã xác nhận. Chạy lại lớp kịch bản quản trị đơn đạt 8/8.'),
+      khongAnh('sửa ở phía máy chủ, kết quả kiểm chứng là mã phản hồi và kết quả chạy kiểm thử.'),
+
+      h2('Việc 68 — Bấm bản đồ hoặc địa chỉ là chỉ đường từ vị trí hiện tại'),
+      p('Ngày 02/11/2026, chưa commit.', { italic: true, size: 21 }),
+      p('Trước đây đường dẫn dưới bản đồ chỉ mở Google Maps ghim vị trí, khách phải tự bấm thêm nút chỉ đường. Nay bấm vào bản đồ, vào đường dẫn bên dưới hay vào địa chỉ ở chân trang đều mở thẳng trang chỉ đường từ vị trí hiện tại của khách tới nhà hàng. Áp dụng cho cả chân trang và trang chi tiết không gian, vì hai nơi dùng chung một thành phần bản đồ.'),
+      p('Đường dẫn theo chuẩn Maps URLs của Google, dạng google.com/maps/dir/?api=1&destination=..., không cần khóa API và không tốn phí. Bỏ trống điểm xuất phát thì Google tự lấy vị trí hiện tại của người bấm. Trên điện thoại có cài app Google Maps thì đường dẫn mở thẳng trong app.'),
+      p('Điểm đến dùng địa chỉ chữ chứ không dùng tọa độ. Kiểm tra cho thấy ghim trên bản đồ đang lệch khoảng 1,2 km so với vị trí Google tra ra cho số nhà 1147 Bình Quới, và rơi giữa sông Sài Gòn. Chỉ đường tới tọa độ đó thì Google bám vào con đường gần nhất, có thể dẫn khách sang nhầm bờ. Dùng địa chỉ chữ thì Google tìm đúng số nhà.'),
+      p('Bản đồ nhúng là trang của Google, khác nguồn với website, nên website không đổi được việc bấm bên trong nó dẫn đi đâu. Cách làm là phủ lên trên một lớp đường dẫn trong suốt, kèm nhãn "Bấm để chỉ đường". Đánh đổi là không kéo thả được ô bản đồ nhỏ; chấp nhận được vì ô chỉ cao vài trăm điểm ảnh, kéo thả trong đó trên điện thoại còn hay làm kẹt cuộn trang.'),
+      p('Ghi nhận thêm: lần bấm thử đầu tiên không mở được Google Maps vì trình duyệt đang đăng nhập tài khoản Google Workspace của trường, nơi quản trị đã tắt dịch vụ Maps. Đây không phải lỗi website; đổi sang tài khoản khác thì mở bình thường. Trang chỉ đường hiện tên Khu du lịch Bình Quới 1 vì đó là cơ sở thật ở địa chỉ này, còn Vườn Sen chưa có hồ sơ doanh nghiệp trên Google.'),
+      p('Kiểm chứng: biên dịch giao diện đạt. Trên trang thật ở khổ điện thoại, cả ba chỗ bấm đều trỏ đúng đường dẫn chỉ đường. Mở đường dẫn thì Google hiện tuyến từ vị trí hiện tại tới 1147 Bình Quới. Chưa thử trên điện thoại thật, chưa dời ghim về đúng tọa độ.'),
+      ...anh('viec-68-chi-duong-ban-do', 'Hình 68.1. Chân trang ở khổ điện thoại: nhãn Bấm để chỉ đường trên bản đồ và đường dẫn Chỉ đường tới Vườn Sen bên dưới.'),
+
+      h2('Việc 69 — Sửa lỗi bấm Tiếp tục ở bước 2 là đơn bị gửi luôn'),
+      p('Ngày 02/11/2026, chưa commit.', { italic: true, size: 21 }),
+      p('Hai ca Selenium TC-BOOK-01 và TC-BOOKV-06 hỏng theo những kiểu khác nhau qua từng lần chạy: lúc không bấm được vào ô số điện thoại, lúc ô họ tên biến mất giữa chừng, lúc không tìm thấy mã đơn. Chạy riêng TC-BOOK-01 ba lần thì hỏng cả ba, tức lỗi lặp lại được chứ không phải chập chờn. Ảnh chụp lúc hỏng cho thấy trang đã ở màn Đã nhận yêu cầu đặt tiệc trong khi kịch bản còn chưa điền thông tin liên hệ.'),
+      p('Nguyên nhân: ở bước 2, nút Tiếp tục có kiểu button; sang bước 3, ở đúng vị trí đó là nút Gửi kiểu submit. Hai nút cùng là thẻ button nằm cùng chỗ nên React giữ nguyên thẻ cũ và chỉ đổi thuộc tính kiểu. Khi người dùng bấm Tiếp tục, React chuyển bước và đổi nút xong trước khi trình duyệt thực hiện hành vi mặc định của cú bấm; lúc đó nút đã là submit nên biểu mẫu bị gửi. Khách đã đăng nhập thì bước 3 được tự điền tên và số điện thoại hợp lệ từ Việc 64, thế là đơn đi luôn mà khách chưa kịp xem lại.'),
+      p('Các lần dựng lại bằng tay đầu tiên không ra lỗi vì bấm nút bằng lệnh click của JavaScript. Bấm kiểu đó thì trình duyệt thực hiện hành vi mặc định trước khi React kịp vẽ lại, nút vẫn là button nên không có gì xảy ra. Chỉ cú bấm như người thật, đúng cách Selenium bấm, mới chạm lỗi. Dựng lại bằng cú bấm thật thì một lần bấm Tiếp tục sinh ngay đơn VS-20261102-0096.'),
+      p('Cách sửa: đặt khóa riêng cho hai nút, key="tiep-tuc" và key="gui-don", buộc React bỏ thẻ cũ và dựng thẻ mới, nên cú bấm Tiếp tục không bao giờ rơi vào nút gửi. Sửa đúng một chỗ trong BookingPage.jsx, có ghi chú giải thích ngay tại chỗ. Đã soát các biểu mẫu khác, chỉ trang đặt tiệc có mẫu hai nút đổi chỗ cho nhau này.'),
+      p('Kiểm chứng theo hai chiều trên trang thật. Trước khi sửa, bấm thật Tiếp tục thì đơn bị gửi. Sau khi sửa, cùng cú bấm đó thì dừng ở bước 3 với tên và số điện thoại điền sẵn, không có đơn nào được gửi; bấm thật nút Gửi thì đơn vẫn gửi bình thường. Chạy lại toàn bộ bộ Selenium: TC-BOOK-01 và TC-BOOKV-06 đều đạt. Các đơn sinh ra trong lúc thử đã được hủy.'),
+      p('Trước khi tìm ra gốc, có một bản vá cho hàm nhập liệu của bộ kiểm thử để chịu được việc ô bị vẽ lại. Bản vá đó dựa trên chẩn đoán sai và chỉ chữa triệu chứng, nên đã trả về như cũ, không để lại trong mã nguồn.'),
+      ...anh('viec-69-bam-tiep-tuc-la-gui-don', 'Hình 69.1. Trước khi sửa: một lần bấm Tiếp tục ở bước 2 là ra luôn màn Đã nhận yêu cầu đặt tiệc với mã đơn VS-20261102-0096, khách chưa hề thấy bước 3.'),
+
+      h2('Việc 70 — Bộ kiểm thử giao diện về 170 trên 170'),
+      p('Ngày 02/11/2026, chưa commit.', { italic: true, size: 21 }),
+      p('Sau khi sửa lỗi ở Việc 67 và Việc 69, lần chạy đầy đủ đầu tiên đạt 169/170, hết 17 phút 10 giây. Ca duy nhất không đạt là TC-CAL-05: tạo một đơn, mở lịch quản trị, lật tới tháng của đơn rồi đọc ô ngày đó, nhưng báo không tìm thấy ô. Ca này buổi sáng vẫn đạt.'),
+      p('Ảnh chụp lúc hỏng cho thấy lịch đã hiện đúng tháng và ô ngày đó có đủ buổi tiệc, tức dữ liệu đúng nhưng đọc sai lúc. Bấm sang tháng mới thì tiêu đề đổi ngay, còn lưới phải đợi trang gọi máy chủ lấy dữ liệu tháng đó rồi mới vẽ lại. Hàm đọc ô của bộ kiểm thử đọc ngay sau cú bấm, rơi vào lúc lưới còn là tháng cũ hoặc đang tải. Đây là lỗi của bộ kiểm thử, có từ trước và chỉ lộ ra khi máy chạy chậm hơn một nhịp.'),
+      p('Cách sửa: hàm đọc ô chờ tới khi ô của ngày cần tìm có mặt rồi mới đọc. Trước khi sửa đã kiểm tra một điều kiện để cách này không đọc phải dữ liệu cũ: lưới của trang lịch dựng từ chính dữ liệu máy chủ trả về chứ không tự tính ô theo lịch, nên ô của ngày cần tìm đã có mặt nghĩa là dữ liệu chứa ngày đó đã về. Không phải sửa gì ở website.'),
+      p('Kiểm chứng: chạy riêng lớp lịch đạt 10/10, sau đó chạy lại toàn bộ bộ kiểm thử đạt 170/170, Maven báo BUILD SUCCESS. Lần chạy này mất 21 phút 5 giây, chậm hơn lần trước vì có một lượt chạy thử JMeter chạy cùng lúc trên máy.'),
+      khongAnh('kết quả là bảng tổng hợp của Maven và báo cáo Surefire, không có màn hình riêng.'),
+
+      h2('Việc 71 — Đo tải đặt tiệc, gọi món và thanh toán bằng JMeter'),
+      p('Ngày 02/11/2026, chưa commit.', { italic: true, size: 21 }),
+      p('Trả lời câu hỏi của cô: một người dùng thì nhanh, nhưng khi website công khai và nhiều người cùng tìm sảnh, đặt tiệc, gọi món, thanh toán thì tốc độ phản hồi bao nhiêu và có lỗi gì không. Website chưa công khai nên đo bằng mô phỏng: Apache JMeter 5.6.3 dựng người dùng ảo, mỗi người một tài khoản riêng trong 100 tài khoản tạo sẵn, nghỉ ngẫu nhiên 1 đến 3 giây giữa các bước như người thật đọc trang, tăng dần số người trong 15 giây đầu, mỗi mức đo 60 giây.'),
+      p('Hai kịch bản đo riêng. Kịch bản đọc gồm đăng nhập, tìm sảnh, xem chi tiết sảnh, tính giá tiệc, xem thực đơn, tính tiền gọi món, đo ở 1, 10, 25, 50 và 100 người. Kịch bản ghi mới viết thêm cho phần đặt tiệc thật và tạo yêu cầu thanh toán cọc, đo ở 1, 10 và 25 người; mỗi lượt đặt một ngày riêng để không vấp luật trùng lịch, và bộ chạy tự hủy các đơn đo tải trước và sau mỗi lần đo.'),
+      p('Kết quả luồng đọc: 4.684 yêu cầu, không yêu cầu nào lỗi. Ở 10 người, 95% yêu cầu xong trong 120 ms; ở 100 người là 208 ms, dưới ngưỡng 1 giây lấy theo ba mốc thời gian phản hồi của Nielsen (1993). Bước chậm nhất là đăng nhập, p95 cao nhất 455 ms, do mật khẩu băm bằng BCrypt cố ý tốn thời gian để chống dò mật khẩu.'),
+      p('Đối chiếu với định luật Little, Little (1961), Operations Research 9(3), trang 383 tới 387: áp dụng cho cả vòng của khách gồm thời gian phản hồi và thời gian nghỉ thì thông lượng dự đoán khớp thông lượng đo được trong vòng 3,6% ở mọi mức, nên hệ thống chưa bão hòa ở 100 người. Ở 100 người, trung bình chỉ 2,28 yêu cầu nằm trong máy chủ cùng lúc, vì phần lớn thời gian người dùng đang đọc trang. Phép kiểm Little trong bộ chạy trước đó so lambda nhân W với số người, sai về lý thuyết khi có thời gian nghỉ; đã sửa lại công thức, kể cả cách tính số người đang hoạt động khi người dùng vào dần.'),
+      p('Trong lúc dựng bộ đo đã sửa năm lỗi của chính bộ đo: chú thích XML chứa hai dấu gạch ngang làm JMeter không đọc được kịch bản; JMeter xin 1 GB bộ nhớ mà máy 8 GB không đáp ứng nổi khi đang chạy cả máy chủ, hạ xuống 512 MB; jmeter.bat nuốt mất lỗi vì kết thúc bằng lệnh pause, nay bộ chạy kiểm tệp kết quả và in đầu ra của JMeter khi thiếu; tệp kết quả có ô chứa dấu phẩy và xuống dòng làm bộ đọc CSV cũ lệch cột, nay đọc đúng chuẩn; bước hủy đơn sau khi đo hỏng vì kết nối cũ bị đóng, nay thử lại và in kết quả trước khi hủy.'),
+      p('Luồng ghi phát hiện một lỗi thật của website, trình bày ở Việc 72. Mục 3.3.8.6 của tiểu luận trình bày đầy đủ phương pháp, năm bảng số liệu, phép đối chiếu Little và năm giới hạn của phép đo, trong đó giới hạn lớn nhất là máy đo và máy chủ chạy chung một máy cá nhân.'),
+      ...anh('viec-71-jmeter-100-nguoi', 'Hình 71.1. Báo cáo của JMeter cho luồng đọc ở mức 100 người đồng thời: chỉ số APDEX 0,996, 100% yêu cầu đạt.'),
+
+      h2('Việc 72 — Sửa lỗi trùng mã khi nhiều người cùng đặt tiệc, đóng cọc'),
+      p('Ngày 02/11/2026, chưa commit.', { italic: true, size: 21 }),
+      p('Lần đo đầu của luồng ghi có 1,94% yêu cầu lỗi ở mức 10 người và 9,34% ở mức 25 người, gần hết ở bước đóng cọc, với mã 409. Tái hiện có kiểm soát: gửi cùng một lúc 20 yêu cầu đặt tiệc thì 6 yêu cầu hỏng, 14 yêu cầu tạo phiếu thu thì 12 yêu cầu hỏng. Tạo một phiếu thu lẻ mất 264 ms vì trong ngày đã có hơn 200 phiếu.'),
+      p('Nguyên nhân: mã đơn và mã phiếu thu có dạng tiền tố, ngày, số thứ tự, và mỗi yêu cầu tự tính số bản ghi trong ngày cộng một. Nhiều người cùng lúc thì tính ra cùng một số vì chưa ai kịp lưu, và cơ sở dữ liệu chặn người ghi sau vì trùng ràng buộc duy nhất. Đơn đặt tiệc đã có cơ chế thử lại, nhưng khi tải dồn thì mỗi vòng chỉ một người thắng nên năm vòng không đủ; phiếu thu thì không có cơ chế thử lại nào, lại dò mã từ số 1 cho mỗi phiếu mới nên càng về cuối ngày càng chậm.'),
+      p('Cách sửa: thêm lớp CapSoThuTu cấp số thứ tự ở một chỗ có khóa, mỗi lần lấy số lớn hơn giữa số bản ghi đã lưu và số vừa cấp trong bộ nhớ rồi cộng một, nên không bao giờ cấp trùng. Dùng chung cho mã đơn đặt tiệc, đơn đặt món và phiếu thu; controller thanh toán thêm cơ chế thử lại như hai loại đơn kia để làm lưới an toàn. Không đổi cấu trúc cơ sở dữ liệu. Giới hạn: khóa nằm trong một tiến trình máy chủ, nếu sau này chạy nhiều máy chủ thì nên chuyển bộ đếm vào cơ sở dữ liệu.'),
+      p('Kiểm chứng theo hai chiều. Thêm ba lớp kiểm thử: hai mươi khách cùng gửi đơn, mười lăm khách cùng tạo phiếu thu gọi thẳng qua controller, và ba bài cho riêng bộ cấp số. Trên mã cũ, hai bài đồng thời thất bại vì trùng mã; trên mã mới thì đạt, không có lần đụng mã nào. Bản đầu của bài phiếu thu tự bọc cơ chế thử lại nên đạt ngay cả khi lỗi còn nguyên; đã sửa cho gọi thẳng controller để đi đúng đường của yêu cầu thật. Toàn bộ kiểm thử phía máy chủ đạt 295/295.'),
+      p('Kiểm chứng trên máy chủ thật: chạy thêm một máy chủ mã mới ở cổng 8099 dùng chung cơ sở dữ liệu. Gửi cùng lúc 20 đơn và 20 phiếu thu đều thành công, một phiếu thu lẻ còn 28 ms. Đo lại luồng ghi hai lần đều 0% lỗi ở cả ba mức. Các đơn đo tải và đơn thử đã hủy hết. Máy chủ ở cổng 8080 vẫn chạy mã cũ cho tới khi khởi động lại.'),
+      ...anh('viec-72-ghi-25-nguoi-sau-sua', 'Hình 72.1. Báo cáo của JMeter cho luồng đặt tiệc và đóng cọc ở mức 25 người sau khi sửa: 100% yêu cầu đạt, APDEX 0,982.'),
+
+      h2('Việc 73 — Viết lại hướng dẫn demo theo website hiện tại'),
+      p('Ngày 02/11/2026, chưa commit.', { italic: true, size: 21 }),
+      p('Hướng dẫn demo viết từ 27/10 đã lệch với website ở nhiều chỗ: khách vãng lai không còn gửi được đơn ở bước 3 mà được mời đăng nhập; đăng ký phải nhập mã xác thực email; chưa có phần đặt tiệc khi đã đăng nhập, đóng cọc qua VNPay và phần kiểm thử tự động là sản phẩm chính của chặng hai. Đã viết lại các phần đó, thêm bảng tài khoản và mật khẩu dùng khi demo, thẻ thử VNPay do VNPay công bố, mã đơn mẫu để tra cứu, mục tạo tài khoản nhân viên, mục bản đồ chỉ đường và phần kiểm thử tự động có số liệu đo tải.'),
+      p('Kiểm chứng các con số và thao tác trong hướng dẫn: dựng thử một cơ sở dữ liệu trắng cho ra 30 tệp di trú, 27 bảng, 6 không gian, 8 gói tiệc, 126 món, 52 đơn đặt tiệc, 35 đơn đặt món, 19 đánh giá, 15 đợt giảm giá, 1 quản trị và 5 khách; ba tài khoản demo đăng nhập được; mã đơn mẫu có thật. Luồng xác thực email chạy đúng: đăng ký xong chưa đăng nhập được, mã 6 số nằm trong bảng email_logs và cửa sổ máy chủ, nhập mã xong thì đăng nhập được. Chưa kiểm chứng: một giao dịch VNPay trọn vẹn bằng thẻ thử, phần này hướng dẫn ghi rõ phải thử trước khi quay.'),
+      khongAnh('đây là tài liệu hướng dẫn, nội dung kiểm chứng là các con số và thao tác ghi ở trên.'),
+
+      h2('Việc 74 — Trang thanh toán còn hai nút Đóng cọc và Trả hết, cả hai đi qua VNPay'),
+      p('Ngày 02/11/2026, chưa commit.', { italic: true, size: 21 }),
+      p('Trang thanh toán có ba nút: Đóng cọc, Trả hết và Thanh toán qua VNPay. Hai nút đầu dựng mã VietQR, chỉ nút thứ ba mới sang cổng VNPay, nên khách phải hiểu hai cách trả rồi mới chọn được. Cổng VNPay môi trường thử đã chạy được nên không cần mã QR và nút giả lập nữa. Yêu cầu: chỉ để hai nút Đóng cọc và Trả hết, bấm nút nào cũng thanh toán qua VNPay.'),
+      p('Thay đổi giao diện ở PaymentPage.jsx. Nhà hàng đã khai báo VNPay thì hai nút gọi thẳng cổng VNPay, nút Đóng cọc với mục đích đóng cọc, nút Trả hết với mục đích trả phần còn lại, dưới hai nút có một dòng báo khách sẽ được chuyển sang VNPay rồi đưa về lại Vườn Sen. Khối mã QR và nút giả lập ngân hàng báo có không hiện nữa. Bỏ nút Thanh toán qua VNPay và câu chữ của nó ở hai tệp ngôn ngữ. Chưa khai báo VNPay, ví dụ máy mới tải mã nguồn về, thì hai nút quay về mã VietQR như cũ để hệ thống vẫn thu được tiền mà không cần đăng ký cổng. Khi có VNPay, hai nút vẫn hiện cả lúc đơn đang có phiếu chờ, vì đó là lượt VNPay khách bỏ dở; đi đường mã QR thì vẫn ẩn để khỏi sinh thêm phiếu.'),
+      p('Lỗi thật lộ ra khi đổi: trước đây chỉ có một nút VNPay nên khách không đổi qua lại giữa hai số tiền trên cổng. Nay khách có thể bấm Trả hết rồi bỏ dở, bấm Đóng cọc rồi bỏ dở, rồi bấm Trả hết lần nữa. Máy chủ lấy phiếu chờ mới nhất của đơn để gửi sang VNPay, trong khi lần bấm thứ ba dùng lại phiếu trả hết cũ còn phiếu mới nhất lại là phiếu cọc. Dựng lại trên máy chủ cổng 8080 đúng ba lần bấm đó: lần thứ ba đáng lẽ gửi 45.554.400 đ thì VNPay nhận 13.666.320 đ, đúng bằng tiền cọc.'),
+      p('Cách sửa trong PaymentService: tách hàm taoPhieuCho trả về chính phiếu vừa tạo hoặc vừa dùng lại cho đúng mục đích khách bấm; hàm tạo đường dẫn VNPay lấy số tiền và mã giao dịch từ phiếu đó, không tra lại phiếu mới nhất. Thêm bài kiểm thử doiQuaLaiTraHetVaDongCoc đi đúng ba lần bấm trên và đọc số tiền trong tham số vnp_Amount gửi sang cổng. Bộ Selenium không có ca nào bấm các nút thanh toán nên không phải sửa.'),
+      p('Kiểm chứng: bài mới đạt, lớp VnPayThanhToanTest đạt 18/18, toàn bộ kiểm thử phía máy chủ đạt 296/296. Chạy máy chủ mã mới ở cổng 8099 và lặp lại ba lần bấm: lần thứ ba gửi đúng 45.554.400 đ. Trên trang thật hiện đúng hai nút và dòng báo, không còn mã QR hay nút giả lập; bấm thật nút Đóng cọc thì chuyển sang trang chọn phương thức thanh toán của VNPay môi trường thử, cơ sở dữ liệu có phiếu đóng cọc, cách trả VNPAY, đúng 13.666.320 đ. Biên dịch giao diện đạt. Đơn thử đã hủy. Chưa kiểm chứng: nhập thẻ thử trả trọn một giao dịch tới lúc quay về website. Máy chủ ở cổng 8080 vẫn chạy mã cũ cho tới khi khởi động lại.'),
+      p('Tài liệu cập nhật theo: mục 2.3 của hướng dẫn demo; trong tiểu luận là đặc tả ca sử dụng Thanh toán tiền cọc (luồng chính đi qua VNPay, mã VietQR thành luồng thay thế khi chưa có cổng), bảng các trang giao diện, danh sách chức năng phía khách, mục A.6 của hướng dẫn sử dụng và bảng cấu hình dịch vụ ngoài. Lỗi này tìm ra khi rà mã chứ không do bộ kiểm thử phát hiện, nên không đưa vào bảng lỗi ở mục 3.3.9.4.'),
+      ...anh('viec-74-hai-nut-thanh-toan-vnpay', 'Hình 74.1. Trang thanh toán sau khi sửa: còn hai nút Đóng cọc và Trả hết, dòng dưới báo khách sẽ được chuyển sang cổng VNPay.'),
+
+      h2('Việc 75 — Gợi ý thông minh theo hồ sơ người dùng trên trang chủ'),
+      p('Ngày 06/11/2026, chưa commit.', { italic: true, size: 21 }),
+      p('Yêu cầu của cô hướng dẫn, theo tin nhắn thoại 8 phút 11 giây: gợi ý những sảnh có độ tương đồng với hồ sơ người dùng ngay ở giao diện đầu tiên khi khách vào web, giống Shopee hay TikTok gợi ý theo những gì đã xem và đã mua. Khách đã dùng web và đăng nhập thì thấy những sảnh phù hợp với nhu cầu dựa trên lịch sử đặt và sự tương đồng giữa các hồ sơ; khách mới chưa có thông tin thì thấy những sảnh được đặt nhiều nhất. Đây là điểm nhấn học thuật của tiểu luận, không phải gợi ý trong chatbot; phải tìm hiểu các thư viện giải bài toán này và chỉ ra được trong mã nguồn chỗ nào tính độ tương đồng, chỗ nào so khớp với lịch sử người dùng. Không làm phần này thì không đạt yêu cầu.'),
+      p('Rà soát trước khi làm, chỉ đọc mã, cho thấy phần cô yêu cầu chưa có. Hệ thống chỉ có chấm điểm theo luật và đếm số đơn, tìm cosine, Jaccard, Pearson hay tương đồng trong toàn bộ backend không ra dòng nào. Phần phân biệt khách mới và khách quen có nhưng nằm trong lời mở đầu của chatbot, đúng chỗ cô bảo là hiểu nhầm. Hồ sơ khai báo chỉ có họ tên, email, điện thoại, địa chỉ. Dữ liệu mẫu V15 chỉ 11 trong 52 đơn gắn tài khoản, còn bộ dữ liệu lớn chọn loại tiệc ngẫu nhiên cho từng đơn nên khách không có khẩu vị nhất quán để học. Đề xuất cách làm được duyệt, kèm hai quyết định: không hiện điểm phù hợp trên giao diện, giữ nguyên chatbot.'),
+      p('Cách làm, gói recommendation.canhan ở backend. Hồ sơ khách và sáu sảnh được biểu diễn thành vector 14 chiều chia bốn nhóm: loại tiệc, dải số khách, kiểu không gian, tầm giá. Hồ sơ dựng từ ba nguồn: đơn đặt tiệc chưa hủy (đơn chờ tính một nửa), sảnh xem từ hai lần trong 60 ngày (trọng số 0,2) và sở thích tự khai ở Việc 76. Mỗi nhóm được chuẩn hóa riêng rồi nhân căn bậc hai trọng số, nên cosine tổng đúng bằng trung bình có trọng số cosine từng nhóm. Điểm của một sảnh bằng 0,6 lần lọc theo nội dung, tức cosine giữa hồ sơ và sảnh, cộng 0,4 lần lọc cộng tác theo người dùng, tức tỉ lệ 30 khách có hồ sơ giống nhất đã đặt sảnh đó. So người với người trên vector hồ sơ chứ không trên tập sảnh đã đặt, vì chỉ có sáu sảnh nên tập sảnh quá thưa (Pazzani, 1999). Món dùng lọc cộng tác theo món, kiểu khách gọi món này cũng hay gọi món kia, và không gợi ý lại món đã gọi. Khách chưa có thông tin thấy sảnh và món được đặt nhiều nhất trong 365 ngày. Mỗi mục kèm lý do lấy từ chính phép tính.'),
+      p('Thư viện: khảo sát bảy thư viện Java, số phiên bản và giấy phép đọc thẳng từ Maven Central. Apache Mahout là thư viện gợi ý kinh điển nhưng bản cuối của phần gợi ý là 0.13.0 năm 2017 và kéo theo hadoop-client; LibRec và Smile giấy phép GPL; Tribuo không có phần gợi ý; Spark MLlib cần cụm Spark. Chọn Apache Commons Math 3.6.1 cho cosine và Pearson, Apache Commons Text 1.15.0 cho Jaccard, tự viết phần dựng hồ sơ, tìm láng giềng và kết hợp để chỉ ra được từng bước. Lớp DoTuongDong là chỗ duy nhất tính độ tương đồng.'),
+      p('Ba lỗi gặp và sửa trong lúc làm. Maven tự hạ commons-lang3 xuống 3.14.0 do Spring Boot ghim, trong khi Commons Text 1.15.0 cần 3.20.0; lệch này chỉ lộ ra lúc chạy nên pom.xml khai lại bản 3.20.0. Khách mới chỉ xem Vườn Cau hai lần lại nhận lý do "hợp với sinh nhật bạn hay tổ chức", một câu sai sự thật; nay lý do về loại tiệc và số khách chỉ lấy từ đơn đã đặt và sở thích đã khai. Lý do "bạn đã xem sảnh này hai lần" bị cắt vì danh sách đủ ba dòng; nay lý do trực tiếp về chính sảnh đó được đưa lên đầu.'),
+      p('Kiểm chứng. 35 bài kiểm thử mới đạt, gồm ví dụ tính tay của từng độ đo và của cả quy trình, hai nhánh khách mới và khách có hồ sơ, đơn hủy không tính, xem một lần chưa tính, món đã gọi không lặp lại, phân quyền hai đường dẫn API. Toàn bộ kiểm thử phía máy chủ đạt 332/332. Trên trang thật với MySQL của máy này: khách chưa đăng nhập thấy Sảnh nổi bật gồm Sảnh Sen Vàng 416 tiệc, Vườn Cau 260 tiệc, Nhà Rường Gỗ 213 tiệc; đăng nhập mai.anh thì đổi thành Những sảnh phù hợp với nhu cầu của bạn, dựa trên 3 tiệc đã đặt, đứng đầu là Cụm Chòi Sen có nhãn đã đặt 1 lần và lý do 27 khách có hồ sơ giống bạn đã đặt sảnh này; ba món gợi ý không trùng món đã gọi. Bản tiếng Anh hiện đúng. Đăng xuất thì trang chủ trở lại sảnh nổi bật. Chưa kiểm chứng: trên điện thoại thật.'),
+      ...anh('viec-75-goi-y-theo-ho-so', 'Hình 75.1. Trang chủ của khách đã có hồ sơ: ba sảnh phù hợp kèm lý do, nhãn đã đặt, và phần món có thể bạn sẽ thích.'),
+      ...anh('viec-75-sanh-noi-bat-khach-moi', 'Hình 75.2. Khách chưa đăng nhập thấy Sảnh nổi bật, mỗi sảnh ghi số tiệc đã đặt.'),
+
+      h2('Việc 76 — Mục khai sở thích trong trang hồ sơ'),
+      p('Ngày 06/11/2026, chưa commit.', { italic: true, size: 21 }),
+      p('Cô ví dụ hồ sơ gồm những thông tin người dùng kê khai, như sở thích chọn sảnh như thế nào. Hệ thống trước đó không lưu sở thích nào. Thêm bảng so_thich_khach bằng migration V31, mỗi tài khoản một dòng: loại tiệc hay tổ chức, số khách thường mời, trong nhà hay ngoài trời, tầm giá, ưu tiên món chay. Mọi ô đều không bắt buộc. Không hỏi giới tính hay tuổi, và không dùng họ tên làm thuộc tính, vì không nói gì về nhu cầu tổ chức tiệc. Hai đường dẫn GET và PUT /api/v1/me/so-thich, bắt buộc đăng nhập. Nhờ phần này khách mới đăng ký chưa đặt lần nào vẫn nhận gợi ý riêng.'),
+      p('Lỗi giao diện gặp khi thử trên trang thật: ô đánh dấu và nút chọn bị kéo rộng hết dòng vì quy tắc chung của biểu mẫu cho mọi ô nhập rộng 100%. Sửa bằng kiểu riêng cho ô đánh dấu, theo đúng cách các trang quản trị đang làm.'),
+      p('Kiểm chứng trên trang thật bằng tài khoản mai.anh: khai tiệc cưới, 250 khách, cao cấp, ngoài trời rồi lưu, mở lại trang hồ sơ thấy đúng các giá trị đã khai; về trang chủ thì căn cứ đổi thành 3 tiệc bạn đã đặt và sở thích bạn khai trong hồ sơ, hai sảnh đầu đổi sang Sảnh Sen Vàng và Sảnh Ven Sông. Sau đó đã xóa dòng sở thích thử khỏi tài khoản mai.anh để dữ liệu demo trở lại như cũ. Bốn bài kiểm thử API đạt: khách lạ gọi được gợi ý, chưa đăng nhập thì không đọc không sửa được sở thích, lưu xong đọc lại đúng và trang chủ đổi sang gợi ý riêng, số khách bằng 0 bị từ chối.'),
+      ...anh('viec-76-so-thich-trong-ho-so', 'Hình 76.1. Mục Sở thích của bạn trong trang hồ sơ, sau khi lưu và mở lại.'),
+
+      h2('Việc 77 — Đánh giá ngoại tuyến, luồng Selenium 20 và cập nhật tài liệu'),
+      p('Ngày 06/11/2026, chưa commit.', { italic: true, size: 21 }),
+      p('Để trả lời câu cô sẽ hỏi là đã giải quyết được bài toán chưa, thêm bài đánh giá ngoại tuyến DanhGiaGoiYKhongGianTest theo phương pháp giữ lại đơn cuối (Herlocker và cộng sự, 2004): giấu đơn cuối của từng khách, xem sảnh khách thật sự đặt đứng thứ mấy trong thứ hạng. Dữ liệu sinh theo đúng bảng loại tiệc và sảnh của bộ dữ liệu lớn, ba điều kiện: có khẩu vị 800 khách, có khẩu vị 40 khách, không khẩu vị 800 khách làm đối chứng; chạy nhiều lần với hạt giống khác nhau rồi lấy trung bình.'),
+      p('Kết quả chính. Có khẩu vị 800 khách: sảnh đúng nằm trong ba sảnh gợi ý ở 86,5% số khách, so với 66,2% khi gợi ý theo độ phổ biến; MRR 0,734 so với 0,507. So người với người trên hồ sơ tốt hơn trên tập sảnh đã đặt: HR@1 bằng cosine 0,584, bằng Jaccard 0,520. Chỉ 40 khách thì lọc cộng tác thuần tụt MRR từ 0,741 xuống 0,648, còn cách kết hợp giữ 0,704; đây là căn cứ giữ α = 0,6 thay vì chỉ dùng lọc cộng tác. Nhóm đối chứng không khẩu vị thì gợi ý theo độ phổ biến thắng, MRR 0,514 so với 0,430, đúng kỳ vọng và chứng tỏ phép đo không thiên vị. Thời gian xếp hạng 0,17 mili giây một lượt. Giới hạn: dữ liệu là giả lập, chưa đo trên khách thật.'),
+      p('Kiểm thử giao diện thêm luồng 20 gồm năm trường hợp TC-GOIY-01 tới TC-GOIY-05: khách lạ thấy sảnh nổi bật, tài khoản mới chưa khai gì vẫn là khách mới, khai sở thích gia đình 30 khách thì trang chủ đổi sang Nhà Rường Gỗ và Cụm Chòi Sen, khai ăn chay thì toàn món chay, đặt một tiệc ở Nhà Rường Gỗ thì sảnh đó có nhãn đã đặt một lần. Chạy riêng luồng 20 đạt 5/5. Chạy lại toàn bộ bộ Selenium: lần chạy đầy đủ ngày 06/11 hết 20 phút 45 giây, đạt 173/175. Không chạy lại toàn bộ mà chỉ chạy lại hai lớp có ca không đạt: TC-ADMIN-04 đạt ngay khi chạy lại, lần đầu hết giờ chờ hộp xác nhận vì máy đang chạy nặng cùng lúc; TC-BOOKV-06 là lỗi thật của website, ghi ở Việc 78, sau khi sửa thì lớp KiemThuRangBuocDatTiec đạt 11/11. Kết quả mới nhất của mọi lớp: 175/175.'),
+      p('Tài liệu. Tiểu luận: thêm mục 2.2.1 Hệ gợi ý dựa trên độ tương đồng gồm bảy mục nhỏ (bài toán, biểu diễn vector, ba độ đo kèm ví dụ tính tay, lọc cộng tác, khách mới, cách đánh giá, khảo sát thư viện); viết lại mục 3.2.5.1 kèm sơ đồ quy trình và bảng bản đồ mã nguồn; thêm mục 3.3.8.7 đánh giá ngoại tuyến; thêm hai use case và cập nhật sơ đồ use case phân hệ trợ lý và gợi ý; sửa mục tiêu đề cương về gợi ý từ đạt một phần thành đạt; thêm 11 tài liệu tham khảo, tám bài báo đã đối chiếu tác giả, năm, trang và DOI qua Crossref. Sửa luôn hai chỗ lệch có từ trước: đặc tả và sơ đồ chấm điểm năm tiêu chí ghi là bỏ sảnh đã kín buổi và có tiêu chí điểm đánh giá, trong khi mã nguồn chỉ bỏ sảnh không đủ sức chứa và không có tiêu chí đó. Hướng dẫn demo thêm mục 2.8 kèm bảng trả lời nhanh các câu cô có thể hỏi.'),
+      ...anh('viec-77-so-do-goi-y-thong-minh', 'Hình 77.1. Sơ đồ quy trình gợi ý thông minh đưa vào tiểu luận mục 3.2.5.1, mỗi khối ghi tên lớp và hàm trong mã nguồn.'),
+
+      h2('Việc 78 — Sửa lỗi form báo buổi còn trống trong khi buổi đó đã có đơn đã cọc'),
+      p('Ngày 07/11/2026, chưa commit.', { italic: true, size: 21 }),
+      p('Bộ Selenium bắt được ở TC-BOOKV-06 trong lần chạy đầy đủ ngày 06/11. Ca này đặt 19 mâm ở Sảnh Sen Vàng đúng 5 ngày sau hôm chạy để kiểm ranh giới thời gian báo trước. Ngày 06/11 thì ngày đó là 11/11, rơi đúng vào đơn VS-20260927-0001 đang chờ xác nhận nhưng đã cọc 32.756.400đ ở buổi tối. Máy chủ từ chối đơn mới là đúng, nhưng form đặt tiệc lại báo Sảnh Sen Vàng buổi tối còn trống. Gọi thẳng API xác nhận lệch: /api/v1/bookings/availability trả buoiDaKin rỗng, còn POST /api/v1/bookings trả 400 "Sảnh Sen Vàng đã có tiệc vào Buổi tối".'),
+      p('Nguyên nhân: hai chỗ dùng hai luật khác nhau. BookingService.tinhTrangTrong, nơi form lấy danh sách buổi đã kín, chỉ tính đơn đã xác nhận. BookingService.validateSlotAvailable, nơi chặn đơn mới, dùng Booking.dangChiemCho: đơn đã xác nhận, đơn đang chờ đã cọc, đơn còn hạn giữ chỗ 15 phút. Hai nơi lệch nhau từ khi có giữ chỗ tạm và đặt cọc trước khi duyệt. Hậu quả với khách: chọn sảnh, điền hết ba bước rồi mới bị báo lỗi ở bước cuối.'),
+      p('Cách sửa, bạn đã duyệt trước khi sửa: tinhTrangTrong lấy cả đơn đã xác nhận lẫn đơn đang chờ rồi lọc bằng đúng Booking.dangChiemCho, nên hai nơi dùng chung một luật. Form vẫn chỉ cảnh báo chứ không khóa nút như thiết kế cũ. Thêm bài kiểm thử trangThaiTrongKhopLuatChanDon trong GiuChoTamTest: còn hạn giữ chỗ thì buổi kín, hết hạn mà chưa cọc thì trống lại, đã cọc thì kín dù chưa xác nhận. Ca TC-BOOKV-06 cũng được sửa để hỏi buổi còn trống qua chính API này rồi mới đặt, vì ngày phải đúng sau 5 ngày nên không né sang ngày khác được; thêm hàm GoiApi.buoiConTrong.'),
+      p('Kiểm chứng: GiuChoTamTest đạt 7/7, gồm bài mới. Trên MySQL thật, API trạng thái trống ngày 11/11 nay trả Sảnh Sen Vàng ["EVENING"], hôm trước trả rỗng. Trên trang thật, bước 2 của form đặt tiệc ngày 11/11 buổi tối hiện dòng "Buổi này đã có tiệc" ở Sảnh Sen Vàng. Chạy lại riêng lớp KiemThuRangBuocDatTiec đạt 11/11; không chạy lại toàn bộ bộ Selenium vì thay đổi chỉ chạm đường dẫn trạng thái trống và không lớp kịch bản nào khác đọc dòng cảnh báo này. Chưa kiểm chứng: chạy bài kiểm thử mới trên mã cũ để thấy nó trượt.'),
+      ...anh('viec-78-form-bao-buoi-da-co-tiec', 'Hình 78.1. Sau khi sửa: bước 2 của form đặt tiệc ngày 11/11 buổi tối báo Sảnh Sen Vàng "Buổi này đã có tiệc" ngay khi chọn, thay vì đợi tới bước cuối.'),
+
+      h2('Việc 79 — Chạy thử bản đóng gói Docker trên GitHub Actions'),
+      p('Ngày 07/11/2026, chưa commit.', { italic: true, size: 21 }),
+      p('Đối chiếu đề cương mục 6.1 thì đề tài phải triển khai bằng Docker. Dự án đã có docker-compose.yml, Dockerfile của backend và giao diện, nginx.conf, và tiểu luận mục 3.3.10 đã mô tả cách đóng gói. Nhưng chưa có bằng chứng nào cho thấy bản đóng gói chạy được: máy cá nhân không cài Docker, còn workflow GitHub Actions chỉ chạy hai bộ kiểm thử, không dựng ảnh nào.'),
+      p('Thêm công việc thứ ba chay-thu-docker vào .github/workflows/kiem-thu.yml, chạy độc lập với hai công việc kiểm thử. Các bước: sinh tệp .env với khóa JWT và mật khẩu quản trị ngẫu nhiên cho riêng lần chạy; docker compose build dựng hai ảnh; docker compose up -d chạy cả MySQL, backend và Nginx; chờ tối đa 4 phút tới khi /api/v1/spaces trả lời qua cổng 80 của Nginx; rồi kiểm bốn điều: danh sách có đúng 6 không gian mẫu (Flyway đã dựng xong bảng và dữ liệu), trang chủ là bản dựng React, mở thẳng /khong-gian vẫn ra trang React (dòng try_files của Nginx hoạt động), và đăng nhập được bằng tài khoản quản trị vừa khai (hai bí mật đã tới được backend). Kích thước hai ảnh và trạng thái các dịch vụ ghi vào trang tóm tắt của lần chạy; lỗi thì in nhật ký; cuối cùng docker compose down -v dọn sạch. Sửa luôn chú thích đầu tệp và tên hai bước đang ghi số kiểm thử cũ (189, 170).'),
+      p('Kiểm chứng: tệp workflow đọc đúng cú pháp YAML (đọc bằng js-yaml, ra ba công việc, công việc mới chín bước). Đã soát các điều kiện mà các bước kiểm dựa vào: tài khoản quản trị do AdminAccountInitializer tạo lúc khởi động từ ADMIN_PASSWORD, không migration nào chèn sẵn; /api/v1/spaces trả về danh sách; Nginx chuyển /api/ sang backend. Chưa kiểm chứng: công việc này chưa chạy lần nào, vì chỉ chạy khi mã được đẩy lên GitHub hoặc bấm chạy tay trên trang Actions.'),
+      khongAnh('chưa có lần chạy nào trên GitHub; sẽ bổ sung ảnh trang tóm tắt sau lần chạy đầu tiên.'),
+
       h1(`Tình trạng dự án đến ngày ${SL.homNay}`),
       p(`Số liệu do script tự đếm từ mã nguồn ngày ${SL.homNay}, không gõ tay và không ước lượng.`, { italic: true, size: 21 }),
       bullet(`Kiểm thử phía máy chủ: ${SL.lopTestMay} lớp viết bằng JUnit, ${moTaChay(SL.chayMay)}.`),
-      bullet(`Kiểm thử giao diện bằng Selenium: ${SL.tcSelenium} test case trong ${SL.luongSelenium} lớp kịch bản, tổng ${SL.tepKiemThu} tệp chia năm tầng của mô hình Page Object Model. ${hoaDau(moTaChay(SL.chaySelenium))}; các test case không đạt đều do lỗi thật của website chưa sửa.`),
+      bullet(`Kiểm thử giao diện bằng Selenium: ${SL.tcSelenium} test case trong ${SL.luongSelenium} lớp kịch bản, tổng ${SL.tepKiemThu} tệp chia năm tầng của mô hình Page Object Model. ${hoaDau(moTaChay(SL.chaySelenium))}${SL.chaySelenium && SL.chaySelenium.dat < SL.chaySelenium.bai ? `; còn ${SL.chaySelenium.bai - SL.chaySelenium.dat} test case không đạt` : ''}.`),
       bullet(`Cơ sở dữ liệu: ${SL.bang} bảng, ${SL.migration} migration.`),
       bullet(`Máy chủ: ${SL.module} module nghiệp vụ, ${SL.controller} controller, ${SL.api} đường dẫn API.`),
       bullet(`Giao diện: ${SL.trang} trang.`),
       bullet('Chặng hai, hệ thống kiểm thử tự động: xong 17/18 mốc. Bốn mốc lý thuyết, ba mốc dựng bộ kiểm thử, hai mốc GitHub Actions, rồi thực nghiệm, phân tích kết quả, bổ sung test case, ảnh minh chứng, viết tiểu luận và rà soát toàn bộ. Mốc duy nhất còn lại là mốc 18, nộp bài.'),
-      bullet(`Mã nguồn: commit gần nhất ${SL.commitCuoi}, nhánh chính trên GitHub hợp nhất tới Pull Request #13. Hai nhánh đã đẩy nhưng chưa hợp nhất là tro-ly-ai/goi-mo-hinh-ngon-ngu (1 commit) và dat-mon/anh-chi-tiet-va-dat-mon-le (4 commit). Ở máy cá nhân còn ${SL.thayDoi} thay đổi chưa commit, gồm toàn bộ các việc từ Việc 25 trở đi.`),
+      bullet(`Mã nguồn: commit gần nhất ${SL.commitCuoi}. Toàn bộ các việc từ Việc 25 tới Việc 66 đã commit ngày 02/11/2026, chia thành chín commit theo từng tính năng thay vì gộp một khối, để lịch sử đọc được từng phần. Ở máy cá nhân còn ${SL.thayDoi} thay đổi chưa commit. Hai nhánh đã đẩy nhưng chưa hợp nhất là tro-ly-ai/goi-mo-hinh-ngon-ngu (1 commit) và dat-mon/anh-chi-tiet-va-dat-mon-le (4 commit).`),
 
       h1('Đối chiếu với kế hoạch 18 mốc'),
       p('Bảng dưới đây đối chiếu từng mốc trong tệp kế hoạch của khoa với tình trạng thật của dự án, để nhìn một lần là thấy đang đứng ở đâu.', { size: 23 }),
@@ -1155,8 +1316,8 @@ const doc = new Document({
           new TableRow({ children: [cell("10", 520), cell("23/10 – 30/10", 1500), cell("Viết và cấu hình workflow GitHub Actions", 3200), cell("Xong sớm 22 ngày. Viết ngày 01/10, đã chạy thật trên GitHub hai lần, cả hai đều Success; lần trên nhánh main hết 6 phút 59 giây", 3806)] }),
           new TableRow({ children: [cell("11", 520), cell("31/10 – 07/11", 1500), cell("Hoàn thiện tích hợp Selenium, POM và Actions", 3200), cell(`Xong sớm. Workflow chạy song song hai bộ kiểm thử, ${SL.chayMay ? SL.chayMay.bai : 0} ca đơn vị và ${SL.tcSelenium} ca giao diện, trên Chrome không giao diện`, 3806)] }),
           new TableRow({ children: [cell("12", 520), cell("08/11 – 15/11", 1500), cell("Thực nghiệm: chạy toàn bộ test case, ghi Pass/Fail, thời gian, lỗi", 3200), cell(`Xong sớm. Lần chạy đầy đủ ngày 05/10 đạt ${SL.tcSelenium}/${SL.tcSelenium}, có ghi thời gian từng lớp kịch bản; các lần chạy ghi trong BaoCao_KiemThuTuDong.docx`, 3806)] }),
-          new TableRow({ children: [cell("13", 520), cell("16/11 – 23/11", 1500), cell("Phân tích kết quả thực nghiệm", 3200), cell("Xong sớm. Mục 3.3.9 của tiểu luận phân tích bốn mặt: khả năng tự động hóa của Selenium, khả năng tái sử dụng mã theo Page Object Model, khả năng chạy tự động qua GitHub Actions, và 10 lỗi thật bộ kiểm thử đã phát hiện", 3806)] }),
-          new TableRow({ children: [cell("14", 520), cell("24/11 – 30/11", 1500), cell("Hoàn thiện, bổ sung test case, sửa lỗi mã kiểm thử", 3200), cell(`Xong sớm. Bộ kiểm thử lên ${SL.tcSelenium} ca trên ${SL.luongSelenium} luồng; toàn bộ 10 lỗi website phát hiện được đã sửa`, 3806)] }),
+          new TableRow({ children: [cell("13", 520), cell("16/11 – 23/11", 1500), cell("Phân tích kết quả thực nghiệm", 3200), cell("Xong sớm. Mục 3.3.9 của tiểu luận phân tích bốn mặt: khả năng tự động hóa của Selenium, khả năng tái sử dụng mã theo Page Object Model, khả năng chạy tự động qua GitHub Actions, và 14 lỗi thật bộ kiểm thử đã phát hiện", 3806)] }),
+          new TableRow({ children: [cell("14", 520), cell("24/11 – 30/11", 1500), cell("Hoàn thiện, bổ sung test case, sửa lỗi mã kiểm thử", 3200), cell(`Xong sớm. Bộ kiểm thử lên ${SL.tcSelenium} ca trên ${SL.luongSelenium} luồng; toàn bộ 14 lỗi website phát hiện được đã sửa`, 3806)] }),
           new TableRow({ children: [cell("15", 520), cell("01/12 – 05/12", 1500), cell("Bảng thống kê, hình ảnh minh họa quá trình thực thi", 3200), cell("Xong sớm. Tiểu luận có 107 hình và 47 bảng, trong đó có ảnh chụp từ GitHub Actions và bảng kết quả hai bộ kiểm thử; còn thiếu bản video demo đầy đủ 5 test case", 3806)] }),
           new TableRow({ children: [cell("16", 520), cell("06/12 – 10/12", 1500), cell("Viết nội dung tiểu luận", 3200), cell("Xong sớm. Tiểu luận đã viết đủ bốn chương theo đúng danh sách mục khoa giao, kèm hai phụ lục hướng dẫn người dùng và hướng dẫn cài đặt", 3806)] }),
           new TableRow({ children: [cell("17", 520), cell("11/12 – 13/12", 1500), cell("Kiểm tra toàn bộ hệ thống, mã nguồn, workflow và tài liệu", 3200), cell("Xong sớm. Đã rà soát đối chiếu tiểu luận với danh sách mục khoa giao, kiểm số hình và bảng, kiểm mọi dẫn chiếu mục và tài liệu tham khảo, kiểm trùng lặp văn bản", 3806)] }),
@@ -1171,17 +1332,17 @@ const doc = new Document({
       h2('Chặng một — website'),
       
       
-      bullet('Đánh giá hiệu năng hệ thống.'),
-      bullet('Toàn bộ 10 lỗi website mà bộ kiểm thử phát hiện đã sửa hết. Hai lỗi cuối cùng vừa xong: trang không gian nay so mã lần gọi để bỏ qua kết quả lọc về muộn, và gửi dữ liệu sai bảng mã nay trả lỗi 400 kèm câu nhắc thay vì lỗi 500.'),
+      bullet('Đo lại hiệu năng trên máy chủ thật sau khi đưa website lên mạng, đặt máy đo tách khỏi máy chủ. Việc 71 mới đo trên một máy cá nhân, máy đo và máy chủ chạy chung.'),
+      bullet('Toàn bộ 14 lỗi website mà bộ kiểm thử phát hiện đã sửa hết. Bốn lỗi mới nhất: nhân viên không xác nhận được đơn còn hạn giữ chỗ (Việc 67), khách đã đăng nhập bấm Tiếp tục ở bước 2 là đơn bị gửi luôn (Việc 69), nhiều người cùng đặt tiệc hoặc đóng cọc thì trùng mã (Việc 72, do đo tải phát hiện), và form báo buổi còn trống trong khi buổi đó đã có đơn đã cọc (Việc 78).'),
       h2('Đã làm nhưng chưa kiểm chứng đủ'),
       bullet('Việc 29 trên MariaDB mới chạy từng lượt xác nhận đơn một; kịch bản hai quản trị xác nhận cùng lúc vẫn chỉ chạy trên H2, nên phần mức cô lập READ_COMMITTED chưa kiểm chứng dưới tải đồng thời thật.'),
       bullet('Nhánh gọi mô hình ngôn ngữ đã chạy thật với khóa Gemini, đo được 8 trên 8 câu hỏi thử đều trả lời đúng dữ liệu. Phần chưa kiểm chứng còn lại là chạy dài ngày để biết hạn mức miễn phí có đủ hay không.'),
       h2('Chặng hai — hệ thống kiểm thử tự động'),
       bullet('Quay bản video demo đầy đủ 5 test case bằng công cụ QuayManHinh và GhepVideo, lệnh đã soạn sẵn.'),
       
-      bullet(`Rút ngắn thời gian chạy, hiện khoảng 13 phút cho ${SL.tcSelenium} test case; thử chạy song song các lớp kịch bản và chạy thêm trên Edge.`),
+      bullet(`Rút ngắn thời gian chạy, hiện khoảng 17 phút cho ${SL.tcSelenium} test case; thử chạy song song các lớp kịch bản và chạy thêm trên Edge.`),
       h2('Mã nguồn'),
-      bullet(`Commit ${SL.thayDoi} thay đổi đang ở máy cá nhân, và hợp nhất hai nhánh đã đẩy theo đúng thứ tự: tro-ly-ai/goi-mo-hinh-ngon-ngu trước, dat-mon/anh-chi-tiet-va-dat-mon-le sau.`),
+      bullet(`Đẩy chín commit ngày 02/11/2026 lên GitHub, và hợp nhất hai nhánh đã đẩy theo đúng thứ tự: tro-ly-ai/goi-mo-hinh-ngon-ngu trước, dat-mon/anh-chi-tiet-va-dat-mon-le sau. Ở máy cá nhân hiện còn ${SL.thayDoi} thay đổi chưa commit.`),
     ],
   }],
 });
