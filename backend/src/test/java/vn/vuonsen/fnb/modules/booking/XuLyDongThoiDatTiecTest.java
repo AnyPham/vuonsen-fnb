@@ -149,6 +149,36 @@ class XuLyDongThoiDatTiecTest {
         assertThat(maDon).as("Mã đơn không được trùng").hasSize(soKhach);
     }
 
+    /*
+     * Tải dồn: hai mươi khách gửi đơn đúng cùng một lúc.
+     *
+     * Bài trên với năm khách vẫn đạt nhờ cơ chế thử lại. Đo tải bằng JMeter thì thấy khi hai
+     * mươi người gửi cùng lúc vẫn có đơn hỏng vì trùng mã: mọi người đếm ra cùng một số thứ
+     * tự vì chưa ai kịp lưu, mỗi vòng thử lại chỉ một người thắng, năm vòng không đủ cho hai
+     * mươi người. Bài này canh đúng tình huống đó.
+     */
+    @Test
+    @DisplayName("Hai mươi khách gửi đơn đúng cùng lúc: đơn nào cũng thành công, không trùng mã")
+    void guiDonDonDapKhongTrungMa() throws Exception {
+        int soKhach = 20;
+        List<Callable<Object>> dsViec = new ArrayList<>();
+        for (int i = 0; i < soKhach; i++) {
+            LocalDate ngay = LocalDate.now().plusDays(300 + i);
+            dsViec.add(() -> thuLai.chay("uk_booking_code",
+                    () -> taoDon(ngay, TimeSlot.EVENING, goiTheoBuoi())));
+        }
+
+        List<Object> ketQua = chayCungLuc(dsViec);
+
+        Set<String> maDon = new HashSet<>();
+        for (Object kq : ketQua) {
+            assertThat(kq).as("Đơn gửi lên phải thành công, nhưng nhận được: %s", kq)
+                    .isInstanceOf(BookingResponse.class);
+            maDon.add(((BookingResponse) kq).code());
+        }
+        assertThat(maDon).as("Mã đơn không được trùng").hasSize(soKhach);
+    }
+
     // ---------------- Dựng dữ liệu và chạy song song ----------------
 
     /** Gói có thời lượng từ mức thuê trọn ngày trở lên (Gói Thượng Uyển 12 tiếng). */

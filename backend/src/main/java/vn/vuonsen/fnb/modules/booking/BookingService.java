@@ -7,6 +7,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
+import vn.vuonsen.fnb.common.concurrency.CapSoThuTu;
 import vn.vuonsen.fnb.modules.menu.Dish;
 import vn.vuonsen.fnb.modules.menu.DishRepository;
 import vn.vuonsen.fnb.common.exception.BusinessException;
@@ -46,6 +47,7 @@ public class BookingService {
     private static final DateTimeFormatter CODE_DATE = DateTimeFormatter.ofPattern("yyyyMMdd");
 
     private final BookingRepository bookingRepository;
+    private final CapSoThuTu capSoThuTu;
     private final BookingStatusHistoryRepository historyRepository;
     private final SpaceRepository spaceRepository;
     private final PartyPackageRepository packageRepository;
@@ -569,18 +571,13 @@ public class BookingService {
     }
 
     // Sinh mã đơn dạng VS-20260815-0001.
-    // Hai khách bấm gửi cùng lúc có thể ra cùng một số nên phải dò tới khi gặp mã chưa dùng.
+    // Số thứ tự xin qua CapSoThuTu: nhiều khách gửi cùng lúc thì mỗi người một số, không ai trùng.
     private String nextBookingCode() {
         LocalDate today = LocalDate.now();
-        long sequence = bookingRepository.countCreatedBetween(
-                today.atStartOfDay(), today.plusDays(1).atStartOfDay()) + 1;
-
-        String code = formatCode(today, sequence);
-        while (bookingRepository.existsByCode(code)) {
-            sequence++;
-            code = formatCode(today, sequence);
-        }
-        return code;
+        long sequence = capSoThuTu.cap("VS", today,
+                () -> bookingRepository.countCreatedBetween(today.atStartOfDay(), today.plusDays(1).atStartOfDay()),
+                so -> bookingRepository.existsByCode(formatCode(today, so)));
+        return formatCode(today, sequence);
     }
 
     private String formatCode(LocalDate date, long sequence) {

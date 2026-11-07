@@ -27,6 +27,9 @@ public interface PaymentRepository extends JpaRepository<Payment, Long> {
 
     boolean existsByCode(String code);
 
+    // Số phiếu đã cấp trong ngày, đếm theo phần đầu mã như TT-B-20261102-
+    long countByCodeStartingWith(String dauMa);
+
     long countByStatus(PaymentStatus status);
 
     // Lịch sử thu tiền của một đơn đặt tiệc, cũ trước mới sau cho dễ đọc

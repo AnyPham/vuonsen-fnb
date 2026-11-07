@@ -6,6 +6,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import vn.vuonsen.fnb.common.concurrency.CapSoThuTu;
 import vn.vuonsen.fnb.common.exception.BusinessException;
 import vn.vuonsen.fnb.common.exception.ResourceNotFoundException;
 import vn.vuonsen.fnb.config.props.MailProperties;
@@ -50,6 +51,7 @@ public class PaymentService {
             DateTimeFormatter.ofPattern("HH:mm dd/MM/yyyy");
 
     private final PaymentRepository paymentRepository;
+    private final CapSoThuTu capSoThuTu;
     private final BookingRepository bookingRepository;
     private final DishOrderRepository dishOrderRepository;
     private final PaymentProperties properties;
@@ -609,14 +611,22 @@ public class PaymentService {
         return maDon;
     }
 
+    /*
+     * Mã phiếu thu dạng TT-B-20261102-0001.
+     *
+     * Trước đây dò từ số 1 tới số đầu tiên chưa dùng: vừa trùng mã khi nhiều người cùng thanh
+     * toán, vừa chậm dần trong ngày vì phiếu thứ n phải hỏi database n lần. Nay xin số qua
+     * CapSoThuTu, xuất phát từ số phiếu đã có trong ngày nên chỉ tốn một câu đếm.
+     */
     private String sinhMa(String tienTo) {
-        String ngay = LocalDate.now().format(NGAY_MA);
-        for (int stt = 1; stt < 10000; stt++) {
-            String ma = "%s-%s-%04d".formatted(tienTo, ngay, stt);
-            if (!paymentRepository.existsByCode(ma)) {
-                return ma;
-            }
+        LocalDate homNay = LocalDate.now();
+        String dau = "%s-%s-".formatted(tienTo, homNay.format(NGAY_MA));
+        long stt = capSoThuTu.cap(tienTo, homNay,
+                () -> paymentRepository.countByCodeStartingWith(dau),
+                so -> paymentRepository.existsByCode(dau + "%04d".formatted(so)));
+        if (stt > 9999) {
+            throw new BusinessException("Đã hết số phiếu thu cho hôm nay");
         }
-        throw new BusinessException("Đã hết số phiếu thu cho hôm nay");
+        return dau + "%04d".formatted(stt);
     }
 }
