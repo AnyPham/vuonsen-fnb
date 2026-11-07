@@ -43,6 +43,10 @@
     "location": "Location",
     "credit": "Graduation thesis — Pham Tran Tuan Anh (21130004)"
   },
+  "map": {
+    "directions": "Get directions to Vuon Sen",
+    "tapForDirections": "Tap for directions"
+  },
   "spaces": {
     "eyebrow": "Venue hire",
     "title": "Find the right venue",

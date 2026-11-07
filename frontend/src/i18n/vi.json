@@ -43,6 +43,10 @@
     "location": "Vị trí",
     "credit": "Tiểu luận tốt nghiệp — Phạm Trần Tuấn Anh (21130004)"
   },
+  "map": {
+    "directions": "Chỉ đường tới Vườn Sen",
+    "tapForDirections": "Bấm để chỉ đường"
+  },
   "spaces": {
     "eyebrow": "Cho thuê không gian",
     "title": "Chọn không gian phù hợp",
