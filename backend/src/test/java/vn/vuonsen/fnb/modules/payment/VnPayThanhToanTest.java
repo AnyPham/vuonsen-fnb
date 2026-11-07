@@ -427,4 +427,35 @@ class VnPayThanhToanTest {
         assertThat(tinhHinh.phieuChoDoiSoat().id()).isEqualTo(phieu(guiDi).getId());
         assertThat(phieu(guiDi).getMethod()).isEqualTo(PaymentMethod.VIETQR);
     }
+
+    /*
+     * Lỗi từng có: VNPay lấy phiếu chờ mới nhất của đơn chứ không lấy phiếu đúng mục đích khách
+     * vừa bấm. Khách bấm trả hết rồi bỏ dở, bấm đóng cọc rồi bỏ dở, rồi bấm trả hết lần nữa thì
+     * phiếu trả hết được dùng lại nhưng phiếu mới nhất là phiếu cọc, và VNPay nhận số tiền cọc.
+     * Đo trên máy chủ thật: bấm trả hết 45.554.400 đ mà VNPay nhận 13.666.320 đ.
+     */
+    @Test
+    @DisplayName("Đổi qua lại giữa trả hết và đóng cọc: VNPay luôn nhận đúng số tiền của nút vừa bấm")
+    void doiQuaLaiTraHetVaDongCoc() {
+        Booking don = donMoi();
+        BigDecimal tienTraHet = don.getTotalAmount();
+        BigDecimal tienCoc = don.getDepositAmount();
+
+        assertThat(soTienGuiSang(don, PaymentPurpose.BALANCE)).isEqualByComparingTo(tienTraHet);
+        assertThat(soTienGuiSang(don, PaymentPurpose.DEPOSIT)).isEqualByComparingTo(tienCoc);
+        assertThat(soTienGuiSang(don, PaymentPurpose.BALANCE))
+                .as("bấm trả hết lần nữa phải gửi số tiền trả hết, không phải tiền cọc")
+                .isEqualByComparingTo(tienTraHet);
+    }
+
+    /* Số tiền gửi sang cổng, đọc từ tham số vnp_Amount mà VNPay quy ước nhân 100. */
+    private BigDecimal soTienGuiSang(Booking b, PaymentPurpose mucDich) {
+        String duongDan = paymentService.taoThanhToanVnPay(b.getCode(), mucDich, "127.0.0.1");
+        String soTien = Arrays.stream(URI.create(duongDan).getRawQuery().split("&"))
+                .filter(cap -> cap.startsWith("vnp_Amount="))
+                .findFirst()
+                .orElseThrow()
+                .substring("vnp_Amount=".length());
+        return new BigDecimal(soTien).movePointLeft(2);
+    }
 }

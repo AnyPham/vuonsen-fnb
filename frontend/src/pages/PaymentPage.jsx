@@ -16,8 +16,12 @@ const NHAN_TRANG_THAI = {
 /*
  * Trang thanh toán của khách.
  *
- * Nhập mã đơn là xem được đơn còn nợ bao nhiêu, bấm một nút là có mã QR chuyển khoản mang
- * sẵn số tiền và nội dung. Không bắt đăng nhập, giống trang tra cứu đơn: có mã đơn thì coi
+ * Nhập mã đơn là xem được đơn còn nợ bao nhiêu. Có đúng hai lựa chọn: đóng cọc hoặc trả hết.
+ *
+ * Nhà hàng đã khai báo VNPay thì cả hai nút đi thẳng sang cổng VNPay, không còn mã QR hay nút
+ * giả lập: cổng sandbox của VNPay đã cho đi trọn luồng thật bằng thẻ thử. Chưa khai báo VNPay,
+ * ví dụ máy mới tải mã nguồn về chạy thử, thì hai nút quay về cách dự phòng là mã VietQR, để
+ * hệ thống vẫn chạy được mà không cần đăng ký cổng thanh toán. Không bắt đăng nhập, giống trang tra cứu đơn: có mã đơn thì coi
  * như là chủ đơn. Đường dẫn phía máy chủ chỉ tạo phiếu chờ đối soát chứ không tự cộng tiền,
  * nên biết mã đơn cũng không tự biến đơn thành đã thanh toán được.
  */
@@ -200,40 +204,42 @@ export default function PaymentPage() {
                   </tbody>
                 </table>
 
-                {conNo && !tinhHinh.phieuChoDoiSoat && (
-                  <div style={{ display: 'flex', gap: 10, marginTop: 18, flexWrap: 'wrap' }}>
-                    {chuaDuCoc && Number(tinhHinh.canCoc) > 0 && (
+                {/*
+                  Có VNPay thì hai nút vẫn hiện khi đơn đang có phiếu chờ: đó là lượt VNPay khách
+                  bỏ dở, bấm lại là sang cổng lần nữa với đúng số tiền của nút vừa bấm. Đi đường
+                  mã QR thì phiếu chờ nghĩa là khách đang chuyển khoản, ẩn nút để khỏi sinh thêm phiếu.
+                */}
+                {conNo && (coVnPay || !tinhHinh.phieuChoDoiSoat) && (
+                  <>
+                    <div style={{ display: 'flex', gap: 10, marginTop: 18, flexWrap: 'wrap' }}>
+                      {chuaDuCoc && Number(tinhHinh.canCoc) > 0 && (
+                        <button
+                          type="button"
+                          className="btn btn-gold"
+                          onClick={() => (coVnPay ? traQuaVnPay : taoYeuCau)('DEPOSIT')}
+                          disabled={dangTai}
+                          data-test="pay-deposit"
+                        >
+                          {t('payment.payDeposit', { tien: dd.tien(Number(tinhHinh.canCoc) - Number(tinhHinh.daThu)) })}
+                        </button>
+                      )}
                       <button
                         type="button"
-                        className="btn btn-gold"
-                        onClick={() => taoYeuCau('DEPOSIT')}
-                        data-test="pay-deposit"
+                        className={chuaDuCoc && Number(tinhHinh.canCoc) > 0 ? 'btn btn-outline' : 'btn btn-gold'}
+                        onClick={() => (coVnPay ? traQuaVnPay : taoYeuCau)(
+                          Number(tinhHinh.canCoc) > 0 ? 'BALANCE' : 'FULL')}
+                        disabled={dangTai}
+                        data-test="pay-full"
                       >
-                        {t('payment.payDeposit', { tien: dd.tien(Number(tinhHinh.canCoc) - Number(tinhHinh.daThu)) })}
+                        {t('payment.payAll', { tien: dd.tien(tinhHinh.conPhaiTra) })}
                       </button>
-                    )}
-                    <button
-                      type="button"
-                      className="btn btn-outline"
-                      onClick={() => taoYeuCau(Number(tinhHinh.canCoc) > 0 ? 'BALANCE' : 'FULL')}
-                      data-test="pay-full"
-                    >
-                      {t('payment.payAll', { tien: dd.tien(tinhHinh.conPhaiTra) })}
-                    </button>
-
-                    {/* Cổng thanh toán tự động, chỉ hiện khi nhà hàng đã khai báo VNPay */}
+                    </div>
                     {coVnPay && (
-                      <button
-                        type="button"
-                        className="btn btn-dark"
-                        onClick={() => traQuaVnPay(
-                          chuaDuCoc && Number(tinhHinh.canCoc) > 0 ? 'DEPOSIT' : 'BALANCE')}
-                        data-test="pay-vnpay"
-                      >
-                        {t('payment.payVnpay')}
-                      </button>
+                      <p className="muted" style={{ fontSize: '0.86rem', marginTop: 10 }} data-test="pay-via-vnpay">
+                        {t('payment.viaVnpay')}
+                      </p>
                     )}
-                  </div>
+                  </>
                 )}
 
                 {!conNo && (
@@ -244,7 +250,7 @@ export default function PaymentPage() {
               </div>
             </div>
 
-            {tinhHinh.phieuChoDoiSoat && ck && (
+            {!coVnPay && tinhHinh.phieuChoDoiSoat && ck && (
               <div className="card" style={{ marginBottom: 24 }} data-test="payment-qr-block">
                 <div className="card-body">
                   <h3 style={{ marginBottom: 6 }}>{t('payment.qrTitle')}</h3>
