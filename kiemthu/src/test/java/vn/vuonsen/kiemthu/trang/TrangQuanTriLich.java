@@ -1,8 +1,12 @@
 package vn.vuonsen.kiemthu.trang;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.StaleElementReferenceException;
+import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.WebDriverWait;
+import vn.vuonsen.kiemthu.coso.CauHinh;
 import vn.vuonsen.kiemthu.coso.TrangCoSo;
 
 import java.util.List;
@@ -144,10 +148,26 @@ public class TrangQuanTriLich extends TrangCoSo {
     }
 
     /** Chữ hiển thị trong ô một ngày, dùng để kiểm ngày trống có ghi rõ là trống không. */
+    /*
+     * Chữ trong ô của một ngày, chờ ô đó có mặt trên lưới rồi mới đọc.
+     *
+     * Không đọc ngay được: bấm sang tháng mới thì tiêu đề đổi trước, còn lưới phải đợi trang
+     * gọi máy chủ lấy dữ liệu tháng đó rồi mới vẽ lại. Đọc ngay sau cú bấm là rơi vào lúc lưới
+     * còn là tháng cũ hoặc đang tải, không thấy ô nào, dù một nhịp sau ô hiện đầy đủ. Lưới dựng
+     * từ chính dữ liệu máy chủ trả về, nên ô của ngày cần tìm đã có mặt nghĩa là dữ liệu chứa
+     * ngày đó đã về, không có chuyện đọc phải chữ của lần tải trước.
+     *
+     * Bỏ qua stale element vì ô có thể bị vẽ lại đúng lúc đang đọc chữ; tìm lại là được.
+     */
     public Optional<String> chuTrongO(String ngayIso) {
-        List<WebElement> o = driver.findElements(
-                By.cssSelector("[data-test='calendar-cell'][data-ngay='" + ngayIso + "']"));
-        return o.isEmpty() ? Optional.empty() : Optional.of(o.get(0).getText().trim());
+        By o = By.cssSelector("[data-test='calendar-cell'][data-ngay='" + ngayIso + "']");
+        try {
+            return Optional.of(new WebDriverWait(driver, CauHinh.CHO_TOI_DA)
+                    .ignoring(StaleElementReferenceException.class)
+                    .until(d -> d.findElement(o).getText().trim()));
+        } catch (TimeoutException e) {
+            return Optional.empty();
+        }
     }
 
     /** Có bảng chi tiết ngày hay không. Chờ tải xong trước để không đọc nhầm lúc đang tải. */

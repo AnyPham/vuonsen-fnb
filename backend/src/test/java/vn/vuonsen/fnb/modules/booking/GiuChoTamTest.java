@@ -155,6 +155,37 @@ class GiuChoTamTest {
 
     // ---------- Tiện ích ----------
 
+    /*
+     * Bài này canh một lỗi thật đã xảy ra, do bộ kiểm thử Selenium phát hiện.
+     *
+     * Đơn vừa gửi còn hạn giữ chỗ nên dangChiemCho trả về true. Bước kiểm trùng lịch lúc
+     * xác nhận lại quét mọi đơn đang giữ chỗ của cùng sảnh cùng ngày, nên nó gặp chính đơn
+     * đang được xác nhận, thấy trùng buổi, rồi ném lỗi "sảnh đã có tiệc". Hậu quả là nhân
+     * viên không xác nhận nổi đơn vừa nhận, lại nhận một câu báo sai sự thật vì ngày đó
+     * không có đơn nào khác.
+     *
+     * Lỗi chỉ lộ ra khi xác nhận trong lúc hạn giữ chỗ còn hiệu lực. Để quá hạn thì đơn
+     * thôi chiếm chỗ và xác nhận lại chạy bình thường, nên nó từng lọt qua: chạy kiểm thử
+     * một lúc sau khi tạo dữ liệu thì không gặp.
+     */
+    @Test
+    @DisplayName("Xác nhận được đơn ngay trong lúc nó còn hạn giữ chỗ")
+    void xacNhanDuocDonConHanGiuCho() {
+        LocalDate ngay = LocalDate.now().plusDays(74);
+        BookingResponse don = taoDon(ngay, TimeSlot.EVENING);
+
+        assertThat(bookingRepository.findById(don.id()).orElseThrow().dangChiemCho())
+                .as("đơn vừa tạo phải đang giữ chỗ, không thì bài kiểm này không canh đúng lỗi")
+                .isTrue();
+
+        BookingResponse sauXacNhan = bookingService.changeStatus(
+                don.id(), BookingStatus.CONFIRMED, "Kiểm thử", "kiemthu");
+
+        assertThat(sauXacNhan.status())
+                .as("xác nhận đơn duy nhất của buổi đó không được coi nó là đối thủ của chính nó")
+                .isEqualTo(BookingStatus.CONFIRMED.name());
+    }
+
     private BookingResponse taoDon(LocalDate ngay, TimeSlot buoi) {
         Long khongGian = spaceRepository.findBySlug("sanh-sen-vang").orElseThrow().getId();
         Long goi = packageRepository.findAll().stream()

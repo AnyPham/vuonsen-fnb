@@ -311,7 +311,7 @@ public class BookingService {
             // nhận cùng lúc sẽ cùng thấy buổi còn trống và cùng xác nhận.
             spaceRepository.khoaDeXacNhanDon(booking.getSpace().getId());
             validateSlotAvailable(booking.getSpace(), booking.getPartyPackage(),
-                    booking.getEventDate(), booking.getTimeSlot());
+                    booking.getEventDate(), booking.getTimeSlot(), booking.getId());
         }
         if (target == BookingStatus.CANCELLED) {
             note = chotTienHoan(booking, note);
@@ -528,8 +528,27 @@ public class BookingService {
      * ngày chỉ có vài đơn nên lọc ở đây không tốn gì.
      */
     private void validateSlotAvailable(Space space, PartyPackage pkg, LocalDate date, TimeSlot slot) {
+        validateSlotAvailable(space, pkg, date, slot, null);
+    }
+
+    /*
+     * boQuaId là đơn không được tự tính là đối thủ của chính mình.
+     *
+     * Lúc xác nhận một đơn, đơn đó đang ở trạng thái chờ và còn hạn giữ chỗ, nên
+     * dangChiemCho trả về true và nó lọt vào danh sách đang giữ chỗ. Không bỏ nó ra thì
+     * vòng lặp dưới gặp chính nó, thấy trùng buổi, và ném lỗi "sảnh đã có tiệc" — nhân viên
+     * không xác nhận nổi đơn vừa nhận, lại còn nhận một câu báo sai sự thật vì ngày đó
+     * không có đơn nào khác.
+     *
+     * Lỗi này chỉ lộ ra khi xác nhận trong lúc hạn giữ chỗ còn hiệu lực. Đợi quá hạn thì
+     * đơn thôi chiếm chỗ và xác nhận lại chạy, nên nó từng bị bỏ qua: bộ kiểm thử chạy lại
+     * sau một lúc thì không gặp.
+     */
+    private void validateSlotAvailable(Space space, PartyPackage pkg, LocalDate date,
+                                       TimeSlot slot, Long boQuaId) {
         List<Booking> dangGiu = bookingRepository
                 .findBySpaceIdAndEventDate(space.getId(), date).stream()
+                .filter(b -> boQuaId == null || !boQuaId.equals(b.getId()))
                 .filter(Booking::dangChiemCho)
                 .toList();
 
