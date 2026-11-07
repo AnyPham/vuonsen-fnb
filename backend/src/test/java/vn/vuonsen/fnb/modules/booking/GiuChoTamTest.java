@@ -186,6 +186,38 @@ class GiuChoTamTest {
                 .isEqualTo(BookingStatus.CONFIRMED.name());
     }
 
+    /*
+     * Phần báo buổi trống của form phải khớp đúng luật chặn đơn mới.
+     *
+     * Lỗi từng có, do bộ Selenium bắt được ở TC-BOOKV-06: tinhTrangTrong chỉ tính đơn đã xác
+     * nhận, còn lúc tạo đơn thì đơn đang chờ đã cọc hoặc còn hạn giữ chỗ vẫn chặn buổi đó.
+     * Form tô buổi là còn trống, khách đi hết ba bước rồi mới bị báo "đã có tiệc".
+     */
+    @Test
+    @DisplayName("Buổi đang được giữ chỗ hoặc đã cọc thì form báo kín, đúng như luật chặn đơn")
+    void trangThaiTrongKhopLuatChanDon() {
+        LocalDate ngay = LocalDate.now().plusDays(76);
+        BookingResponse don = taoDon(ngay, TimeSlot.EVENING);
+        Long sanh = bookingRepository.findById(don.id()).orElseThrow().getSpace().getId();
+
+        assertThat(buoiDaKin(ngay, sanh)).as("còn hạn giữ chỗ thì buổi đó kín").contains("EVENING");
+
+        choHetHanGiuCho(don.id());
+        assertThat(buoiDaKin(ngay, sanh)).as("hết hạn mà chưa cọc thì buổi đó trống lại").doesNotContain("EVENING");
+
+        Booking trongKho = bookingRepository.findById(don.id()).orElseThrow();
+        trongKho.setDepositPaid(new BigDecimal("1000000"));
+        bookingRepository.save(trongKho);
+        assertThat(buoiDaKin(ngay, sanh)).as("đã cọc thì buổi đó kín dù chưa xác nhận").contains("EVENING");
+    }
+
+    private List<String> buoiDaKin(LocalDate ngay, Long sanhId) {
+        return bookingService.tinhTrangTrong(ngay).khongGian().stream()
+                .filter(k -> k.spaceId().equals(sanhId))
+                .findFirst().orElseThrow()
+                .buoiDaKin();
+    }
+
     private BookingResponse taoDon(LocalDate ngay, TimeSlot buoi) {
         Long khongGian = spaceRepository.findBySlug("sanh-sen-vang").orElseThrow().getId();
         Long goi = packageRepository.findAll().stream()

@@ -205,6 +205,32 @@ public final class GoiApi {
         return so(doiTuong(goi("GET", "/api/v1/spaces/" + slug, null, null)), "id");
     }
 
+    /*
+     * Buổi còn trống của một không gian trong một ngày, ưu tiên tối, rồi trưa, rồi sáng.
+     *
+     * Dùng cho kịch bản buộc phải đặt đúng một ngày cụ thể, ví dụ ranh giới "trước 5 ngày".
+     * Cơ sở dữ liệu đang dùng có thể đã có đơn thật ở buổi đó; ngày 06/11/2026 TC-BOOKV-06
+     * trượt vì ngày thử rơi đúng vào một đơn đang chờ đã đặt cọc ở Sảnh Sen Vàng. Hỏi đường
+     * dẫn trạng thái trống, nay đã dùng đúng luật chặn đơn, rồi chọn buổi chưa ai chiếm.
+     */
+    @SuppressWarnings("unchecked")
+    public static String buoiConTrong(String slug, LocalDate ngay) {
+        long id = idKhongGian(slug);
+        Map<String, Object> khongGian = danhSach(doiTuong(goi("GET",
+                "/api/v1/bookings/availability?date=" + ngay, null, null)).get("khongGian")).stream()
+                .filter(k -> so(k, "spaceId") == id)
+                .findFirst()
+                .orElseThrow(() -> new IllegalStateException("Không thấy " + slug + " trong trạng thái trống"));
+        if (Boolean.TRUE.equals(khongGian.get("kinCaNgay"))) {
+            throw new IllegalStateException("Chuẩn bị dữ liệu thất bại: " + slug + " đã kín cả ngày " + ngay);
+        }
+        List<String> daKin = (List<String>) khongGian.get("buoiDaKin");
+        return List.of("EVENING", "NOON", "MORNING").stream()
+                .filter(b -> !daKin.contains(b))
+                .findFirst()
+                .orElseThrow(() -> new IllegalStateException("Chuẩn bị dữ liệu thất bại: " + slug + " kín cả ba buổi ngày " + ngay));
+    }
+
     public static long idGoi(String tenGoi) {
         return danhSach(goi("GET", "/api/v1/packages", null, null)).stream()
                 .filter(g -> tenGoi.equals(g.get("name")))

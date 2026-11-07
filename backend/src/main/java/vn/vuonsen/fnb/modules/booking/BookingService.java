@@ -231,8 +231,19 @@ public class BookingService {
      * đơn còn chờ duyệt thì chưa chắc thành tiệc nên không khóa chỗ của người khác.
      */
     public TinhTrangTrongResponse tinhTrangTrong(LocalDate ngay) {
-        Map<Long, List<Booking>> theoKhongGian = bookingRepository
-                .findTrongNgay(ngay, BookingStatus.CONFIRMED).stream()
+        /*
+         * Buổi "đã kín" phải dùng đúng luật mà validateSlotAvailable dùng để chặn đơn mới, tức
+         * Booking.dangChiemCho: đơn đã xác nhận, đơn đang chờ đã đặt cọc, đơn còn hạn giữ chỗ.
+         *
+         * Bản cũ chỉ lấy đơn đã xác nhận. Từ khi có giữ chỗ tạm và đặt cọc trước khi duyệt, hai
+         * nơi lệch nhau: form tô buổi đó là còn trống, khách đi hết ba bước, bấm gửi mới bị máy
+         * chủ báo "đã có tiệc". Bộ Selenium bắt được ở TC-BOOKV-06 ngày 06/11/2026, khi ngày thử
+         * rơi đúng vào một đơn đang chờ đã cọc 32.756.400đ ở Sảnh Sen Vàng.
+         */
+        List<Booking> dangGiu = new java.util.ArrayList<>(bookingRepository.findTrongNgay(ngay, BookingStatus.CONFIRMED));
+        dangGiu.addAll(bookingRepository.findTrongNgay(ngay, BookingStatus.PENDING));
+        Map<Long, List<Booking>> theoKhongGian = dangGiu.stream()
+                .filter(Booking::dangChiemCho)
                 .collect(Collectors.groupingBy(b -> b.getSpace().getId()));
 
         List<TinhTrangTrongResponse.KhongGian> ra = spaceRepository.findByActiveTrueOrderBySortOrderAsc().stream()

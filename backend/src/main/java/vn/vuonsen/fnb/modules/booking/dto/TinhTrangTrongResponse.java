@@ -15,7 +15,7 @@ public record TinhTrangTrongResponse(
 ) {
 
     /**
-     * @param buoiDaKin các buổi đã có tiệc được xác nhận, dạng MORNING / NOON / EVENING
+     * @param buoiDaKin các buổi đang bị chiếm (đơn đã xác nhận, đơn chờ đã cọc, đơn còn hạn giữ chỗ), dạng MORNING / NOON / EVENING
      * @param kinCaNgay đã có đơn thuê trọn ngày nên không nhận thêm buổi nào
      */
     public record KhongGian(

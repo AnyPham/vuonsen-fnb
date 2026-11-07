@@ -58,7 +58,11 @@ class KiemThuRangBuocDatTiec extends KiemThuCoSo {
     }
 
     private TrangDatTiec denBuoc3(int soKhach, LocalDate ngay, String goi) {
-        TrangDatTiec trang = buoc1(soKhach, ngay, "EVENING");
+        return denBuoc3(soKhach, ngay, "EVENING", goi);
+    }
+
+    private TrangDatTiec denBuoc3(int soKhach, LocalDate ngay, String buoi, String goi) {
+        TrangDatTiec trang = buoc1(soKhach, ngay, buoi);
         trang.dangOBuoc2();
         trang.chonKhongGian(SEN_VANG).chonGoi(goi).tiepTuc();
         trang.dangOBuoc3();
@@ -115,7 +119,9 @@ class KiemThuRangBuocDatTiec extends KiemThuCoSo {
     @Test
     @DisplayName("TC-BOOKV-06 Ranh giới tiệc lớn: 19 mâm đặt trước 5 ngày vẫn được nhận")
     void tcBookv06_ranhGioi19Mam() {
-        TrangDatTiec trang = denBuoc3(190, sau(5), "Gói Đồng Quê");
+        // Ngày phải đúng sau 5 ngày nên không né sang ngày khác được; chỉ né buổi đã có đơn thật
+        LocalDate ngay = sau(5);
+        TrangDatTiec trang = denBuoc3(190, ngay, GoiApi.buoiConTrong("sanh-sen-vang", ngay), "Gói Đồng Quê");
 
         String maDon = trang.dienLienHe("Khách Ranh Giới", "0901234567", null).guiYeuCau().maDonVuaTao();
 
