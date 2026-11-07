@@ -1,9 +1,12 @@
 package vn.vuonsen.kiemthu.kichban;
 
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import vn.vuonsen.kiemthu.coso.GoiApi;
 import vn.vuonsen.kiemthu.coso.KiemThuCoSo;
+import vn.vuonsen.kiemthu.luong.LuongDangNhap;
 import vn.vuonsen.kiemthu.trang.TrangDatTiec;
 
 import java.time.LocalDate;
@@ -22,6 +25,27 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 @DisplayName("Luồng 6 — Ràng buộc khi đặt tiệc")
 class KiemThuRangBuocDatTiec extends KiemThuCoSo {
+
+    /*
+     * Gửi đơn giờ bắt buộc đăng nhập, nên mọi ca trong lớp này phải có phiên trước khi
+     * tới bước gửi; không thì bước 3 hiện khối mời đăng nhập thay cho nút gửi.
+     *
+     * Một tài khoản dùng chung cho cả lớp thay vì mỗi ca một tài khoản: trình duyệt mở lại
+     * cho từng ca nên vẫn phải đăng nhập lại từng lần, nhưng không cần đẻ thêm tài khoản,
+     * mỗi lượt chạy chỉ thêm đúng một dòng vào bảng người dùng.
+     */
+    private static LuongDangNhap.TaiKhoan khachCuaLop;
+
+    @BeforeAll
+    static void taoTaiKhoanChoLop() {
+        khachCuaLop = LuongDangNhap.taoKhachMoi();
+    }
+
+    @BeforeEach
+    void dangNhapTruocMoiCa() {
+        LuongDangNhap.dangNhap(driver(), khachCuaLop.email(), khachCuaLop.matKhau());
+    }
+
 
     private static final String SEN_VANG = "Sảnh Sen Vàng";
 

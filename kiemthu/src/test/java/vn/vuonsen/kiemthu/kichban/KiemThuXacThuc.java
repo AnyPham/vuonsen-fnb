@@ -33,17 +33,30 @@ class KiemThuXacThuc extends KiemThuCoSo {
         return "kiemthu." + System.nanoTime() + "@vuonsen.vn";
     }
 
+    /*
+     * Đăng ký không còn đăng nhập luôn.
+     *
+     * Từ khi bắt xác thực email, tài khoản tạo ra ở trạng thái chờ và màn hình chuyển sang ô
+     * nhập mã sáu số. Kịch bản vì vậy kiểm hai điều: đã sang bước nhập mã, và chưa được coi là
+     * đã đăng nhập. Vế thứ hai mới là vế quan trọng — bỏ nó đi thì một lỗi cho vào thẳng tài
+     * khoản mà chưa xác thực sẽ lọt qua.
+     *
+     * Không kiểm tiếp phần nhập mã đúng, vì mã gửi về hộp thư mà bộ kiểm thử không đọc được.
+     * Phần đó đã có kiểm thử phía máy chủ trong XacThucEmailTest lo.
+     */
     @Test
-    @DisplayName("TC-AUTH-01 Đăng ký tài khoản mới hợp lệ")
+    @DisplayName("TC-AUTH-01 Đăng ký tài khoản mới hợp lệ thì chuyển sang bước xác thực email")
     void tcAuth01_dangKyTaiKhoanMoiHopLe() {
         TrangDangKy trang = new TrangDangKy(driver()).mo();
 
         ThanhDieuHuong thanhDieuHuong = trang.dangKy("Khách Kiểm Thử", emailMoi(), "0901234567", LuongDangNhap.MAT_KHAU_KHACH);
 
-        assertThat(thanhDieuHuong.coChuyenSangDaDangNhap())
-                .as("Đăng ký thành công thì phải tự đăng nhập").isTrue();
-        assertThat(trang.coChuyenToi("/"))
-                .as("Đăng ký xong phải chuyển về trang chủ, đang ở %s", trang.duongDanHienTai()).isTrue();
+        assertThat(trang.coChuyenSangNhapMa())
+                .as("Đăng ký xong phải hiện ô nhập mã xác thực").isTrue();
+        assertThat(trang.oNhapMaSanSang())
+                .as("Ô nhập mã phải nhập được ngay").isTrue();
+        assertThat(thanhDieuHuong.daDangNhap())
+                .as("Chưa nhập mã thì chưa được coi là đã đăng nhập").isFalse();
     }
 
     @Test

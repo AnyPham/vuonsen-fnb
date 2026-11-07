@@ -1,11 +1,13 @@
 package vn.vuonsen.kiemthu.kichban;
 
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import vn.vuonsen.kiemthu.coso.GoiApi;
 import vn.vuonsen.kiemthu.coso.KiemThuCoSo;
+import vn.vuonsen.kiemthu.luong.LuongDangNhap;
 import vn.vuonsen.kiemthu.luong.LuongBaoGiaTiec;
 import vn.vuonsen.kiemthu.thanhphan.BangTamTinh;
 import vn.vuonsen.kiemthu.thanhphan.HopThoaiTroLy;
@@ -36,10 +38,27 @@ import static org.assertj.core.api.Assertions.assertThat;
 @DisplayName("Luồng 14 — Giảm giá ngày lễ")
 class KiemThuGiamGiaNgayLe extends KiemThuCoSo {
 
+    /*
+     * Gửi đơn giờ bắt buộc đăng nhập, nên mọi ca trong lớp này phải có phiên trước khi
+     * tới bước gửi; không thì bước 3 hiện khối mời đăng nhập thay cho nút gửi.
+     *
+     * Một tài khoản dùng chung cho cả lớp thay vì mỗi ca một tài khoản: trình duyệt mở lại
+     * cho từng ca nên vẫn phải đăng nhập lại từng lần, nhưng không cần đẻ thêm tài khoản,
+     * mỗi lượt chạy chỉ thêm đúng một dòng vào bảng người dùng.
+     */
+    private static LuongDangNhap.TaiKhoan khachCuaLop;
+
+    @BeforeAll
+    static void taoTaiKhoanChoLop() {
+        khachCuaLop = LuongDangNhap.taoKhachMoi();
+    }
+
+
     private static final String COM_CHAY = "Cơm cháy chà bông kho quẹt";
 
     @BeforeEach
     void donDipLeTruoc() {
+        LuongDangNhap.dangNhap(driver(), khachCuaLop.email(), khachCuaLop.matKhau());
         GoiApi.donDipLeKiemThu();
     }
 

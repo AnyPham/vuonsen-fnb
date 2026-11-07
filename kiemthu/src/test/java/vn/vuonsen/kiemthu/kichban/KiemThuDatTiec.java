@@ -5,7 +5,9 @@ import org.junit.jupiter.api.Test;
 import vn.vuonsen.kiemthu.coso.GoiApi;
 import vn.vuonsen.kiemthu.coso.KiemThuCoSo;
 import vn.vuonsen.kiemthu.thanhphan.BangTamTinh;
+import vn.vuonsen.kiemthu.luong.LuongDangNhap;
 import vn.vuonsen.kiemthu.trang.TrangDatTiec;
+import vn.vuonsen.kiemthu.luong.LuongDangNhap;
 import vn.vuonsen.kiemthu.trang.TrangTraCuuTiec;
 
 import java.time.LocalDate;
@@ -61,9 +63,21 @@ class KiemThuDatTiec extends KiemThuCoSo {
         return trang.bangTamTinh().docKhiOnDinh();
     }
 
+    /*
+     * Phải đăng nhập trước mới gửi được đơn.
+     *
+     * Từ khi khách vãng lai không tạo đơn được nữa, bước 3 thay nút gửi bằng khối mời đăng
+     * nhập, nên kịch bản cũ dừng ở chỗ không tìm thấy nút. Đăng nhập bằng một tài khoản mới
+     * tạo riêng cho lượt chạy này, để đơn sinh ra không lẫn với đơn của tài khoản khác và
+     * chạy lại bao nhiêu lần cũng được.
+     *
+     * Việc khách chưa đăng nhập bị chặn được kiểm riêng ở luồng phân quyền, không kiểm ở đây.
+     */
     @Test
     @DisplayName("TC-BOOK-01 Đi trọn ba bước và gửi đơn, đơn ở trạng thái chờ xác nhận")
     void tcBook01_diTronBaBuoc() {
+        LuongDangNhap.khachMoiDaDangNhap(driver());
+
         TrangDatTiec trang = denBuoc2(200, sau(30)).chonKhongGian(SEN_VANG).chonGoi(GOI_SEN_VANG).tiepTuc();
         trang.dangOBuoc3();
 

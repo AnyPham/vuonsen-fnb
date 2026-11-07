@@ -7,6 +7,8 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -150,17 +152,42 @@ public final class GoiApi {
      * gửi mã về hộp thư rồi để tài khoản ở trạng thái chờ; bộ kiểm thử không đọc được hộp
      * thư nên không lấy được mã.
      *
-     * Đi qua đường quản trị tạo tài khoản, vì tài khoản sinh ra đã bật sẵn — đúng trạng
-     * thái mà phần lớn kịch bản cần. Chính màn đăng ký trên giao diện vẫn được kiểm riêng
-     * ở luồng 1, nên bước xác nhận email không bị bỏ sót.
+     * Đường quản trị tạo tài khoản cũng không dùng được: nó cố ý chỉ nhận vai trò STAFF và
+     * ADMIN vì sinh ra để lập tài khoản nhân viên. Nới nó ra cho nhận cả CUSTOMER là mở rộng
+     * quyền thật của sản phẩm chỉ vì tiện cho kiểm thử, nên không làm.
+     *
+     * Cách đi ở đây chỉ dùng những đường đã có, theo đúng thứ tự một quản trị viên thật sẽ
+     * làm khi kích hoạt tài khoản giúp khách: đăng ký bình thường, tìm tài khoản vừa tạo,
+     * rồi mở khoá nó. Màn đăng ký và bước nhập mã trên giao diện vẫn được kiểm riêng ở
+     * luồng 1 nên không chỗ nào bị bỏ sót.
      */
     public static String dangKyKhach(String hoTen, String email, String matKhau) {
-        goi("POST", "/api/v1/admin/users", Map.of(
+        goi("POST", "/api/auth/register", Map.of(
                 "fullName", hoTen,
                 "email", email,
-                "password", matKhau,
-                "role", "CUSTOMER"), tokenQuanTri());
+                "phone", "0900000000",
+                "password", matKhau), null);
+        moKhoaTaiKhoan(email);
         return dangNhap(email, matKhau);
+    }
+
+    /*
+     * Bật tài khoản vừa đăng ký, thay cho bước nhập mã gửi về email.
+     *
+     * Tìm theo từ khoá rồi vẫn lọc lại bằng email đầy đủ, vì tìm kiếm khớp cả một phần chuỗi
+     * nên có thể trả về nhiều tài khoản; mở nhầm khoá một tài khoản khác thì hỏng âm thầm.
+     */
+    private static void moKhoaTaiKhoan(String email) {
+        String tuKhoa = URLEncoder.encode(email, StandardCharsets.UTF_8);
+        Map<String, Object> taiKhoan = danhSach(goi("GET",
+                "/api/v1/admin/users?keyword=" + tuKhoa, null, tokenQuanTri())).stream()
+                .filter(u -> email.equalsIgnoreCase((String) u.get("email")))
+                .findFirst()
+                .orElseThrow(() -> new IllegalStateException(
+                        "Chuẩn bị dữ liệu thất bại: đăng ký xong nhưng không tìm thấy tài khoản "
+                                + email));
+        goi("PATCH", "/api/v1/admin/users/" + so(taiKhoan, "id") + "/enabled?enabled=true",
+                null, tokenQuanTri());
     }
 
     /** Token khách dùng chung cho các bước chỉ cần "có người đăng nhập". */
