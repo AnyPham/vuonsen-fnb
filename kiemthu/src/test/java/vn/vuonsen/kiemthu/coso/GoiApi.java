@@ -272,6 +272,11 @@ public final class GoiApi {
                 thanDonTiec(slug, tenGoi, ngay, buoi, soKhach), tokenKhach());
     }
 
+    /** Mã số của đơn đặt tiệc theo mã đơn khách nhìn thấy, ví dụ VS-20260815-0001. */
+    public static long idDonTiecTheoMa(String maDon) {
+        return so(doiTuong(goi("GET", "/api/v1/admin/bookings/" + maDon, null, tokenQuanTri())), "id");
+    }
+
     public static void doiTrangThaiDonTiec(long id, String trangThai) {
         goi("PATCH", "/api/v1/admin/bookings/" + id + "/status",
                 Map.of("status", trangThai, "note", "Dữ liệu thử"), tokenQuanTri());
