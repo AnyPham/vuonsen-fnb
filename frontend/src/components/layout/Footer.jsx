@@ -1,4 +1,4 @@
-import GoogleMap from '@/components/common/GoogleMap';
+import GoogleMap, { duongDanChiDuong } from '@/components/common/GoogleMap';
 import { useI18n } from '@/i18n';
 
 export default function Footer() {
@@ -15,7 +15,12 @@ export default function Footer() {
 
           <div>
             <h4>{t('footer.contact')}</h4>
-            <p>{t('footer.address')}</p>
+            {/* Bấm vào địa chỉ cũng ra chỉ đường, giống bấm vào bản đồ bên cạnh */}
+            <p>
+              <a href={duongDanChiDuong()} target="_blank" rel="noreferrer" title={t('map.directions')} data-test="footer-address">
+                {t('footer.address')}
+              </a>
+            </p>
             <p>
               {t('footer.phoneLabel')}: <a href="tel:+842812345678">(028) 1234 5678</a>
             </p>

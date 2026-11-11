@@ -43,6 +43,10 @@
     "location": "Location",
     "credit": "Graduation thesis — Pham Tran Tuan Anh (21130004)"
   },
+  "map": {
+    "directions": "Get directions to Vuon Sen",
+    "tapForDirections": "Tap for directions"
+  },
   "spaces": {
     "eyebrow": "Venue hire",
     "title": "Find the right venue",
@@ -378,7 +382,7 @@
     "requestFailed": "The payment request could not be created",
     "simulateFailed": "The simulation failed",
     "title": "Pay for an order",
-    "desc": "Enter the code you received when booking an event or ordering food to see what is owed and get a transfer code.",
+    "desc": "Enter the code you received when booking an event or ordering food to see what is owed and pay it.",
     "codeLabel": "Order code",
     "codePlaceholder": "VS-20260927-0001 or DM-20260927-0001",
     "total": "Order total",
@@ -387,7 +391,7 @@
     "outstanding": "Still owing",
     "payDeposit": "Pay the {{tien}} deposit",
     "payAll": "Pay the full {{tien}}",
-    "payVnpay": "Pay through VNPay",
+    "viaVnpay": "You will be taken to the VNPay payment gateway and brought back to Vuon Sen when done.",
     "settled": "This order is fully paid; nothing further is needed.",
     "qrTitle": "Scan the code to transfer",
     "qrDesc": "Open your banking app and scan the code below. The amount and reference are already inside the code, so there is nothing to type.",
@@ -636,5 +640,76 @@
   },
   "auth": {
     "needLoginToOrder": "Please sign in to place this order. You will come back to this page and keep what you have filled in."
+  },
+  "goiY": {
+    "eyebrowCaNhan": "Picked for you",
+    "eyebrowNoiBat": "Most popular",
+    "tieuDeCaNhan": "Venues that fit your needs",
+    "tieuDeNoiBat": "Featured venues",
+    "moTaNoiBat": "The venues our guests book most often at Vuon Sen.",
+    "canCu": {
+      "mo": "Based on {{ds}}.",
+      "noi": ", ",
+      "soTiec": "{{n}} parties you booked",
+      "soSanhDaXem": "{{n}} venues you viewed several times",
+      "soThich": "the preferences in your profile",
+      "va": " and "
+    },
+    "daDat": "You booked this {{n}} times",
+    "sucChua": "Seats {{min}}–{{max}} guests",
+    "sucChuaTu": "From {{min}} guests",
+    "chay": "Vegetarian",
+    "monCaNhan": "Dishes you may like",
+    "monNoiBat": "Most ordered dishes",
+    "monCanCu": "Based on {{n}} dishes you ordered and your preferences, without repeating them.",
+    "monMoTaNoiBat": "The dishes our guests order most at Vuon Sen.",
+    "moiKhaiSoThich": "Add your preferences to your profile to get suggestions made for you.",
+    "diToiHoSo": "Add preferences",
+    "moiDangNhap": "Sign in to get suggestions based on what you booked and viewed.",
+    "dangNhap": "Sign in",
+    "lyDo": {
+      "LOAI_TIEC": "Suits the {{loai}} you usually host",
+      "SO_KHACH": "Fits around {{dai}} guests like your past parties",
+      "KIEU_KHONG_GIAN": "The {{kieu}} setting you prefer",
+      "TAM_GIA": "In the {{muc}} price range you usually choose",
+      "KHACH_GIONG": "{{n}} guests with profiles like yours booked this venue",
+      "DA_XEM": "You viewed this venue {{n}} times",
+      "SO_TIEC": "{{n}} parties booked here",
+      "HAY_GOI_CUNG": "Guests who order {{ten}} often order this too",
+      "CUNG_LOAI": "Same kind as the {{ten}} you often order",
+      "MON_CHAY": "A vegetarian dish to suit your taste",
+      "SO_LAN_GOI": "Included in {{n}} orders"
+    },
+    "loaiTiec": {
+      "WEDDING": "weddings",
+      "CORPORATE": "company events and conferences",
+      "BIRTHDAY": "birthdays",
+      "FAMILY": "family gatherings",
+      "OTHER": "other events"
+    },
+    "kieu": {
+      "TRONG_NHA": "indoor",
+      "NGOAI_TROI": "outdoor"
+    },
+    "tamGia": {
+      "TIET_KIEM": "budget",
+      "VUA_PHAI": "mid",
+      "CAO_CAP": "premium"
+    }
+  },
+  "soThich": {
+    "tieuDe": "Your preferences",
+    "moTa": "Optional. The clearer they are, the better the home page can suggest venues and dishes for you.",
+    "loaiTiec": "Events you usually host",
+    "soKhach": "Usual number of guests",
+    "soKhachGoiY": "For example 150",
+    "tamGia": "Price range",
+    "khongRo": "Not sure",
+    "kieuKhongGian": "Setting",
+    "khongQuanTrong": "No preference",
+    "anChay": "Prefer vegetarian dishes",
+    "luu": "Save preferences",
+    "daLuu": "Preferences saved.",
+    "xemTrangChu": "See suggestions on the home page"
   }
 }

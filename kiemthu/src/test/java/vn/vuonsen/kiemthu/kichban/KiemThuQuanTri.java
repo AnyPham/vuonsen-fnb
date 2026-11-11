@@ -94,19 +94,35 @@ class KiemThuQuanTri extends KiemThuCoSo {
         assertThat(trang.thaoTacCuaDon(maDon)).isEmpty();
     }
 
+    /*
+     * Buổi đã có đơn thì bị chiếm chỗ, cả khi đơn mới gửi còn hạn giữ chỗ tạm lẫn khi đã xác nhận.
+     *
+     * Bài này từng khẳng định ngược lại: "đơn chờ xác nhận chưa chiếm chỗ nên đặt trùng vẫn được".
+     * Điều đó đúng ở thời điểm viết, trước khi hệ thống có cơ chế giữ chỗ tạm. Sau khi thêm giữ
+     * chỗ tạm, đơn vừa gửi còn hạn giữ chỗ đã chiếm buổi ngay, nên đặt trùng bị từ chối. Luật mới
+     * này được chốt bằng kiểm thử đơn vị GiuChoTamTest ở phía máy chủ; bài kiểm thử giao diện này
+     * được cập nhật cho khớp, vì để nguyên là tài liệu nói một đằng hệ thống chạy một nẻo.
+     *
+     * Nhánh "hết hạn giữ chỗ thì thả buổi ra" cần tua đồng hồ nên để cho kiểm thử đơn vị canh;
+     * ở tầng giao diện không ép hết hạn qua API công khai được, và canh lại cũng không thêm phủ.
+     */
     @Test
-    @DisplayName("TC-ADMIN-06 Đơn đã xác nhận thì chiếm chỗ, đơn chờ xác nhận thì không")
-    void tcAdmin06_donXacNhanChiemCho() {
+    @DisplayName("TC-ADMIN-06 Buổi đã có đơn thì bị chiếm, cả khi đơn còn giữ chỗ lẫn khi đã xác nhận")
+    void tcAdmin06_donChiemCho() {
         LocalDate ngay = GoiApi.ngayChuaDung();
         String maDon = (String) donMoi(ngay).get("code");
-        assertThat(GoiApi.thuTaoDonTiec("sanh-sen-vang", "Gói Đồng Quê", ngay, "EVENING", 200).ma())
-                .as("Đơn chờ xác nhận chưa chiếm chỗ nên vẫn đặt trùng buổi được").isEqualTo(201);
+
+        GoiApi.KetQua trungLucGiuCho = GoiApi.thuTaoDonTiec("sanh-sen-vang", "Gói Đồng Quê", ngay, "EVENING", 200);
+        assertThat(trungLucGiuCho.ma())
+                .as("Đơn vừa gửi còn hạn giữ chỗ tạm nên đã chiếm buổi, đặt trùng phải bị từ chối")
+                .isEqualTo(400);
+        assertThat(trungLucGiuCho.than()).contains("đã có tiệc");
 
         moQuanTriDon(maDon).chuyenTrangThai(maDon, "CONFIRMED");
 
-        GoiApi.KetQua datTrung = GoiApi.thuTaoDonTiec("sanh-sen-vang", "Gói Đồng Quê", ngay, "EVENING", 200);
-        assertThat(datTrung.ma()).as("Đã xác nhận thì buổi đó bị chiếm").isEqualTo(400);
-        assertThat(datTrung.than()).contains("đã có tiệc");
+        GoiApi.KetQua trungSauXacNhan = GoiApi.thuTaoDonTiec("sanh-sen-vang", "Gói Đồng Quê", ngay, "EVENING", 200);
+        assertThat(trungSauXacNhan.ma()).as("Đã xác nhận thì buổi đó bị chiếm").isEqualTo(400);
+        assertThat(trungSauXacNhan.than()).contains("đã có tiệc");
     }
 
     @Test

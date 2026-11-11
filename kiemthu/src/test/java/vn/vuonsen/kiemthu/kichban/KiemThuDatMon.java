@@ -1,9 +1,12 @@
 package vn.vuonsen.kiemthu.kichban;
 
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import vn.vuonsen.kiemthu.coso.GoiApi;
 import vn.vuonsen.kiemthu.coso.KiemThuCoSo;
+import vn.vuonsen.kiemthu.luong.LuongDangNhap;
 import vn.vuonsen.kiemthu.coso.TrangCoSo;
 import vn.vuonsen.kiemthu.trang.TrangChiTietMon;
 import vn.vuonsen.kiemthu.trang.TrangDatMon;
@@ -25,6 +28,27 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 @DisplayName("Luồng 8 — Đặt món lẻ")
 class KiemThuDatMon extends KiemThuCoSo {
+
+    /*
+     * Gửi đơn giờ bắt buộc đăng nhập, nên mọi ca trong lớp này phải có phiên trước khi
+     * tới bước gửi; không thì bước 3 hiện khối mời đăng nhập thay cho nút gửi.
+     *
+     * Một tài khoản dùng chung cho cả lớp thay vì mỗi ca một tài khoản: trình duyệt mở lại
+     * cho từng ca nên vẫn phải đăng nhập lại từng lần, nhưng không cần đẻ thêm tài khoản,
+     * mỗi lượt chạy chỉ thêm đúng một dòng vào bảng người dùng.
+     */
+    private static LuongDangNhap.TaiKhoan khachCuaLop;
+
+    @BeforeAll
+    static void taoTaiKhoanChoLop() {
+        khachCuaLop = LuongDangNhap.taoKhachMoi();
+    }
+
+    @BeforeEach
+    void dangNhapTruocMoiCa() {
+        LuongDangNhap.dangNhap(driver(), khachCuaLop.email(), khachCuaLop.matKhau());
+    }
+
 
     private static final String COM_CHAY = "Cơm cháy chà bông kho quẹt";
     private static final String COMBO_NUONG = "Combo nướng than hoa";

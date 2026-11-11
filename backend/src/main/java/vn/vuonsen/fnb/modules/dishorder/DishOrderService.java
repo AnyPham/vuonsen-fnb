@@ -5,6 +5,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import vn.vuonsen.fnb.common.concurrency.CapSoThuTu;
 import vn.vuonsen.fnb.common.exception.BusinessException;
 import vn.vuonsen.fnb.common.exception.ResourceNotFoundException;
 import vn.vuonsen.fnb.config.props.DishOrderProperties;
@@ -42,6 +43,7 @@ public class DishOrderService {
     private static final DateTimeFormatter GIO_PHUT = DateTimeFormatter.ofPattern("HH:mm dd/MM/yyyy");
 
     private final DishOrderRepository orderRepository;
+    private final CapSoThuTu capSoThuTu;
     private final DishRepository dishRepository;
     private final DishOrderPricing pricing;
     private final DishOrderProperties props;
@@ -327,15 +329,11 @@ public class DishOrderService {
      */
     private String nextOrderCode() {
         LocalDate today = LocalDate.now();
-        long stt = orderRepository.countCreatedBetween(
-                today.atStartOfDay(), today.plusDays(1).atStartOfDay()) + 1;
-
-        String code = "DM-%s-%04d".formatted(today.format(CODE_DATE), stt);
-        while (orderRepository.existsByCode(code)) {
-            stt++;
-            code = "DM-%s-%04d".formatted(today.format(CODE_DATE), stt);
-        }
-        return code;
+        String dau = "DM-%s-".formatted(today.format(CODE_DATE));
+        long stt = capSoThuTu.cap("DM", today,
+                () -> orderRepository.countCreatedBetween(today.atStartOfDay(), today.plusDays(1).atStartOfDay()),
+                so -> orderRepository.existsByCode(dau + "%04d".formatted(so)));
+        return dau + "%04d".formatted(stt);
     }
 
     private String tienVND(BigDecimal so) {

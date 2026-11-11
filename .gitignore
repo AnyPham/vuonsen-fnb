@@ -50,3 +50,8 @@ cong-cu/yeu-cau/
 
 # Anh goc tai ve, da dua len Cloudinary nen khong day vao kho ma nguon
 anh-tai-ve/
+
+# Đo tải JMeter: danh sách tài khoản thử và kết quả đo thô chỉ để trên máy, không đưa lên GitHub.
+# Bộ chạy tự tạo lại tài khoản thử bằng chuan-bi-tai-khoan.js.
+cong-cu/do-hieu-nang/jmeter/taikhoan.csv
+cong-cu/do-hieu-nang/jmeter/ket-qua/

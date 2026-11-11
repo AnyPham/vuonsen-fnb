@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import vn.vuonsen.fnb.common.concurrency.ThuLaiKhiTrungMa;
 import vn.vuonsen.fnb.modules.payment.dto.KetQuaVnPay;
 import vn.vuonsen.fnb.modules.payment.dto.PaymentResponse;
 import vn.vuonsen.fnb.modules.payment.dto.TaoThanhToanRequest;
@@ -36,6 +37,7 @@ public class PaymentController {
 
     private final PaymentService paymentService;
     private final VnPayService vnPayService;
+    private final ThuLaiKhiTrungMa thuLai;
 
     @GetMapping("/order/{maDon}")
     @Operation(summary = "Tình hình thanh toán của một đơn, kèm mã VietQR nếu đang chờ trả")
@@ -50,7 +52,9 @@ public class PaymentController {
         PaymentPurpose mucDich = request.purpose() == null || request.purpose().isBlank()
                 ? null
                 : PaymentPurpose.valueOf(request.purpose());
-        return ResponseEntity.ok(paymentService.taoYeuCau(request.orderCode(), mucDich));
+        // Thử lại như đặt tiệc và đặt món, phòng khi vẫn đụng mã phiếu với người khác
+        return ResponseEntity.ok(thuLai.chay("uk_payment_code",
+                () -> paymentService.taoYeuCau(request.orderCode(), mucDich)));
     }
 
     /*
@@ -66,7 +70,8 @@ public class PaymentController {
         PaymentPurpose mucDich = request.purpose() == null || request.purpose().isBlank()
                 ? null
                 : PaymentPurpose.valueOf(request.purpose());
-        String duongDan = paymentService.taoThanhToanVnPay(request.orderCode(), mucDich, ipKhach(http));
+        String duongDan = thuLai.chay("uk_payment_code",
+                () -> paymentService.taoThanhToanVnPay(request.orderCode(), mucDich, ipKhach(http)));
         return ResponseEntity.ok(Map.of("payUrl", duongDan));
     }
 

@@ -7,6 +7,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
+import vn.vuonsen.fnb.common.concurrency.CapSoThuTu;
 import vn.vuonsen.fnb.modules.menu.Dish;
 import vn.vuonsen.fnb.modules.menu.DishRepository;
 import vn.vuonsen.fnb.common.exception.BusinessException;
@@ -46,6 +47,7 @@ public class BookingService {
     private static final DateTimeFormatter CODE_DATE = DateTimeFormatter.ofPattern("yyyyMMdd");
 
     private final BookingRepository bookingRepository;
+    private final CapSoThuTu capSoThuTu;
     private final BookingStatusHistoryRepository historyRepository;
     private final SpaceRepository spaceRepository;
     private final PartyPackageRepository packageRepository;
@@ -229,8 +231,19 @@ public class BookingService {
      * đơn còn chờ duyệt thì chưa chắc thành tiệc nên không khóa chỗ của người khác.
      */
     public TinhTrangTrongResponse tinhTrangTrong(LocalDate ngay) {
-        Map<Long, List<Booking>> theoKhongGian = bookingRepository
-                .findTrongNgay(ngay, BookingStatus.CONFIRMED).stream()
+        /*
+         * Buổi "đã kín" phải dùng đúng luật mà validateSlotAvailable dùng để chặn đơn mới, tức
+         * Booking.dangChiemCho: đơn đã xác nhận, đơn đang chờ đã đặt cọc, đơn còn hạn giữ chỗ.
+         *
+         * Bản cũ chỉ lấy đơn đã xác nhận. Từ khi có giữ chỗ tạm và đặt cọc trước khi duyệt, hai
+         * nơi lệch nhau: form tô buổi đó là còn trống, khách đi hết ba bước, bấm gửi mới bị máy
+         * chủ báo "đã có tiệc". Bộ Selenium bắt được ở TC-BOOKV-06 ngày 06/11/2026, khi ngày thử
+         * rơi đúng vào một đơn đang chờ đã cọc 32.756.400đ ở Sảnh Sen Vàng.
+         */
+        List<Booking> dangGiu = new java.util.ArrayList<>(bookingRepository.findTrongNgay(ngay, BookingStatus.CONFIRMED));
+        dangGiu.addAll(bookingRepository.findTrongNgay(ngay, BookingStatus.PENDING));
+        Map<Long, List<Booking>> theoKhongGian = dangGiu.stream()
+                .filter(Booking::dangChiemCho)
                 .collect(Collectors.groupingBy(b -> b.getSpace().getId()));
 
         List<TinhTrangTrongResponse.KhongGian> ra = spaceRepository.findByActiveTrueOrderBySortOrderAsc().stream()
@@ -311,7 +324,7 @@ public class BookingService {
             // nhận cùng lúc sẽ cùng thấy buổi còn trống và cùng xác nhận.
             spaceRepository.khoaDeXacNhanDon(booking.getSpace().getId());
             validateSlotAvailable(booking.getSpace(), booking.getPartyPackage(),
-                    booking.getEventDate(), booking.getTimeSlot());
+                    booking.getEventDate(), booking.getTimeSlot(), booking.getId());
         }
         if (target == BookingStatus.CANCELLED) {
             note = chotTienHoan(booking, note);
@@ -528,8 +541,27 @@ public class BookingService {
      * ngày chỉ có vài đơn nên lọc ở đây không tốn gì.
      */
     private void validateSlotAvailable(Space space, PartyPackage pkg, LocalDate date, TimeSlot slot) {
+        validateSlotAvailable(space, pkg, date, slot, null);
+    }
+
+    /*
+     * boQuaId là đơn không được tự tính là đối thủ của chính mình.
+     *
+     * Lúc xác nhận một đơn, đơn đó đang ở trạng thái chờ và còn hạn giữ chỗ, nên
+     * dangChiemCho trả về true và nó lọt vào danh sách đang giữ chỗ. Không bỏ nó ra thì
+     * vòng lặp dưới gặp chính nó, thấy trùng buổi, và ném lỗi "sảnh đã có tiệc" — nhân viên
+     * không xác nhận nổi đơn vừa nhận, lại còn nhận một câu báo sai sự thật vì ngày đó
+     * không có đơn nào khác.
+     *
+     * Lỗi này chỉ lộ ra khi xác nhận trong lúc hạn giữ chỗ còn hiệu lực. Đợi quá hạn thì
+     * đơn thôi chiếm chỗ và xác nhận lại chạy, nên nó từng bị bỏ qua: bộ kiểm thử chạy lại
+     * sau một lúc thì không gặp.
+     */
+    private void validateSlotAvailable(Space space, PartyPackage pkg, LocalDate date,
+                                       TimeSlot slot, Long boQuaId) {
         List<Booking> dangGiu = bookingRepository
                 .findBySpaceIdAndEventDate(space.getId(), date).stream()
+                .filter(b -> boQuaId == null || !boQuaId.equals(b.getId()))
                 .filter(Booking::dangChiemCho)
                 .toList();
 
@@ -550,18 +582,13 @@ public class BookingService {
     }
 
     // Sinh mã đơn dạng VS-20260815-0001.
-    // Hai khách bấm gửi cùng lúc có thể ra cùng một số nên phải dò tới khi gặp mã chưa dùng.
+    // Số thứ tự xin qua CapSoThuTu: nhiều khách gửi cùng lúc thì mỗi người một số, không ai trùng.
     private String nextBookingCode() {
         LocalDate today = LocalDate.now();
-        long sequence = bookingRepository.countCreatedBetween(
-                today.atStartOfDay(), today.plusDays(1).atStartOfDay()) + 1;
-
-        String code = formatCode(today, sequence);
-        while (bookingRepository.existsByCode(code)) {
-            sequence++;
-            code = formatCode(today, sequence);
-        }
-        return code;
+        long sequence = capSoThuTu.cap("VS", today,
+                () -> bookingRepository.countCreatedBetween(today.atStartOfDay(), today.plusDays(1).atStartOfDay()),
+                so -> bookingRepository.existsByCode(formatCode(today, so)));
+        return formatCode(today, sequence);
     }
 
     private String formatCode(LocalDate date, long sequence) {

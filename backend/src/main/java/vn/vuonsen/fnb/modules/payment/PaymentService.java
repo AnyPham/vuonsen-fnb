@@ -6,6 +6,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import vn.vuonsen.fnb.common.concurrency.CapSoThuTu;
 import vn.vuonsen.fnb.common.exception.BusinessException;
 import vn.vuonsen.fnb.common.exception.ResourceNotFoundException;
 import vn.vuonsen.fnb.config.props.MailProperties;
@@ -50,6 +51,7 @@ public class PaymentService {
             DateTimeFormatter.ofPattern("HH:mm dd/MM/yyyy");
 
     private final PaymentRepository paymentRepository;
+    private final CapSoThuTu capSoThuTu;
     private final BookingRepository bookingRepository;
     private final DishOrderRepository dishOrderRepository;
     private final PaymentProperties properties;
@@ -97,7 +99,18 @@ public class PaymentService {
         return tinhHinhCuaMon(mon);
     }
 
-    private void taoYeuCauChoTiec(Booking booking, PaymentPurpose mucDich) {
+    /** Tạo hoặc dùng lại phiếu chờ cho đúng đơn và đúng mục đích, trả về chính phiếu đó. */
+    private Payment taoPhieuCho(String maDon, PaymentPurpose mucDich) {
+        Optional<Booking> tiec = timDonTiec(maDon);
+        if (tiec.isPresent()) {
+            return taoYeuCauChoTiec(tiec.get(), mucDich);
+        }
+        DishOrder mon = timDonMon(maDon)
+                .orElseThrow(() -> ResourceNotFoundException.of("đơn hàng", maDon));
+        return taoYeuCauChoMon(mon);
+    }
+
+    private Payment taoYeuCauChoTiec(Booking booking, PaymentPurpose mucDich) {
         if (booking.getStatus() == BookingStatus.CANCELLED) {
             throw new BusinessException("Đơn đã hủy thì không thanh toán được");
         }
@@ -115,11 +128,11 @@ public class PaymentService {
         if (dangCho.isPresent() && dangCho.get().getAmount().compareTo(soTien) == 0) {
             // Khách bỏ dở VNPay rồi quay sang quét mã thì phiếu phải ghi đúng cách trả mới
             dangCho.get().setMethod(PaymentMethod.VIETQR);
-            return;
+            return dangCho.get();
         }
         dangCho.ifPresent(cu -> cu.setStatus(PaymentStatus.CANCELLED));
 
-        paymentRepository.save(Payment.builder()
+        return paymentRepository.save(Payment.builder()
                 .code(sinhMa("TT-B"))
                 .orderType(OrderType.BOOKING)
                 .booking(booking)
@@ -131,7 +144,7 @@ public class PaymentService {
                 .build());
     }
 
-    private void taoYeuCauChoMon(DishOrder order) {
+    private Payment taoYeuCauChoMon(DishOrder order) {
         if (order.getStatus() == DishOrderStatus.CANCELLED) {
             throw new BusinessException("Đơn đã hủy thì không thanh toán được");
         }
@@ -145,12 +158,12 @@ public class PaymentService {
                 order.getId(), PaymentPurpose.FULL, PaymentStatus.PENDING);
         if (dangCho.isPresent() && dangCho.get().getAmount().compareTo(soTien) == 0) {
             dangCho.get().setMethod(PaymentMethod.VIETQR);
-            return;
+            return dangCho.get();
         }
         dangCho.ifPresent(cu -> cu.setStatus(PaymentStatus.CANCELLED));
 
         order.setPaymentMethod(PaymentMethod.VIETQR.name());
-        paymentRepository.save(Payment.builder()
+        return paymentRepository.save(Payment.builder()
                 .code(sinhMa("TT-M"))
                 .orderType(OrderType.DISH_ORDER)
                 .dishOrder(order)
@@ -468,16 +481,18 @@ public class PaymentService {
                     + "Vui lòng chọn chuyển khoản quét mã QR hoặc trả tiền mặt tại nhà hàng.");
         }
 
-        TinhHinhThanhToanResponse tinhHinh = taoYeuCau(maDon, mucDich);
-        PaymentResponse phieu = tinhHinh.phieuChoDoiSoat();
-        if (phieu == null) {
-            throw new BusinessException("Không tạo được phiếu thanh toán cho đơn này");
-        }
+        /*
+         * Lấy đúng phiếu vừa tạo hoặc vừa dùng lại cho mục đích khách bấm, không lấy phiếu chờ
+         * mới nhất của đơn. Khách bấm trả hết rồi bỏ dở, bấm đóng cọc rồi bỏ dở, rồi bấm trả hết
+         * lần nữa: phiếu trả hết cũ được dùng lại nhưng phiếu mới nhất lại là phiếu cọc, nên lấy
+         * theo phiếu mới nhất thì VNPay nhận nhầm số tiền cọc. Đã đo được đúng tình huống này.
+         */
+        Payment phieu = taoPhieuCho(maDon, mucDich);
 
         // Đánh dấu phiếu đi qua cổng, để lúc đối soát biết khoản này không nằm trong sao kê ngân hàng
-        paymentRepository.findById(phieu.id()).ifPresent(p -> p.setMethod(PaymentMethod.VNPAY));
+        phieu.setMethod(PaymentMethod.VNPAY);
 
-        return vnPayService.dungDuongDanThanhToan(vnPayService.sinhMaGiaoDich(phieu.id()), phieu.amount(),
+        return vnPayService.dungDuongDanThanhToan(vnPayService.sinhMaGiaoDich(phieu.getId()), phieu.getAmount(),
                 "Thanh toan don " + maDon, ipKhach);
     }
 
@@ -609,14 +624,22 @@ public class PaymentService {
         return maDon;
     }
 
+    /*
+     * Mã phiếu thu dạng TT-B-20261102-0001.
+     *
+     * Trước đây dò từ số 1 tới số đầu tiên chưa dùng: vừa trùng mã khi nhiều người cùng thanh
+     * toán, vừa chậm dần trong ngày vì phiếu thứ n phải hỏi database n lần. Nay xin số qua
+     * CapSoThuTu, xuất phát từ số phiếu đã có trong ngày nên chỉ tốn một câu đếm.
+     */
     private String sinhMa(String tienTo) {
-        String ngay = LocalDate.now().format(NGAY_MA);
-        for (int stt = 1; stt < 10000; stt++) {
-            String ma = "%s-%s-%04d".formatted(tienTo, ngay, stt);
-            if (!paymentRepository.existsByCode(ma)) {
-                return ma;
-            }
+        LocalDate homNay = LocalDate.now();
+        String dau = "%s-%s-".formatted(tienTo, homNay.format(NGAY_MA));
+        long stt = capSoThuTu.cap(tienTo, homNay,
+                () -> paymentRepository.countByCodeStartingWith(dau),
+                so -> paymentRepository.existsByCode(dau + "%04d".formatted(so)));
+        if (stt > 9999) {
+            throw new BusinessException("Đã hết số phiếu thu cho hôm nay");
         }
-        throw new BusinessException("Đã hết số phiếu thu cho hôm nay");
+        return dau + "%04d".formatted(stt);
     }
 }

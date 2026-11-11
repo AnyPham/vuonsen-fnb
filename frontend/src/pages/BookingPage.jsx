@@ -266,12 +266,22 @@ export default function BookingPage() {
                     <span />
                   )}
 
+                  {/*
+                    Hai nút phải mang key khác nhau, không phải cho đẹp.
+                    Thiếu key thì React thấy cùng một thẻ button ở cùng chỗ nên giữ nguyên
+                    thẻ cũ, chỉ đổi type từ button sang submit. Khách bấm Tiếp tục ở bước 2:
+                    React chuyển sang bước 3 và đổi nút xong trước khi trình duyệt thực hiện
+                    hành vi mặc định của cú bấm, lúc đó nút đã là submit nên form bị gửi
+                    luôn. Khách đã đăng nhập thì bước 3 được điền sẵn hợp lệ, thế là đơn đi
+                    mà khách chưa kịp xem lại thông tin liên hệ. Key khác nhau buộc React bỏ
+                    thẻ cũ và dựng thẻ mới, nên cú bấm Tiếp tục không bao giờ rơi vào nút gửi.
+                  */}
                   {step < 3 ? (
-                    <button type="button" className="btn btn-dark" onClick={next} data-test="next-step">
+                    <button key="tiep-tuc" type="button" className="btn btn-dark" onClick={next} data-test="next-step">
                       {t('booking.next')}
                     </button>
                   ) : nguoiDung ? (
-                    <button type="submit" className="btn btn-gold" disabled={submitStatus === 'loading'} data-test="submit-booking">
+                    <button key="gui-don" type="submit" className="btn btn-gold" disabled={submitStatus === 'loading'} data-test="submit-booking">
                       {submitStatus === 'loading' ? t('booking.sending') : t('booking.submit')}
                     </button>
                   ) : null}

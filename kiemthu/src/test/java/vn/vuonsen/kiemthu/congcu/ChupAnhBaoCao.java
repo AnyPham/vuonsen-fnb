@@ -8,8 +8,10 @@ import org.openqa.selenium.chromium.HasCdp;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import vn.vuonsen.kiemthu.coso.CauHinh;
+import vn.vuonsen.kiemthu.coso.GoiApi;
 import vn.vuonsen.kiemthu.coso.KiemThuCoSo;
 import vn.vuonsen.kiemthu.luong.LuongDangNhap;
+import vn.vuonsen.kiemthu.trang.TrangDatTiec;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -336,13 +338,84 @@ class ChupAnhBaoCao extends KiemThuCoSo {
     void ketXuatSoDo() {
         List.of("kien-truc", "usecase-tong-quat", "usecase-dat-tiec",
                 "usecase-quan-tri", "usecase-tro-ly", "erd",
-                "activity-dat-tiec", "activity-tro-ly",
+                "activity-dat-tiec", "activity-tro-ly", "activity-goi-y",
                 "sequence-xac-nhan-don", "sequence-tro-ly",
                 "ket-qua-kiem-thu",
                 /* So do ly thuyet cho chuong 2 */
                 "lt-kim-tu-thap", "lt-kien-truc", "lt-spring-boot", "lt-dom-ao", "lt-rest",
                 "lt-jwt", "lt-selenium", "lt-pom", "lt-github-actions", "lt-goi-y",
-                "lt-rang-buoc-llm", "lt-tinh-gia").forEach(this::chupSoDo);
+                "lt-goi-y-tuong-dong", "lt-rang-buoc-llm", "lt-tinh-gia").forEach(this::chupSoDo);
+    }
+
+    /*
+     * Chụp trọn khối section chứa một phần tử, thay vì cả trang.
+     *
+     * Ảnh phụ lục hướng dẫn cần khách nhìn thấy ngay ô nào vừa điền, nên bỏ thanh điều hướng
+     * và chân trang. Chụp theo khung của section chứ không theo khung nhìn, để kích cỡ cửa sổ
+     * trình duyệt không làm ảnh bị cắt ngang.
+     */
+    @SuppressWarnings("unchecked")
+    private void chupKhoiChua(String ten, String cssBenTrong) {
+        js("window.scrollTo(0, 0);");
+        nghi(400);
+        /* Lấy khung .wrap là phần nội dung đã căn giữa, chừa thêm 16 điểm mỗi bên cho khỏi sát mép. */
+        Map<String, Object> k = (Map<String, Object>) js(
+                "const p = document.querySelector(arguments[0]);"
+                        + "const e = p.closest('.wrap') || p.closest('section') || p;"
+                        + "const b = e.getBoundingClientRect();"
+                        + "return {x: Math.max(0, b.left + window.scrollX - 16), y: Math.max(0, b.top + window.scrollY - 16),"
+                        + " w: b.width + 32, h: b.height + 32};",
+                cssBenTrong);
+        double cao = Math.min(((Number) k.get("h")).doubleValue(), CAO_MOI_LAT);
+        Map<String, Object> ketQua = ((HasCdp) driver()).executeCdpCommand("Page.captureScreenshot",
+                Map.of("format", "jpeg", "quality", 85, "captureBeyondViewport", true,
+                        "clip", Map.of("x", ((Number) k.get("x")).doubleValue(), "y", ((Number) k.get("y")).doubleValue(),
+                                "width", ((Number) k.get("w")).doubleValue(), "height", cao, "scale", 0.8)));
+        luu(ten, (String) ketQua.get("data"));
+    }
+
+    /*
+     * Ảnh từng bước đặt tiệc cho phụ lục hướng dẫn người dùng.
+     *
+     * Gửi đơn phải đăng nhập, nên tạo một tài khoản khách mang tên người thật cho ảnh dễ đọc,
+     * không dùng tên "Khách Kiểm Thử" của bộ kiểm thử. Đơn tạo ra để chụp màn hình mã đơn được
+     * hủy ngay sau khi chụp, để không giữ chỗ buổi đó trên lịch của nhà hàng.
+     */
+    @Test
+    @DisplayName("Chụp từng bước đặt tiệc cho phụ lục hướng dẫn người dùng")
+    void chupPhuLucDatTiec() {
+        String email = "minhanh." + System.nanoTime() + "@vuonsen.vn";
+        GoiApi.dangKyKhach("Nguyễn Minh Anh", email, LuongDangNhap.MAT_KHAU_KHACH);
+        LuongDangNhap.dangNhap(driver(), email, LuongDangNhap.MAT_KHAU_KHACH);
+
+        String maDon = null;
+        try {
+            TrangDatTiec trang = new TrangDatTiec(driver()).mo()
+                    .dienBuoc1("WEDDING", GoiApi.ngayChuaDung(), "EVENING", 200);
+            nghi(600);
+            chupKhoiChua("pl-04a-dat-tiec-buoc-1", ".steps");
+
+            trang.tiepTuc();
+            trang.dangOBuoc2();
+            trang.chonKhongGian("Sảnh Sen Vàng").chonGoi("Gói Sen Vàng").bangTamTinh().docKhiOnDinh();
+            nghi(600);
+            chupKhoiChua("pl-04b-dat-tiec-buoc-2", ".steps");
+
+            trang.tiepTuc();
+            trang.dangOBuoc3();
+            trang.dienLienHe("Nguyễn Minh Anh", "0912345678", "nguyen.minhanh@example.com");
+            nghi(400);
+            chupKhoiChua("pl-04c-dat-tiec-buoc-3", ".steps");
+
+            maDon = trang.guiYeuCau().maDonVuaTao();
+            nghi(600);
+            chupKhoiChua("pl-04d-dat-tiec-ma-don", "[data-test='booking-code']");
+        } finally {
+            if (maDon != null) {
+                GoiApi.doiTrangThaiDonTiec(GoiApi.idDonTiecTheoMa(maDon), "CANCELLED");
+                System.out.println("[anh-bao-cao] da huy don chup anh " + maDon);
+            }
+        }
     }
 
     // ---------------- Các lượt chụp ----------------

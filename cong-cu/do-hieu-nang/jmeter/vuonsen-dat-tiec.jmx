@@ -1,0 +1,267 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Kịch bản đo tải Vườn Sen bằng Apache JMeter 5.6.3.
+
+  Mô phỏng đúng chuỗi việc của một khách đi đặt tiệc, theo yêu cầu khảo sát:
+  đăng nhập, tìm sảnh tiệc, xem chi tiết sảnh, tính giá tiệc, xem thực đơn, tính tiền món.
+
+  Mỗi luồng trong JMeter là một khách ảo. Số luồng đặt qua biến SO_NGUOI, nên cùng một tệp
+  chạy được ở mọi mức tải mà không phải sửa gì:
+
+    jmeter -n -t vuonsen-dat-tiec.jmx -JSO_NGUOI=10 -l ketqua-10.jtl -e -o bao-cao-10
+
+  Ba điểm thiết kế cần giải thích được khi bảo vệ:
+
+  1. Có thời gian nghĩ giữa các bước (Uniform Random Timer, 1 đến 3 giây). Khách thật đọc
+     trang rồi mới bấm tiếp. Bỏ thời gian nghĩ đi thì 10 luồng tạo ra lượng yêu cầu tương
+     đương hàng trăm khách thật, và con số đo được không còn trả lời đúng câu hỏi
+     "mười người cùng dùng thì bao nhiêu".
+
+  2. Tăng dần số người trong RAMP giây thay vì thả cùng lúc. Thả cùng lúc tạo ra một đỉnh
+     giả ở giây đầu, không giống cách người dùng thật vào trang.
+
+  3. Mỗi luồng một tài khoản riêng, đọc từ taikhoan.csv. Dùng chung một tài khoản thì dòng
+     người dùng đó nằm sẵn trong bộ đệm và các luồng tranh khoá khi ghi lần đăng nhập cuối,
+     cả hai đều làm sai số đo.
+
+  Kịch bản chỉ gọi các đường đọc và tính toán, không tạo đơn thật. Lý do: tạo vài nghìn đơn
+  trong một lượt đo sẽ đụng ràng buộc trùng lịch và sinh ra lỗi nghiệp vụ, lẫn vào tỉ lệ lỗi
+  khiến không phân biệt được lỗi do quá tải với lỗi do ràng buộc. Bước tính giá đã đi qua
+  đúng phần tính toán nặng nhất của luồng đặt tiệc.
+-->
+<jmeterTestPlan version="1.2" properties="5.0" jmeter="5.6.3">
+  <hashTree>
+    <TestPlan guiclass="TestPlanGui" testclass="TestPlan" testname="Vườn Sen — đo tải luồng đặt tiệc">
+      <boolProp name="TestPlan.functional_mode">false</boolProp>
+      <boolProp name="TestPlan.serialize_threadgroups">false</boolProp>
+      <elementProp name="TestPlan.user_defined_variables" elementType="Arguments" guiclass="ArgumentsPanel" testclass="Arguments" testname="Biến dùng chung">
+        <collectionProp name="Arguments.arguments">
+          <elementProp name="MAY_CHU" elementType="Argument">
+            <stringProp name="Argument.name">MAY_CHU</stringProp>
+            <stringProp name="Argument.value">${__P(MAY_CHU,localhost)}</stringProp>
+          </elementProp>
+          <elementProp name="CONG" elementType="Argument">
+            <stringProp name="Argument.name">CONG</stringProp>
+            <stringProp name="Argument.value">${__P(CONG,8080)}</stringProp>
+          </elementProp>
+          <elementProp name="SO_NGUOI" elementType="Argument">
+            <stringProp name="Argument.name">SO_NGUOI</stringProp>
+            <stringProp name="Argument.value">${__P(SO_NGUOI,10)}</stringProp>
+          </elementProp>
+          <elementProp name="RAMP" elementType="Argument">
+            <stringProp name="Argument.name">RAMP</stringProp>
+            <stringProp name="Argument.value">${__P(RAMP,10)}</stringProp>
+          </elementProp>
+          <elementProp name="SO_GIAY" elementType="Argument">
+            <stringProp name="Argument.name">SO_GIAY</stringProp>
+            <stringProp name="Argument.value">${__P(SO_GIAY,60)}</stringProp>
+          </elementProp>
+        </collectionProp>
+      </elementProp>
+    </TestPlan>
+    <hashTree>
+
+      <!-- Gửi và nhận JSON cho mọi yêu cầu trong kịch bản -->
+      <HeaderManager guiclass="HeaderPanel" testclass="HeaderManager" testname="Tiêu đề chung">
+        <collectionProp name="HeaderManager.headers">
+          <elementProp name="" elementType="Header">
+            <stringProp name="Header.name">Content-Type</stringProp>
+            <stringProp name="Header.value">application/json</stringProp>
+          </elementProp>
+          <elementProp name="" elementType="Header">
+            <stringProp name="Header.name">Accept</stringProp>
+            <stringProp name="Header.value">application/json</stringProp>
+          </elementProp>
+        </collectionProp>
+      </HeaderManager>
+      <hashTree/>
+
+      <ConfigTestElement guiclass="HttpDefaultsGui" testclass="ConfigTestElement" testname="Máy chủ mặc định">
+        <stringProp name="HTTPSampler.domain">${MAY_CHU}</stringProp>
+        <stringProp name="HTTPSampler.port">${CONG}</stringProp>
+        <stringProp name="HTTPSampler.protocol">http</stringProp>
+        <stringProp name="HTTPSampler.connect_timeout">10000</stringProp>
+        <stringProp name="HTTPSampler.response_timeout">30000</stringProp>
+      </ConfigTestElement>
+      <hashTree/>
+
+      <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="Khách đặt tiệc">
+        <stringProp name="ThreadGroup.num_threads">${SO_NGUOI}</stringProp>
+        <stringProp name="ThreadGroup.ramp_time">${RAMP}</stringProp>
+        <boolProp name="ThreadGroup.scheduler">true</boolProp>
+        <stringProp name="ThreadGroup.duration">${SO_GIAY}</stringProp>
+        <stringProp name="ThreadGroup.on_sample_error">continue</stringProp>
+        <elementProp name="ThreadGroup.main_controller" elementType="LoopController" guiclass="LoopControlPanel" testclass="LoopController" testname="Lặp">
+          <boolProp name="LoopController.continue_forever">true</boolProp>
+          <intProp name="LoopController.loops">-1</intProp>
+        </elementProp>
+      </ThreadGroup>
+      <hashTree>
+
+        <!-- Mỗi luồng lấy một dòng tài khoản riêng; hết tệp thì quay lại từ đầu -->
+        <CSVDataSet guiclass="TestBeanGUI" testclass="CSVDataSet" testname="Tài khoản khách">
+          <stringProp name="filename">taikhoan.csv</stringProp>
+          <stringProp name="variableNames">EMAIL,MAT_KHAU</stringProp>
+          <stringProp name="delimiter">,</stringProp>
+          <boolProp name="quotedData">false</boolProp>
+          <boolProp name="recycle">true</boolProp>
+          <boolProp name="stopThread">false</boolProp>
+          <stringProp name="shareMode">shareMode.all</stringProp>
+          <boolProp name="ignoreFirstLine">false</boolProp>
+          <stringProp name="fileEncoding">UTF-8</stringProp>
+        </CSVDataSet>
+        <hashTree/>
+
+        <!-- Bước 1: đăng nhập -->
+        <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="1. Đăng nhập">
+          <stringProp name="HTTPSampler.path">/api/auth/login</stringProp>
+          <stringProp name="HTTPSampler.method">POST</stringProp>
+          <boolProp name="HTTPSampler.postBodyRaw">true</boolProp>
+          <elementProp name="HTTPsampler.Arguments" elementType="Arguments">
+            <collectionProp name="Arguments.arguments">
+              <elementProp name="" elementType="HTTPArgument">
+                <boolProp name="HTTPArgument.always_encode">false</boolProp>
+                <stringProp name="Argument.value">{"email":"${EMAIL}","password":"${MAT_KHAU}"}</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+              </elementProp>
+            </collectionProp>
+          </elementProp>
+        </HTTPSamplerProxy>
+        <hashTree>
+          <JSONPostProcessor guiclass="JSONPostProcessorGui" testclass="JSONPostProcessor" testname="Lấy token">
+            <stringProp name="JSONPostProcessor.referenceNames">TOKEN</stringProp>
+            <stringProp name="JSONPostProcessor.jsonPathExprs">$.accessToken</stringProp>
+            <stringProp name="JSONPostProcessor.defaultValues">KHONG_CO_TOKEN</stringProp>
+          </JSONPostProcessor>
+          <hashTree/>
+          <ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="Phải trả 200">
+            <collectionProp name="Asserion.test_strings">
+              <stringProp name="49586">200</stringProp>
+            </collectionProp>
+            <stringProp name="Assertion.test_field">Assertion.response_code</stringProp>
+            <intProp name="Assertion.test_type">8</intProp>
+          </ResponseAssertion>
+          <hashTree/>
+        </hashTree>
+
+        <!-- Bước 2: tìm sảnh tiệc theo số khách và loại không gian -->
+        <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="2. Tìm sảnh tiệc">
+          <stringProp name="HTTPSampler.path">/api/v1/spaces?guests=200</stringProp>
+          <stringProp name="HTTPSampler.method">GET</stringProp>
+        </HTTPSamplerProxy>
+        <hashTree>
+          <ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="Phải trả 200">
+            <collectionProp name="Asserion.test_strings">
+              <stringProp name="49586">200</stringProp>
+            </collectionProp>
+            <stringProp name="Assertion.test_field">Assertion.response_code</stringProp>
+            <intProp name="Assertion.test_type">8</intProp>
+          </ResponseAssertion>
+          <hashTree/>
+        </hashTree>
+
+        <!-- Bước 3: mở chi tiết một sảnh -->
+        <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="3. Xem chi tiết sảnh">
+          <stringProp name="HTTPSampler.path">/api/v1/spaces/sanh-ven-song</stringProp>
+          <stringProp name="HTTPSampler.method">GET</stringProp>
+        </HTTPSamplerProxy>
+        <hashTree>
+          <JSONPostProcessor guiclass="JSONPostProcessorGui" testclass="JSONPostProcessor" testname="Lấy mã không gian">
+            <stringProp name="JSONPostProcessor.referenceNames">ID_KHONG_GIAN</stringProp>
+            <stringProp name="JSONPostProcessor.jsonPathExprs">$.id</stringProp>
+            <stringProp name="JSONPostProcessor.defaultValues">1</stringProp>
+          </JSONPostProcessor>
+          <hashTree/>
+        </hashTree>
+
+        <!-- Bước 4: tính giá tiệc, phần tính toán nặng nhất của luồng đặt tiệc -->
+        <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="4. Tính giá tiệc">
+          <stringProp name="HTTPSampler.path">/api/v1/bookings/quote</stringProp>
+          <stringProp name="HTTPSampler.method">POST</stringProp>
+          <boolProp name="HTTPSampler.postBodyRaw">true</boolProp>
+          <elementProp name="HTTPsampler.Arguments" elementType="Arguments">
+            <collectionProp name="Arguments.arguments">
+              <elementProp name="" elementType="HTTPArgument">
+                <boolProp name="HTTPArgument.always_encode">false</boolProp>
+                <stringProp name="Argument.value">{"spaceId":${ID_KHONG_GIAN},"guestCount":200}</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+              </elementProp>
+            </collectionProp>
+          </elementProp>
+        </HTTPSamplerProxy>
+        <hashTree>
+          <ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="Phải trả 200">
+            <collectionProp name="Asserion.test_strings">
+              <stringProp name="49586">200</stringProp>
+            </collectionProp>
+            <stringProp name="Assertion.test_field">Assertion.response_code</stringProp>
+            <intProp name="Assertion.test_type">8</intProp>
+          </ResponseAssertion>
+          <hashTree/>
+        </hashTree>
+
+        <!-- Bước 5: xem thực đơn, yêu cầu trả về nhiều dữ liệu nhất -->
+        <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="5. Xem thực đơn">
+          <stringProp name="HTTPSampler.path">/api/v1/menu/dishes</stringProp>
+          <stringProp name="HTTPSampler.method">GET</stringProp>
+        </HTTPSamplerProxy>
+        <hashTree>
+          <JSONPostProcessor guiclass="JSONPostProcessorGui" testclass="JSONPostProcessor" testname="Lấy mã món đầu tiên">
+            <stringProp name="JSONPostProcessor.referenceNames">ID_MON</stringProp>
+            <stringProp name="JSONPostProcessor.jsonPathExprs">$..id</stringProp>
+            <stringProp name="JSONPostProcessor.match_numbers">1</stringProp>
+            <stringProp name="JSONPostProcessor.defaultValues">1</stringProp>
+          </JSONPostProcessor>
+          <hashTree/>
+          <ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="Phải trả 200">
+            <collectionProp name="Asserion.test_strings">
+              <stringProp name="49586">200</stringProp>
+            </collectionProp>
+            <stringProp name="Assertion.test_field">Assertion.response_code</stringProp>
+            <intProp name="Assertion.test_type">8</intProp>
+          </ResponseAssertion>
+          <hashTree/>
+        </hashTree>
+
+        <!-- Bước 6: tính tiền giỏ món -->
+        <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="6. Tính tiền gọi món">
+          <stringProp name="HTTPSampler.path">/api/v1/dish-orders/quote</stringProp>
+          <stringProp name="HTTPSampler.method">POST</stringProp>
+          <boolProp name="HTTPSampler.postBodyRaw">true</boolProp>
+          <elementProp name="HTTPsampler.Arguments" elementType="Arguments">
+            <collectionProp name="Arguments.arguments">
+              <elementProp name="" elementType="HTTPArgument">
+                <boolProp name="HTTPArgument.always_encode">false</boolProp>
+                <stringProp name="Argument.value">{"fulfillmentType":"DINE_IN","items":[{"dishId":${ID_MON},"quantity":2}]}</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+              </elementProp>
+            </collectionProp>
+          </elementProp>
+        </HTTPSamplerProxy>
+        <hashTree>
+          <ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="Phải trả 200">
+            <collectionProp name="Asserion.test_strings">
+              <stringProp name="49586">200</stringProp>
+            </collectionProp>
+            <stringProp name="Assertion.test_field">Assertion.response_code</stringProp>
+            <intProp name="Assertion.test_type">8</intProp>
+          </ResponseAssertion>
+          <hashTree/>
+        </hashTree>
+
+        <!--
+          Thời gian nghĩ giữa các bước: 1 đến 3 giây.
+          Đây là điểm quyết định con số đo được có trả lời đúng câu hỏi hay không. Khách thật
+          đọc trang rồi mới bấm tiếp; bỏ nhịp nghĩ đi thì mỗi luồng gửi liên tục và mười luồng
+          sinh ra tải tương đương hàng trăm khách thật.
+        -->
+        <UniformRandomTimer guiclass="UniformRandomTimerGui" testclass="UniformRandomTimer" testname="Thời gian nghĩ 1-3 giây">
+          <stringProp name="ConstantTimer.delay">1000</stringProp>
+          <stringProp name="RandomTimer.range">2000</stringProp>
+        </UniformRandomTimer>
+        <hashTree/>
+
+      </hashTree>
+    </hashTree>
+  </hashTree>
+</jmeterTestPlan>

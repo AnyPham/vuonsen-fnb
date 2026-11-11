@@ -48,7 +48,7 @@ thực đơn, không gian, ngày lễ giảm giá và tài khoản người dùn
 | Module nghiệp vụ (backend) | 15 |
 | Trang giao diện | 32 |
 | Migration cơ sở dữ liệu | 29 |
-| Kiểm thử đơn vị và tích hợp | 254 bài |
+| Kiểm thử đơn vị và tích hợp | 289 bài |
 | Kiểm thử giao diện (Selenium) | 170 test case / 19 luồng |
 
 ---
@@ -449,7 +449,7 @@ máy cá nhân thì cần một đường hầm HTTPS công khai trỏ vào cổ
 
 ## 🧪 Kiểm thử
 
-### Kiểm thử phía máy chủ — 254 bài
+### Kiểm thử phía máy chủ — 289 bài
 
 Chạy trên H2 nên **không cần MySQL và không phải khởi động gì trước**. Dữ liệu trong MySQL
 không bị chạm tới.

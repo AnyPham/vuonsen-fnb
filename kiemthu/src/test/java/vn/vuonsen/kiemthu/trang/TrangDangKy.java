@@ -18,6 +18,10 @@ public class TrangDangKy extends TrangCoSo {
     private static final By NUT_GUI = dt("submit-register");
     private static final By THONG_BAO_LOI = dt("error");
 
+    /* Khối nhập mã hiện ngay tại trang đăng ký sau khi gửi form thành công. */
+    private static final By BIEU_MAU_XAC_THUC = dt("verify-form");
+    private static final By O_MA_XAC_THUC = dt("verify-code");
+
     public TrangDangKy(WebDriver driver) {
         super(driver);
     }
@@ -43,6 +47,22 @@ public class TrangDangKy extends TrangCoSo {
     /** Chờ khối thông báo lỗi do máy chủ trả về hiện ra rồi trả về nội dung. */
     public String thongBaoLoi() {
         return chuCua(THONG_BAO_LOI);
+    }
+
+    /*
+     * Đăng ký xong có chuyển sang bước nhập mã xác thực hay không.
+     *
+     * Trước đây đăng ký là đăng nhập luôn, nên kịch bản chỉ cần kiểm thanh điều hướng đã đổi
+     * sang trạng thái đã đăng nhập. Từ khi bắt xác thực email thì tài khoản còn ở trạng thái
+     * chờ, màn hình chuyển sang ô nhập mã sáu số ngay tại trang đăng ký.
+     */
+    public boolean coChuyenSangNhapMa() {
+        return choHien(BIEU_MAU_XAC_THUC).isDisplayed();
+    }
+
+    /** Ô nhập mã có sẵn sàng nhận chữ hay không, dùng để chắc bước kế tiếp thao tác được. */
+    public boolean oNhapMaSanSang() {
+        return choHien(O_MA_XAC_THUC).isEnabled();
     }
 
     /*
