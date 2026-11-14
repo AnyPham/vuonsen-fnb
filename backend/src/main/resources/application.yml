@@ -152,6 +152,8 @@ app:
   mail:
     from: ${MAIL_FROM:Vuon Sen <khong-tra-loi@vuonsen.vn>}
     base-url: ${APP_BASE_URL:http://localhost:5173}
+    # Ten mien chi dung cho kiem thu: thu toi day chi ghi nhat ky, ke ca khi da bat Gmail
+    mien-chi-ghi: ${MAIL_MIEN_CHI_GHI:example.com,vuonsen.vn}
 
   # Tai khoan ngan hang nhan tien, dung de dung ma VietQR cho khach quet.
   #

@@ -2,6 +2,9 @@ package vn.vuonsen.fnb.config.props;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
+import java.util.List;
+import java.util.Locale;
+
 /*
  * Thư đi của nhà hàng.
  *
@@ -14,12 +17,31 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
  * ngay, không bị chặn ở bước phải có tài khoản email.
  *
  * Gửi thật bằng Gmail: bật xác thực hai bước cho tài khoản, tạo một "mật khẩu ứng dụng", rồi
- * đặt ba biến môi trường ở trên với host là smtp.gmail.com. Không ghi mật khẩu vào tệp cấu
- * hình vì tệp đó nằm trong kho mã nguồn.
+ * khai các dòng spring.mail.* trong backend/tro-ly-ai.properties (xem tệp .example). Tệp đó
+ * nằm trong .gitignore; không ghi mật khẩu vào application.yml vì tệp này nằm trong kho mã nguồn.
+ *
+ * mienChiGhi là các tên miền chỉ dùng cho kiểm thử. Thư gửi tới đó luôn chỉ ghi nhật ký kể cả
+ * khi đã bật máy chủ thư: bộ Selenium đăng ký hàng trăm tài khoản @vuonsen.vn, test backend
+ * dùng @example.com, gửi thật tới các địa chỉ không tồn tại đó thì Gmail coi là thư rác và
+ * khóa tài khoản gửi.
  */
 @ConfigurationProperties(prefix = "app.mail")
 public record MailProperties(
         String from,
-        String baseUrl
+        String baseUrl,
+        List<String> mienChiGhi
 ) {
+    public MailProperties {
+        mienChiGhi = mienChiGhi == null ? List.of() : List.copyOf(mienChiGhi);
+    }
+
+    /** Địa chỉ thuộc tên miền kiểm thử thì không gửi ra ngoài. */
+    public boolean chiGhi(String diaChi) {
+        int a = diaChi == null ? -1 : diaChi.lastIndexOf('@');
+        if (a < 0) {
+            return true;
+        }
+        String mien = diaChi.substring(a + 1).trim().toLowerCase(Locale.ROOT);
+        return mienChiGhi.stream().anyMatch(m -> mien.equals(m) || mien.endsWith("." + m));
+    }
 }
