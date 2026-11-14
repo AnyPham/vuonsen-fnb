@@ -17,7 +17,7 @@ import java.util.Locale;
  * ngay, không bị chặn ở bước phải có tài khoản email.
  *
  * Gửi thật bằng Gmail: bật xác thực hai bước cho tài khoản, tạo một "mật khẩu ứng dụng", rồi
- * khai các dòng spring.mail.* trong backend/tro-ly-ai.properties (xem tệp .example). Tệp đó
+ * dán mật khẩu đó vào backend/gui-thu.properties (chép từ gui-thu.properties.example). Tệp đó
  * nằm trong .gitignore; không ghi mật khẩu vào application.yml vì tệp này nằm trong kho mã nguồn.
  *
  * mienChiGhi là các tên miền chỉ dùng cho kiểm thử. Thư gửi tới đó luôn chỉ ghi nhật ký kể cả

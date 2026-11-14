@@ -10,9 +10,10 @@ spring:
     active: local
 
   config:
-    # Khoa API doc tu tep rieng, khong nam trong git. Hai duong dan de chay duoc
-    # ca tu thu muc backend lan tu thu muc goc du an.
-    import: "optional:file:./tro-ly-ai.properties,optional:file:./backend/tro-ly-ai.properties"
+    # Khoa bi mat doc tu tep rieng, khong nam trong git: tro-ly-ai.properties (khoa AI,
+    # VNPay) va gui-thu.properties (Gmail gui thu). Hai duong dan de chay duoc ca tu
+    # thu muc backend lan tu thu muc goc du an.
+    import: "optional:file:./tro-ly-ai.properties,optional:file:./backend/tro-ly-ai.properties,optional:file:./gui-thu.properties,optional:file:./backend/gui-thu.properties"
 
   datasource:
     url: ${DB_URL:jdbc:mysql://localhost:3306/vuonsen_fnb?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Ho_Chi_Minh&allowPublicKeyRetrieval=true&useSSL=false}

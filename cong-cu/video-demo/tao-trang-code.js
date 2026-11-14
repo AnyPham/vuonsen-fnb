@@ -115,8 +115,8 @@ ${doan(B + 'modules/notification/EmailService.java', 'MimeMessage thu = sender.c
 ${doan(B + 'modules/payment/PaymentService.java', 'private void guiHoaDon(Payment phieu) {', 16, /HoaDonEmail|guiHtml/)}`,
 
   'g06-bat-gmail': `<h1>Bật gửi thư thật qua Gmail</h1>
-<p class="giai">Tạo Mật khẩu ứng dụng 16 ký tự trong tài khoản Google (cần bật Xác minh 2 bước), bỏ dấu # và điền vào tệp tro-ly-ai.properties. Tệp này nằm trong .gitignore nên mật khẩu không lên GitHub.</p>
-${doan('backend/tro-ly-ai.properties.example', '# --- Gui thu that qua Gmail', 18, /spring\.mail\.host|spring\.mail\.username|spring\.mail\.password|app\.mail\.from/)}`,
+<p class="giai">Tạo Mật khẩu ứng dụng 16 ký tự trong tài khoản Google (cần bật Xác minh 2 bước), chép gui-thu.properties.example thành gui-thu.properties rồi dán mật khẩu vào. Tệp này nằm trong .gitignore nên mật khẩu không lên GitHub.</p>
+${doan('backend/gui-thu.properties.example', '# Cach bat', 21, /gui-thu\.properties|spring\.mail\.username|spring\.mail\.password|app\.mail\.from/)}`,
 
   'g99-ket': `<div class="giua"><h1>Tóm tắt</h1>
 <p>Đăng ký → mã OTP qua Gmail → kích hoạt → đăng nhập bằng mật khẩu</p>
