@@ -1,0 +1,24 @@
+# Gmail nha hang dung de gui thu cho khach: ma OTP dang ky, dat lai mat khau,
+# xac nhan don, hoa don.
+#
+# Cach bat (moi may lam mot lan):
+# 1. Chep tep nay thanh gui-thu.properties (cung thu muc backend).
+# 2. Dan mat khau ung dung 16 ky tu vao sau dau = o dong spring.mail.password,
+#    viet lien, khong khoang trang. Mat khau do truong nhom nhan rieng, khong
+#    dan vao tep .example nay.
+# 3. Chay lai backend.
+#
+# Khong co tep gui-thu.properties thi website van chay, thu chi ghi vao bang
+# email_logs (trang thai LOGGED) chu khong gui di.
+# Thu toi @example.com va @vuonsen.vn (tai khoan cua bo kiem thu) luon chi ghi
+# nhat ky, ke ca khi da bat Gmail.
+# Tep gui-thu.properties nam trong .gitignore nen mat khau khong len GitHub.
+
+spring.mail.host=smtp.gmail.com
+spring.mail.port=587
+spring.mail.username=nhahangvuonsen@gmail.com
+spring.mail.password=
+spring.mail.properties.mail.smtp.auth=true
+spring.mail.properties.mail.smtp.starttls.enable=true
+spring.mail.properties.mail.smtp.connectiontimeout=10000
+app.mail.from=Vuon Sen <nhahangvuonsen@gmail.com>

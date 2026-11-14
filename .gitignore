@@ -3,6 +3,8 @@
 *.env.local
 # Khoa API cua tro ly AI, doc tu dong khi khoi dong backend
 tro-ly-ai.properties
+# Mat khau Gmail nha hang dung de gui thu, doc tu dong khi khoi dong backend
+gui-thu.properties
 
 # --- Java / Maven ---
 target/
