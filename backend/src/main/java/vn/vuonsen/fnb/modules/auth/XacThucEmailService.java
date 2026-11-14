@@ -65,8 +65,8 @@ public class XacThucEmailService {
         soLanSai.remove(user.getId());
         userRepository.save(user);
 
-        emailService.gui(user.getEmail(),
-                "Mã xác nhận tài khoản Vườn Sen",
+        emailService.guiHtml(user.getEmail(),
+                "Mã xác nhận tài khoản Vườn Sen: " + ma,
                 """
                 Chào %s,
 
@@ -82,9 +82,38 @@ public class XacThucEmailService {
 
                 Vườn Sen
                 """.formatted(user.getFullName(), ma, PHUT_HIEU_LUC),
+                thuMaHtml(user.getFullName(), ma),
                 "XAC_THUC_EMAIL");
 
         log.info("Đã cấp mã xác nhận cho tài khoản {}", user.getEmail());
+    }
+
+    /*
+     * Bản HTML của thư mã xác nhận: mã đặt trong ô chữ to, giãn cách để đọc và gõ lại không nhầm.
+     * Mã cũng nằm luôn ở tiêu đề thư, nên trên điện thoại khách đọc được ngay ở thông báo mà
+     * không cần mở thư. CSS đặt thẳng trên thẻ vì hộp thư bỏ phần lớn CSS khác.
+     */
+    private static String thuMaHtml(String ten, String ma) {
+        String tenAnToan = ten == null ? "" : ten.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;");
+        return """
+                <!doctype html><html lang="vi"><head><meta charset="utf-8"></head>
+                <body style="margin:0;padding:0;background:#f6f3ec;">
+                <table role="presentation" width="100%%" cellpadding="0" cellspacing="0" style="background:#f6f3ec;padding:24px 0;"><tr><td align="center">
+                <table role="presentation" width="560" cellpadding="0" cellspacing="0" style="max-width:560px;width:100%%;background:#ffffff;border-radius:10px;overflow:hidden;font-family:Arial,Helvetica,sans-serif;color:#1f2937;">
+                <tr><td style="background:#1f3a2e;padding:22px 28px;">
+                <div style="font-size:22px;font-weight:bold;color:#c9a24d;letter-spacing:1px;">VƯỜN SEN</div>
+                <div style="font-size:13px;color:#d1d5db;margin-top:4px;">Khu ẩm thực và tiệc sân vườn</div></td></tr>
+                <tr><td style="padding:28px 28px 8px;">
+                <div style="font-size:20px;font-weight:bold;color:#1f3a2e;">Xác nhận địa chỉ email</div>
+                <p style="font-size:15px;line-height:1.6;margin:10px 0 0;">Chào %s, đây là mã xác nhận tài khoản Vườn Sen của bạn:</p></td></tr>
+                <tr><td align="center" style="padding:18px 28px;">
+                <div style="display:inline-block;background:#f6f3ec;border:1px dashed #c9a24d;border-radius:8px;padding:16px 28px;font-size:34px;font-weight:bold;letter-spacing:10px;color:#1f3a2e;font-family:'Courier New',monospace;">%s</div></td></tr>
+                <tr><td style="padding:0 28px 8px;font-size:14px;line-height:1.6;">
+                Mã có hiệu lực trong <b>%d phút</b>. Nhập mã này trên trang đăng ký để kích hoạt tài khoản. Nhập sai %d lần thì mã bị hủy, bấm gửi lại mã để nhận mã mới.</td></tr>
+                <tr><td style="padding:18px 28px 24px;font-size:12px;line-height:1.6;color:#9ca3af;border-top:1px solid #eee;">
+                Nếu bạn không đăng ký tài khoản nào ở Vườn Sen thì bỏ qua thư này, tài khoản sẽ không được kích hoạt. Thư được gửi tự động, vui lòng không trả lời.</td></tr>
+                </table></td></tr></table></body></html>
+                """.formatted(tenAnToan, ma, PHUT_HIEU_LUC, SO_LAN_SAI_TOI_DA);
     }
 
     /*
