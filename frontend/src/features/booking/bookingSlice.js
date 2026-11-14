@@ -53,11 +53,23 @@ const bookingSlice = createSlice({
     submitStatus: 'idle',
     result: null,
     error: null,
+    /*
+     * Lỗi lấy báo giá tách khỏi lỗi gửi đơn. Trước đây dùng chung error: phản hồi báo giá về
+     * muộn (gọi sau 350 ms kể từ lúc chọn sảnh, gói) đặt error = null và xóa mất thông báo
+     * máy chủ vừa từ chối đơn, ví dụ "đã có tiệc vào buổi bạn chọn". Khách bị từ chối mà
+     * không thấy lý do. Bộ Selenium bắt được lỗi này ở ca TC-BOOKV-08 khi chạy trên CI.
+     */
+    quoteError: null,
     fieldErrors: null,
   },
   reducers: {
     updateForm: (state, action) => {
       state.form = { ...state.form, ...action.payload };
+      // Khách đã sửa lại thông tin sau lần gửi bị từ chối thì thông báo cũ không còn đúng
+      if (state.submitStatus === 'failed') {
+        state.error = null;
+        state.submitStatus = 'idle';
+      }
     },
     /*
      * Đổi số phần của một món tự chọn.
@@ -86,6 +98,7 @@ const bookingSlice = createSlice({
       state.submitStatus = 'idle';
       state.result = null;
       state.error = null;
+      state.quoteError = null;
       state.fieldErrors = null;
     },
   },
@@ -100,12 +113,12 @@ const bookingSlice = createSlice({
       .addCase(fetchQuote.fulfilled, (state, action) => {
         state.quoteStatus = 'succeeded';
         state.quote = action.payload;
-        state.error = null;
+        state.quoteError = null;
       })
       .addCase(fetchQuote.rejected, (state, action) => {
         state.quoteStatus = 'failed';
         state.quote = null;
-        state.error = action.payload;
+        state.quoteError = action.payload;
       })
       .addCase(submitBooking.pending, (state) => {
         state.submitStatus = 'loading';

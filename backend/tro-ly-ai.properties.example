@@ -33,3 +33,20 @@
 # app.assistant.llm.max-tokens=800
 # app.assistant.llm.timeout-seconds=20
 # app.assistant.llm.base-url=http://192.168.1.50:11434
+
+
+# --- Gui thu that qua Gmail (ma OTP dang ky, dat lai mat khau, hoa don) ---
+# 1. Dung mot Gmail rieng cho nha hang, bat Xac minh 2 buoc cho Gmail do.
+# 2. Tao Mat khau ung dung tai https://myaccount.google.com/apppasswords (16 ky tu).
+# 3. Bo dau # o 8 dong duoi, thay ten.gmail@gmail.com bang dia chi Gmail do va dan
+#    mat khau ung dung vao dong password (viet lien, bo khoang trang).
+# De trong thi thu chi ghi vao bang email_logs, website van chay binh thuong.
+# Thu toi @example.com va @vuonsen.vn (tai khoan cua bo kiem thu) luon chi ghi nhat ky.
+# spring.mail.host=smtp.gmail.com
+# spring.mail.port=587
+# spring.mail.username=ten.gmail@gmail.com
+# spring.mail.password=
+# spring.mail.properties.mail.smtp.auth=true
+# spring.mail.properties.mail.smtp.starttls.enable=true
+# spring.mail.properties.mail.smtp.connectiontimeout=10000
+# app.mail.from=Vuon Sen <ten.gmail@gmail.com>

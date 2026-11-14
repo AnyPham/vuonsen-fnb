@@ -34,6 +34,10 @@ public class EmailLog extends BaseEntity {
     @Column(nullable = false, columnDefinition = "TEXT")
     private String body;
 
+    // Bản HTML của thư, null với thư chỉ có chữ trơn (migration V32)
+    @Column(name = "html_body", columnDefinition = "MEDIUMTEXT")
+    private String htmlBody;
+
     @Column(nullable = false, length = 40)
     private String kind;
 

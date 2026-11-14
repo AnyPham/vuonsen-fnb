@@ -1,9 +1,10 @@
 package vn.vuonsen.fnb.modules.notification;
 
+import jakarta.mail.internet.MimeMessage;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.ObjectProvider;
-import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import vn.vuonsen.fnb.config.props.MailProperties;
@@ -44,6 +45,16 @@ public class EmailService {
 
     @Transactional
     public void gui(String nguoiNhan, String tieuDe, String noiDung, String loai) {
+        guiHtml(nguoiNhan, tieuDe, noiDung, null, loai);
+    }
+
+    /*
+     * Gửi thư có hai bản: chữ trơn và HTML. Hộp thư nào hiển thị được HTML (Gmail, Outlook)
+     * thì hiện bản HTML, còn lại hiện bản chữ trơn. Nhật ký luôn ghi bản chữ trơn để đọc được
+     * ngay trong cơ sở dữ liệu. html để null thì gửi thư chữ trơn như cũ.
+     */
+    @Transactional
+    public void guiHtml(String nguoiNhan, String tieuDe, String noiDung, String html, String loai) {
         if (nguoiNhan == null || nguoiNhan.isBlank()) {
             return;
         }
@@ -54,36 +65,47 @@ public class EmailService {
          * riêng rồi lại có nguy cơ hai chỗ khai lệch nhau.
          */
         JavaMailSender sender = mailSender.getIfAvailable();
-        if (sender == null) {
-            ghiNhat(nguoiNhan, tieuDe, noiDung, loai, CHI_GHI, null);
-            log.info("Chưa khai báo máy chủ thư nên không gửi đi. Nội dung thư gửi {}:\n--- {} ---\n{}",
+        if (sender == null || properties.chiGhi(nguoiNhan)) {
+            ghiNhat(nguoiNhan, tieuDe, noiDung, html, loai, CHI_GHI, null);
+            log.info("{} nên không gửi đi. Nội dung thư gửi {}:\n--- {} ---\n{}",
+                    sender == null ? "Chưa khai báo máy chủ thư" : "Địa chỉ thuộc tên miền kiểm thử",
                     nguoiNhan, tieuDe, noiDung);
             return;
         }
 
         try {
-            SimpleMailMessage thu = new SimpleMailMessage();
-            thu.setFrom(properties.from());
-            thu.setTo(nguoiNhan);
-            thu.setSubject(tieuDe);
-            thu.setText(noiDung);
+            /*
+             * MimeMessageHelper thay cho SimpleMailMessage: mã hóa UTF-8 cho tiêu đề và tên
+             * người gửi có dấu ("Vườn Sen"), và ghép được hai bản chữ trơn và HTML vào một thư.
+             */
+            MimeMessage thu = sender.createMimeMessage();
+            MimeMessageHelper h = new MimeMessageHelper(thu, html != null, "UTF-8");
+            h.setFrom(properties.from());
+            h.setTo(nguoiNhan);
+            h.setSubject(tieuDe);
+            if (html == null) {
+                h.setText(noiDung);
+            } else {
+                h.setText(noiDung, html);
+            }
             sender.send(thu);
 
-            ghiNhat(nguoiNhan, tieuDe, noiDung, loai, DA_GUI, null);
+            ghiNhat(nguoiNhan, tieuDe, noiDung, html, loai, DA_GUI, null);
             log.info("Đã gửi thư {} tới {}", loai, nguoiNhan);
         } catch (Exception e) {
             // Gửi hỏng không được làm hỏng nghiệp vụ đang chạy, chỉ ghi lại để còn tra
             log.warn("Gửi thư tới {} không thành công: {}", nguoiNhan, e.getMessage());
-            ghiNhat(nguoiNhan, tieuDe, noiDung, loai, HONG, cat(e.getMessage()));
+            ghiNhat(nguoiNhan, tieuDe, noiDung, html, loai, HONG, cat(e.getMessage()));
         }
     }
 
-    private void ghiNhat(String nguoiNhan, String tieuDe, String noiDung,
+    private void ghiNhat(String nguoiNhan, String tieuDe, String noiDung, String html,
                          String loai, String trangThai, String loi) {
         logRepository.save(EmailLog.builder()
                 .recipient(nguoiNhan)
                 .subject(tieuDe)
                 .body(noiDung)
+                .htmlBody(html)
                 .kind(loai)
                 .status(trangThai)
                 .errorDetail(loi)

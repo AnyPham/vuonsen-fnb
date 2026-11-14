@@ -47,8 +47,6 @@ import java.util.Optional;
 public class PaymentService {
 
     private static final DateTimeFormatter NGAY_MA = DateTimeFormatter.ofPattern("yyyyMMdd");
-    private static final DateTimeFormatter GIO_HOA_DON =
-            DateTimeFormatter.ofPattern("HH:mm dd/MM/yyyy");
 
     private final PaymentRepository paymentRepository;
     private final CapSoThuTu capSoThuTu;
@@ -262,9 +260,10 @@ public class PaymentService {
                 log.info("Phiếu {} không có email khách, bỏ qua bước gửi hóa đơn", phieu.getCode());
                 return;
             }
-            emailService.gui(nguoiNhan,
+            HoaDonEmail.NoiDung thu = HoaDonEmail.dung(phieu, mailProperties.baseUrl());
+            emailService.guiHtml(nguoiNhan,
                     "Vườn Sen đã nhận thanh toán đơn %s".formatted(phieu.maDon()),
-                    noiDungHoaDon(phieu),
+                    thu.vanBan(), thu.html(),
                     "HOA_DON");
         } catch (Exception e) {
             log.warn("Không gửi được hóa đơn cho phiếu {}: {}", phieu.getCode(), e.toString());
@@ -293,51 +292,6 @@ public class PaymentService {
         return o.getUser() == null ? null : o.getUser().getEmail();
     }
 
-    private String noiDungHoaDon(Payment phieu) {
-        boolean laTiec = phieu.getOrderType() == OrderType.BOOKING;
-        String tenKhach = laTiec
-                ? phieu.getBooking().getCustomerName() : phieu.getDishOrder().getCustomerName();
-        BigDecimal tongDon = laTiec
-                ? phieu.getBooking().getTotalAmount() : phieu.getDishOrder().getTotal();
-        BigDecimal daThu = laTiec
-                ? phieu.getBooking().getDepositPaid() : phieu.getDishOrder().getPaidAmount();
-        BigDecimal conLai = tongDon.subtract(daThu).max(BigDecimal.ZERO);
-        String duongTraCuu = laTiec
-                ? "%s/tra-cuu?code=%s".formatted(mailProperties.baseUrl(), phieu.maDon())
-                : "%s/tra-cuu-mon?ma=%s".formatted(mailProperties.baseUrl(), phieu.maDon());
-
-        return """
-                Chào %s,
-
-                Vườn Sen đã nhận được thanh toán của bạn. Thư này là xác nhận đã thu tiền,
-                không phải hóa đơn giá trị gia tăng.
-
-                Mã đơn: %s (%s)
-                Mã phiếu thu: %s
-                Hình thức: %s
-                Số tiền lần này: %s đồng
-                Thời điểm: %s
-
-                Tổng tiền đơn: %s đồng
-                Đã thanh toán: %s đồng
-                Còn phải trả: %s đồng
-
-                Tra cứu đơn bất cứ lúc nào tại: %s
-                Đã đăng nhập thì xem ở mục Đơn của tôi.
-
-                Vườn Sen
-                """.formatted(
-                        tenKhach,
-                        phieu.maDon(), laTiec ? "đơn đặt tiệc" : "đơn đặt món lẻ",
-                        phieu.getCode(),
-                        phieu.getMethod().getLabel(),
-                        phieu.getAmount().toPlainString(),
-                        phieu.getConfirmedAt().format(GIO_HOA_DON),
-                        tongDon.toPlainString(),
-                        daThu.toPlainString(),
-                        conLai.toPlainString(),
-                        duongTraCuu);
-    }
 
     @Transactional
     public PaymentResponse huy(Long id, String lyDo) {

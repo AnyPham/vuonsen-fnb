@@ -88,7 +88,7 @@ function validateStep(step, form, rules, t) {
 
 export default function BookingPage() {
   const dispatch = useDispatch();
-  const { step, form, options, quote, quoteStatus, submitStatus, result, error, fieldErrors } =
+  const { step, form, options, quote, quoteStatus, submitStatus, result, error, quoteError, fieldErrors } =
     useSelector(selectBooking);
   const nguoiDung = useSelector(selectUser);
   const spaces = useSelector(selectSpaces);
@@ -235,7 +235,7 @@ export default function BookingPage() {
                 ))}
               </div>
 
-              {error && <ErrorBlock message={error} />}
+              {(error || quoteError) && <ErrorBlock message={error || quoteError} />}
 
               <form onSubmit={handleSubmit} noValidate>
                 {step === 1 && (
