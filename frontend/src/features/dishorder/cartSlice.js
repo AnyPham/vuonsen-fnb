@@ -2,6 +2,9 @@ import { createSlice } from '@reduxjs/toolkit';
 
 const KHOA_LUU = 'vuonsen-gio-mon';
 
+// Khớp giới hạn @Max của DishOrderRequest phía máy chủ, để nút + dừng trước khi máy chủ từ chối
+export const SO_PHAN_TOI_DA = 200;
+
 /*
  * Giỏ món của khách.
  *
@@ -41,11 +44,11 @@ const cartSlice = createSlice({
       const { dishId, name, price, slug, imageUrl } = action.payload;
       const co = state.items.find((i) => i.dishId === dishId);
       if (co) {
-        co.quantity += action.payload.quantity ?? 1;
+        co.quantity = Math.min(SO_PHAN_TOI_DA, co.quantity + (action.payload.quantity ?? 1));
       } else {
         state.items.push({
           dishId, name, price, slug, imageUrl,
-          quantity: action.payload.quantity ?? 1,
+          quantity: Math.min(SO_PHAN_TOI_DA, action.payload.quantity ?? 1),
         });
       }
       ghi(state.items);
@@ -58,7 +61,7 @@ const cartSlice = createSlice({
       if (quantity <= 0) {
         state.items = state.items.filter((i) => i.dishId !== dishId);
       } else {
-        mon.quantity = quantity;
+        mon.quantity = Math.min(SO_PHAN_TOI_DA, quantity);
       }
       ghi(state.items);
     },

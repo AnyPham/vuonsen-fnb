@@ -1,5 +1,6 @@
 package vn.vuonsen.fnb.modules.menu;
 
+import vn.vuonsen.fnb.common.util.TuKhoaTimKiem;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -41,7 +42,7 @@ public class MenuController {
             @RequestParam(required = false) String category,
             @RequestParam(required = false) String keyword,
             @RequestParam(required = false) Boolean vegetarian) {
-        return ResponseEntity.ok(dishRepository.search(category, keyword, vegetarian)
+        return ResponseEntity.ok(dishRepository.search(category, TuKhoaTimKiem.choLike(keyword), vegetarian)
                 .stream().map(DishResponse::from).toList());
     }
 

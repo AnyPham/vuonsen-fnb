@@ -3,6 +3,7 @@ package vn.vuonsen.fnb.modules.assistant;
 import org.springframework.stereotype.Component;
 
 import java.text.Normalizer;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -42,9 +43,6 @@ public class IntentDetector {
                     "tiem khac", "doi thu", "ben ngoai", "thi truong", "dat hon o dau",
                     "re hon o dau", "hon nha hang", "hon cho khac", "hon noi khac")),
 
-            Map.entry(Intent.CHAO_HOI, List.of(
-                    "xin chao", "chao ban", "chao shop", "hello", "alo", "hi", "chao")),
-
             /*
              * Hoàn cọc phải đứng trước đặt cọc.
              *
@@ -52,9 +50,12 @@ public class IntentDetector {
              * chứa từ khóa nhóm này vừa chứa nhóm kia. Khách hỏi về hủy thì điều họ cần
              * biết là mất bao nhiêu, không phải phải đóng bao nhiêu.
              */
+            // "hoan lai", "huy thi", "neu huy" bổ sung theo KAN-69: câu "hủy thì hoàn lại tiền
+            // đặt cọc không" trước đây chỉ khớp "dat coc" và bị trả lời về mức đặt cọc
             Map.entry(Intent.HOAN_COC, List.of(
-                    "hoan coc", "hoan tien", "huy don", "huy tiec", "doi y",
-                    "co lay lai", "mat coc", "tra lai tien", "khong to chuc nua")),
+                    "hoan coc", "hoan tien", "hoan lai", "huy don", "huy tiec", "huy dat",
+                    "huy thi", "neu huy", "doi y", "co lay lai", "lay lai coc", "mat coc",
+                    "tra lai tien", "khong to chuc nua")),
 
             Map.entry(Intent.DAT_COC, List.of(
                     "dat coc", "tien coc", "coc bao nhieu", "phai coc", "giu cho")),
@@ -81,9 +82,12 @@ public class IntentDetector {
             Map.entry(Intent.KHUYEN_MAI, List.of(
                     "khuyen mai", "giam gia", "uu dai", "dat som", "mien phi thue", "dip le", "ngay le")),
 
+            // "gia goi", "gia thue"... bổ sung theo KAN-68: "giá gói tiệc bao nhiêu" có chữ "giá"
+            // và "bao nhiêu" đứng cách nhau nên không khớp "gia bao nhieu", rơi xuống nhóm gói tiệc
             Map.entry(Intent.CHI_PHI, List.of(
                     "bao nhieu tien", "gia bao nhieu", "chi phi", "bao nhieu mot mam",
-                    "gia ca", "tinh gia", "bang gia", "het bao nhieu", "thue bao nhieu")),
+                    "gia ca", "tinh gia", "bang gia", "het bao nhieu", "thue bao nhieu",
+                    "gia goi", "gia mot mam", "gia moi mam", "gia thue", "gia sanh", "gia phong")),
 
             Map.entry(Intent.QUY_TRINH_DAT, List.of(
                     "dat tiec nhu the nao", "dat truoc bao lau", "quy trinh", "thu tuc",
@@ -108,22 +112,71 @@ public class IntentDetector {
 
             Map.entry(Intent.LIEN_HE, List.of(
                     "dia chi", "o dau", "so dien thoai", "lien he", "gio mo cua",
-                    "may gio", "duong di", "ban do"))
+                    "may gio", "duong di", "ban do")),
+
+            /*
+             * Lời chào đứng cuối bảng (KAN-67).
+             *
+             * Khách hay mở đầu bằng "Chào shop, ..." rồi mới hỏi. Để nhóm này ở trên thì cả câu
+             * bị hiểu là lời chào và câu hỏi thật bị bỏ qua. Đứng cuối thì chỉ câu chào suông,
+             * không chứa từ khóa nào khác, mới được trả lời bằng lời chào.
+             */
+            Map.entry(Intent.CHAO_HOI, List.of(
+                    "xin chao", "chao ban", "chao shop", "hello", "alo", "hi", "chao"))
     );
 
+    /*
+     * Từ nối cho thấy khách hỏi hai việc trong một câu, ví dụ "không gian và món ăn".
+     * Chỉ gộp chủ đề khi có từ nối, để câu đơn có chữ "phòng" hay "sảnh" đi kèm không bị
+     * trả lời lan sang chủ đề khác.
+     */
+    private static final List<String> TU_NOI = List.of("va", "voi", "cung nhu", "kem", "con");
+
+    /* Số chủ đề tối đa trong một câu trả lời gộp, nhiều hơn thì câu trả lời quá dài. */
+    private static final int SO_CHU_DE_GOP_TOI_DA = 2;
+
     public Intent detect(String cauHoi) {
-        // Đệm hai đầu bằng dấu cách để so khớp theo từ trọn vẹn.
-        // Nếu so kiểu chứa chuỗi thì từ khóa "hi" sẽ khớp vào giữa chữ "chi phí",
-        // khiến câu hỏi về chi phí bị hiểu nhầm thành lời chào.
+        List<Intent> ds = tatCaChuDe(cauHoi);
+        return ds.isEmpty() ? Intent.KHONG_HIEU : ds.get(0);
+    }
+
+    /*
+     * Các chủ đề cần trả lời của một câu hỏi gộp (KAN-70).
+     *
+     * Trả về danh sách rỗng khi câu chỉ hỏi một chủ đề. Không gộp khi có chủ đề sảnh nhỏ,
+     * vì sảnh nhỏ vốn đã trả lời cả không gian lẫn thực đơn tự chọn.
+     */
+    public List<Intent> chuDeGop(String cauHoi) {
         String s = " " + boDau(cauHoi) + " ";
+        if (TU_NOI.stream().noneMatch(t -> s.contains(" " + t + " "))) {
+            return List.of();
+        }
+        List<Intent> ds = tatCaChuDe(cauHoi).stream()
+                .filter(i -> i != Intent.CHAO_HOI && i.coSanTrongNganHang())
+                .limit(SO_CHU_DE_GOP_TOI_DA)
+                .toList();
+        if (ds.size() < 2 || ds.contains(Intent.SANH_NHO)) {
+            return List.of();
+        }
+        return ds;
+    }
+
+    /*
+     * Mọi chủ đề có từ khóa xuất hiện trong câu, theo thứ tự ưu tiên của bảng.
+     *
+     * Đệm hai đầu bằng dấu cách để so khớp theo từ trọn vẹn. Nếu so kiểu chứa chuỗi thì
+     * từ khóa "hi" sẽ khớp vào giữa chữ "chi phí", khiến câu hỏi về chi phí bị hiểu nhầm
+     * thành lời chào.
+     */
+    private List<Intent> tatCaChuDe(String cauHoi) {
+        String s = " " + boDau(cauHoi) + " ";
+        List<Intent> kq = new ArrayList<>();
         for (var nhom : TU_KHOA) {
-            for (String tu : nhom.getValue()) {
-                if (s.contains(" " + tu + " ")) {
-                    return nhom.getKey();
-                }
+            if (nhom.getValue().stream().anyMatch(tu -> s.contains(" " + tu + " "))) {
+                kq.add(nhom.getKey());
             }
         }
-        return Intent.KHONG_HIEU;
+        return kq;
     }
 
     /*

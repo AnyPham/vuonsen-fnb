@@ -56,10 +56,10 @@ public interface PaymentRepository extends JpaRepository<Payment, Long> {
             LEFT JOIN p.dishOrder d
             WHERE (:status IS NULL OR p.status = :status)
               AND (:keyword IS NULL
-                   OR LOWER(p.code) LIKE LOWER(CONCAT('%', :keyword, '%'))
-                   OR LOWER(p.reference) LIKE LOWER(CONCAT('%', :keyword, '%'))
-                   OR LOWER(b.code) LIKE LOWER(CONCAT('%', :keyword, '%'))
-                   OR LOWER(d.code) LIKE LOWER(CONCAT('%', :keyword, '%')))
+                   OR LOWER(p.code) LIKE LOWER(CONCAT('%', :keyword, '%')) ESCAPE '!'
+                   OR LOWER(p.reference) LIKE LOWER(CONCAT('%', :keyword, '%')) ESCAPE '!'
+                   OR LOWER(b.code) LIKE LOWER(CONCAT('%', :keyword, '%')) ESCAPE '!'
+                   OR LOWER(d.code) LIKE LOWER(CONCAT('%', :keyword, '%')) ESCAPE '!')
             ORDER BY p.createdAt DESC
             """)
     Page<Payment> search(@Param("status") PaymentStatus status,

@@ -51,7 +51,27 @@ public class AssistantService {
     private final HolidayDiscountService holidayDiscounts;
 
     public AnswerResponse answer(String cauHoi) {
-        Intent intent = detector.detect(cauHoi);
+        List<Intent> gop = detector.chuDeGop(cauHoi);
+        if (!gop.isEmpty()) {
+            return traLoiGop(cauHoi, gop);
+        }
+        return traLoiTheo(detector.detect(cauHoi), cauHoi);
+    }
+
+    /*
+     * Câu hỏi hai chủ đề, ví dụ "cho mình hỏi về không gian và món ăn" (KAN-70).
+     *
+     * Ghép lời đáp của từng chủ đề theo thứ tự ưu tiên; gợi ý và đường dẫn lấy của chủ đề
+     * đầu để giao diện vẫn chỉ hiện một nút chuyển trang.
+     */
+    private AnswerResponse traLoiGop(String cauHoi, List<Intent> chuDe) {
+        List<AnswerResponse> phan = chuDe.stream().map(i -> traLoiTheo(i, cauHoi)).toList();
+        AnswerResponse dau = phan.get(0);
+        String loiDap = String.join("\n\n", phan.stream().map(AnswerResponse::answer).toList());
+        return new AnswerResponse(loiDap, dau.intent(), dau.suggestions(), dau.link(), dau.linkLabel());
+    }
+
+    private AnswerResponse traLoiTheo(Intent intent, String cauHoi) {
         return switch (intent) {
             case CHAO_HOI -> chaoHoi();
             case KHONG_GIAN -> traLoiKhongGian(detector.soTrongCau(cauHoi));

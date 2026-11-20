@@ -2,6 +2,7 @@ package vn.vuonsen.fnb.modules.dishorder.dto;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
@@ -52,7 +53,10 @@ public record DishOrderRequest(
 
     public record ItemRequest(
             @NotNull(message = "Thiếu mã món") Long dishId,
-            @NotNull @Min(value = 1, message = "Số lượng phải lớn hơn 0") Integer quantity
+            // Chặn trên cùng mức 200 phần của thực đơn tự chọn: không có giới hạn này thì gửi thẳng
+            // API được đơn 100.000 phần, tổng tiền hàng chục tỷ, làm sai thống kê doanh thu (KAN-64)
+            @NotNull @Min(value = 1, message = "Số lượng phải lớn hơn 0")
+            @Max(value = 200, message = "Mỗi món tối đa 200 phần") Integer quantity
     ) {
     }
 }

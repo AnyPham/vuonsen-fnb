@@ -11,13 +11,18 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 import vn.vuonsen.fnb.common.dto.ErrorResponse;
 
+import java.time.LocalDate;
+import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 // Bắt lỗi cho toàn bộ API, trả về JSON theo cùng một định dạng
 @Slf4j
@@ -97,6 +102,39 @@ public class GlobalExceptionHandler {
                 .body(ErrorResponse.of(400, "Bad Request",
                         "Dữ liệu gửi lên không đọc được, vui lòng kiểm tra lại định dạng JSON",
                         request.getRequestURI()));
+    }
+
+    /*
+     * Tham số trên đường dẫn sai kiểu: ngày không có thật (30/02), chuỗi không phải ngày,
+     * hay giá trị không thuộc danh sách trạng thái. Trước đây lọt xuống handler chung và
+     * trả 500 (lỗi KAN-60); đây là lỗi của bên gửi nên phải là 400, kèm tên tham số sai.
+     */
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    public ResponseEntity<ErrorResponse> handleTypeMismatch(MethodArgumentTypeMismatchException ex,
+                                                            HttpServletRequest request) {
+        Class<?> kieu = ex.getRequiredType();
+        String yeuCau;
+        if (kieu == LocalDate.class) {
+            yeuCau = "phải là ngày có thật theo định dạng YYYY-MM-DD";
+        } else if (kieu != null && kieu.isEnum()) {
+            yeuCau = "chỉ nhận một trong các giá trị " + Arrays.stream(kieu.getEnumConstants())
+                    .map(String::valueOf).collect(Collectors.joining(", "));
+        } else {
+            yeuCau = "sai kiểu dữ liệu";
+        }
+        log.warn("Tham số {} không hợp lệ tại {}: {}", ex.getName(), request.getRequestURI(), ex.getValue());
+        return ResponseEntity.badRequest()
+                .body(ErrorResponse.of(400, "Bad Request",
+                        "Tham số " + ex.getName() + " không hợp lệ: " + yeuCau, request.getRequestURI()));
+    }
+
+    // Thiếu hẳn một tham số bắt buộc, ví dụ gọi lịch mà không có tuNgay
+    @ExceptionHandler(MissingServletRequestParameterException.class)
+    public ResponseEntity<ErrorResponse> handleMissingParam(MissingServletRequestParameterException ex,
+                                                            HttpServletRequest request) {
+        return ResponseEntity.badRequest()
+                .body(ErrorResponse.of(400, "Bad Request",
+                        "Thiếu tham số bắt buộc " + ex.getParameterName(), request.getRequestURI()));
     }
 
     /*

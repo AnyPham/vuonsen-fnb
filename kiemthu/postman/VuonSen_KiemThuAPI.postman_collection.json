@@ -1,0 +1,1651 @@
+{
+  "info": {
+    "_postman_id": "968b3341-f93b-52af-b9e4-585930c7a3e3",
+    "name": "Vườn Sen – Kiểm thử API (Nhóm 20)",
+    "description": "Bộ kiểm thử API của đồ án Kiểm thử phần mềm: 10 ca API ngoại lệ (API-NEG) và 15 ca quản trị (ADM).",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "00 - Chuẩn bị",
+      "item": [
+        {
+          "name": "Đăng nhập quản trị",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "login"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{adminEmail}}\",\n  \"password\": \"{{adminPassword}}\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Đăng nhập thành công\", function () { pm.response.to.have.status(200); });",
+                  "pm.collectionVariables.set(\"token\", pm.response.json().accessToken);",
+                  "pm.collectionVariables.set(\"hauTo\", String(Date.now()).slice(-6));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Lấy một món đang bán",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/menu/dishes",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "menu",
+                "dishes"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const ds = pm.response.json();",
+                  "pm.test(\"Có món đang bán\", function () { pm.expect(ds.length).to.be.above(0); });",
+                  "pm.collectionVariables.set(\"dishId\", ds[0].id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Lấy danh mục món",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/menu/categories",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "menu",
+                "categories"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Có danh mục món\", function () { pm.expect(pm.response.json().length).to.be.above(0); });",
+                  "pm.collectionVariables.set(\"categoryId\", pm.response.json()[0].id);"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "API-NEG - Kiểm thử API ngoại lệ",
+      "item": [
+        {
+          "name": "TC-API-01 Từ chối số lượng món vượt giới hạn",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/dish-orders",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "dish-orders"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fulfillmentType\": \"DELIVERY\",\n  \"customerName\": \"Khách kiểm thử\",\n  \"customerPhone\": \"0901234567\",\n  \"deliveryAddress\": \"12 Nguyễn Huệ, Quận 1\",\n  \"serveAt\": \"{{serveAt}}\",\n  \"items\": [\n    {\n      \"dishId\": \"{{dishId}}\",\n      \"quantity\": 100000\n    }\n  ]\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Trả 400 khi số lượng 100.000 phần\", function () {",
+                  "  pm.response.to.have.status(400);",
+                  "  pm.expect(pm.response.json().message).to.include(\"200\"); });"
+                ]
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const d = new Date(Date.now() + 5*86400000); d.setHours(11,0,0,0);",
+                  "const p = n => String(n).padStart(2,\"0\");",
+                  "pm.collectionVariables.set(\"serveAt\", `${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())}T11:00:00`);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "TC-API-02 Từ khóa % được hiểu theo nghĩa đen",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/menu/dishes?keyword=%25",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "menu",
+                "dishes"
+              ],
+              "query": [
+                {
+                  "key": "keyword",
+                  "value": "%25"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Danh sách rỗng với %\", function () {",
+                  "  pm.response.to.have.status(200); pm.expect(pm.response.json().length).to.eql(0); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "TC-API-02b Từ khóa _ được hiểu theo nghĩa đen",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/menu/dishes?keyword=_",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "menu",
+                "dishes"
+              ],
+              "query": [
+                {
+                  "key": "keyword",
+                  "value": "_"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Danh sách rỗng với _\", function () {",
+                  "  pm.response.to.have.status(200); pm.expect(pm.response.json().length).to.eql(0); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "TC-API-03 Lời chào kèm câu hỏi",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/assistant/ask",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "assistant",
+                "ask"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"question\": \"Chào shop, sảnh nào chứa được 300 khách?\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Trả lời theo chủ đề không gian\", function () {",
+                  "  pm.expect(pm.response.json().intent).to.eql(\"KHONG_GIAN\"); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "TC-API-04 Hỏi giá gói tiệc",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/assistant/ask",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "assistant",
+                "ask"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"question\": \"Giá gói tiệc bao nhiêu?\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Trả lời theo chủ đề chi phí\", function () {",
+                  "  pm.expect(pm.response.json().intent).to.eql(\"CHI_PHI\"); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "TC-API-05 Hỏi hủy thì có hoàn cọc không",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/assistant/ask",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "assistant",
+                "ask"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"question\": \"Hủy thì hoàn lại tiền đặt cọc không?\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Trả lời theo chính sách hoàn cọc\", function () {",
+                  "  pm.expect(pm.response.json().intent).to.eql(\"HOAN_COC\"); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "TC-API-06 Câu hỏi gộp hai chủ đề",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/assistant/ask",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "assistant",
+                "ask"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"question\": \"Cho mình hỏi về không gian và món ăn\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Trả lời đủ không gian và thực đơn\", function () {",
+                  "  const t = pm.response.json().answer;",
+                  "  pm.expect(t).to.include(\"Sảnh Sen Vàng\"); pm.expect(t).to.include(\"Gỏi củ hũ dừa tôm thịt\"); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "TC-API-07 Lịch quản trị với ngày không có thật",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/admin/calendar?tuNgay=2026-02-30&denNgay=2026-03-01",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "calendar"
+              ],
+              "query": [
+                {
+                  "key": "tuNgay",
+                  "value": "2026-02-30"
+                },
+                {
+                  "key": "denNgay",
+                  "value": "2026-03-01"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Trả 400 kèm tên tham số\", function () {",
+                  "  pm.response.to.have.status(400); pm.expect(pm.response.json().message).to.include(\"tuNgay\"); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "TC-API-08 Kiểm tra buổi trống với ngày không có thật",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/bookings/availability?date=2026-02-30",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "bookings",
+                "availability"
+              ],
+              "query": [
+                {
+                  "key": "date",
+                  "value": "2026-02-30"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Trả 400 kèm tên tham số\", function () {",
+                  "  pm.response.to.have.status(400); pm.expect(pm.response.json().message).to.include(\"date\"); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "TC-API-09 Danh sách đơn với from không có thật",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/admin/bookings?from=2026-02-30",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "bookings"
+              ],
+              "query": [
+                {
+                  "key": "from",
+                  "value": "2026-02-30"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Trả 400 kèm tên tham số\", function () {",
+                  "  pm.response.to.have.status(400); pm.expect(pm.response.json().message).to.include(\"from\"); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "TC-API-10 Danh sách đơn với status không hợp lệ",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/admin/bookings?status=ABC",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "bookings"
+              ],
+              "query": [
+                {
+                  "key": "status",
+                  "value": "ABC"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Trả 400 và liệt kê trạng thái hợp lệ\", function () {",
+                  "  pm.response.to.have.status(400); pm.expect(pm.response.json().message).to.include(\"PENDING\"); });"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "ADM - Quản trị danh mục, thanh toán, thống kê",
+      "item": [
+        {
+          "name": "TC-ADM-01 Thêm món mới hợp lệ",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/admin/dishes",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "dishes"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"categoryId\": \"{{categoryId}}\",\n  \"name\": \"Món kiểm thử {{hauTo}}\",\n  \"description\": \"Tạo bởi bộ Postman\",\n  \"price\": 120000,\n  \"available\": true,\n  \"bestSeller\": false\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Tạo được món\", function () {",
+                  "  pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+                  "  pm.collectionVariables.set(\"monMoiId\", pm.response.json().id); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "TC-ADM-01b Món mới hiện trên thực đơn công khai",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/menu/dishes?keyword=Món kiểm thử {{hauTo}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "menu",
+                "dishes"
+              ],
+              "query": [
+                {
+                  "key": "keyword",
+                  "value": "Món kiểm thử {{hauTo}}"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Tìm thấy đúng 1 món\", function () {",
+                  "  pm.expect(pm.response.json().length).to.eql(1); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "TC-ADM-02 Thêm món thiếu tên",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/admin/dishes",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "dishes"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"categoryId\": \"{{categoryId}}\",\n  \"name\": \"\",\n  \"price\": 120000\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Trả 400\", function () {",
+                  "  pm.response.to.have.status(400); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "TC-ADM-03 Sửa giá món",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/admin/dishes/{{monMoiId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "dishes",
+                "{{monMoiId}}"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"categoryId\": \"{{categoryId}}\",\n  \"name\": \"Món kiểm thử {{hauTo}}\",\n  \"price\": 150000,\n  \"available\": true\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Sửa thành công\", function () {",
+                  "  pm.response.to.have.status(200); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "TC-ADM-03b Thực đơn công khai hiện giá mới",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/menu/dishes?keyword=Món kiểm thử {{hauTo}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "menu",
+                "dishes"
+              ],
+              "query": [
+                {
+                  "key": "keyword",
+                  "value": "Món kiểm thử {{hauTo}}"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Giá mới 150.000\", function () {",
+                  "  pm.expect(Number(pm.response.json()[0].price)).to.eql(150000); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "TC-ADM-04 Ngừng phục vụ món",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/admin/dishes/{{monMoiId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "dishes",
+                "{{monMoiId}}"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Ngừng phục vụ thành công\", function () {",
+                  "  pm.expect(pm.response.code).to.be.oneOf([200, 204]); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "TC-ADM-04b Món đã ngừng không còn trên thực đơn",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/menu/dishes?keyword=Món kiểm thử {{hauTo}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "menu",
+                "dishes"
+              ],
+              "query": [
+                {
+                  "key": "keyword",
+                  "value": "Món kiểm thử {{hauTo}}"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Không còn món\", function () {",
+                  "  pm.expect(pm.response.json().length).to.eql(0); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "TC-ADM-05 Thêm không gian có sức chứa tối thiểu lớn hơn tối đa",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/admin/spaces",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "spaces"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"code\": \"KT{{hauTo}}\",\n  \"name\": \"Không gian kiểm thử {{hauTo}}\",\n  \"slug\": \"khong-gian-kiem-thu-{{hauTo}}\",\n  \"spaceType\": \"INDOOR\",\n  \"capacityMin\": 100,\n  \"capacityMax\": 50,\n  \"rentalFee\": 1000000\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Trả 400 kèm lý do\", function () {",
+                  "  pm.response.to.have.status(400); pm.expect(pm.response.json().message).to.include(\"Sức chứa\"); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "TC-ADM-06 Thêm không gian hợp lệ",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/admin/spaces",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "spaces"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"code\": \"KT{{hauTo}}\",\n  \"name\": \"Không gian kiểm thử {{hauTo}}\",\n  \"slug\": \"khong-gian-kiem-thu-{{hauTo}}\",\n  \"spaceType\": \"INDOOR\",\n  \"capacityMin\": 20,\n  \"capacityMax\": 50,\n  \"rentalFee\": 1000000,\n  \"active\": true,\n  \"amenities\": [\n    \"Máy lạnh\"\n  ]\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Tạo được không gian\", function () {",
+                  "  pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+                  "  pm.collectionVariables.set(\"khongGianId\", pm.response.json().id); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "TC-ADM-06b Không gian mới hiện trong danh sách công khai",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/spaces",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "spaces"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Có không gian mới\", function () {",
+                  "  pm.expect(pm.response.json().some(s => s.slug === \"khong-gian-kiem-thu-\" + pm.collectionVariables.get(\"hauTo\"))).to.be.true; });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "TC-ADM-07 Ngừng kinh doanh không gian",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/admin/spaces/{{khongGianId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "spaces",
+                "{{khongGianId}}"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Ngừng thành công\", function () {",
+                  "  pm.expect(pm.response.code).to.be.oneOf([200, 204]); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "TC-ADM-07b Không gian đã ngừng không còn trong danh sách",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/spaces",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "spaces"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Không còn không gian\", function () {",
+                  "  pm.expect(pm.response.json().some(s => s.slug === \"khong-gian-kiem-thu-\" + pm.collectionVariables.get(\"hauTo\"))).to.be.false; });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "TC-ADM-08 Thêm gói tiệc hợp lệ",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/admin/packages",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "packages"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"code\": \"GKT{{hauTo}}\",\n  \"name\": \"Gói kiểm thử {{hauTo}}\",\n  \"pricePerTable\": 2500000,\n  \"dishCount\": 6,\n  \"hoursIncluded\": 4,\n  \"active\": true,\n  \"features\": [\n    \"Trang trí cơ bản\"\n  ]\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Tạo được gói\", function () {",
+                  "  pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+                  "  pm.collectionVariables.set(\"goiId\", pm.response.json().id); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "TC-ADM-08b Gói mới hiện trên bảng giá",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/packages",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "packages"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Có gói mới\", function () {",
+                  "  pm.expect(pm.response.json().some(g => g.name === \"Gói kiểm thử \" + pm.collectionVariables.get(\"hauTo\"))).to.be.true; });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Dọn dữ liệu – ngừng gói kiểm thử",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/admin/packages/{{goiId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "packages",
+                "{{goiId}}"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Ngừng gói kiểm thử\", function () {",
+                  "  pm.expect(pm.response.code).to.be.oneOf([200, 204]); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Dọn dữ liệu – bảng giá trở lại như cũ",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/packages",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "packages"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Không còn gói kiểm thử\", function () {",
+                  "  pm.expect(pm.response.json().some(g => g.name.startsWith(\"Gói kiểm thử\"))).to.be.false; });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "TC-ADM-09 Thêm gói giá âm",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/admin/packages",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "packages"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"code\": \"GAM{{hauTo}}\",\n  \"name\": \"Gói giá âm\",\n  \"pricePerTable\": -1\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Trả 400\", function () {",
+                  "  pm.response.to.have.status(400); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "TC-ADM-10a Tạo đơn món để ghi phiếu thu",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/dish-orders",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "dish-orders"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fulfillmentType\": \"DELIVERY\",\n  \"customerName\": \"Khách kiểm thử\",\n  \"customerPhone\": \"0901234567\",\n  \"deliveryAddress\": \"12 Nguyễn Huệ, Quận 1\",\n  \"serveAt\": \"{{serveAt}}\",\n  \"items\": [\n    {\n      \"dishId\": \"{{dishId}}\",\n      \"quantity\": 2\n    }\n  ]\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Tạo được đơn\", function () {",
+                  "  pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+                  "  pm.collectionVariables.set(\"maDon\", pm.response.json().code); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "TC-ADM-10 Ghi phiếu thu dưới 1.000 đồng",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/admin/payments",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "payments"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"orderCode\": \"{{maDon}}\",\n  \"amount\": 500,\n  \"purpose\": \"FULL\",\n  \"method\": \"CASH\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Trả 400 kèm câu báo\", function () {",
+                  "  pm.response.to.have.status(400); pm.expect(pm.response.json().message).to.include(\"1.000\"); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "TC-ADM-11 Ghi thu tiền mặt tại quầy",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/admin/payments",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "payments"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"orderCode\": \"{{maDon}}\",\n  \"amount\": 10000,\n  \"purpose\": \"DEPOSIT\",\n  \"method\": \"CASH\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Phiếu vào sổ ở trạng thái đã xác nhận\", function () {",
+                  "  pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+                  "  pm.expect(pm.response.json().status).to.eql(\"CONFIRMED\"); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "TC-ADM-12a Khách tạo yêu cầu chuyển khoản VietQR",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/payments",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "payments"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"orderCode\": \"{{maDon}}\",\n  \"purpose\": \"FULL\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Tạo được yêu cầu thanh toán\", function () {",
+                  "  pm.response.to.have.status(200); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "TC-ADM-12b Phiếu VietQR nằm trong danh sách chờ đối soát",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/admin/payments?status=PENDING&keyword={{maDon}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "payments"
+              ],
+              "query": [
+                {
+                  "key": "status",
+                  "value": "PENDING"
+                },
+                {
+                  "key": "keyword",
+                  "value": "{{maDon}}"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Có đúng phiếu chờ đối soát của đơn\", function () {",
+                  "  const ds = pm.response.json().content;",
+                  "  pm.expect(ds.length).to.be.above(0); pm.collectionVariables.set(\"phieuId\", ds[0].id); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "TC-ADM-12 Xác nhận phiếu chờ đối soát",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/admin/payments/{{phieuId}}/confirm",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "payments",
+                "{{phieuId}}",
+                "confirm"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Phiếu chuyển sang đã xác nhận\", function () {",
+                  "  pm.response.to.have.status(200); pm.expect(pm.response.json().status).to.eql(\"CONFIRMED\"); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "TC-ADM-13 Thống kê khoảng ngày không có đơn",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/admin/statistics?from=2020-01-01&to=2020-01-31",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "statistics"
+              ],
+              "query": [
+                {
+                  "key": "from",
+                  "value": "2020-01-01"
+                },
+                {
+                  "key": "to",
+                  "value": "2020-01-31"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Trả 200, doanh thu bằng 0\", function () {",
+                  "  pm.response.to.have.status(200); pm.expect(Number(pm.response.json().tongQuan.doanhThu)).to.eql(0); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "TC-ADM-14 Thống kê mặc định 12 tháng",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/admin/statistics",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "statistics"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Trả 200 và có số liệu tổng quan\", function () {",
+                  "  pm.response.to.have.status(200); pm.expect(pm.response.json().tongQuan).to.be.an(\"object\"); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "TC-ADM-15 Gọi API quản trị khi chưa đăng nhập",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/admin/dishes",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "dishes"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Bị từ chối 401 hoặc 403\", function () {",
+                  "  pm.expect(pm.response.code).to.be.oneOf([401, 403]); });"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "token",
+      "value": ""
+    },
+    {
+      "key": "hauTo",
+      "value": ""
+    },
+    {
+      "key": "dishId",
+      "value": ""
+    },
+    {
+      "key": "categoryId",
+      "value": ""
+    },
+    {
+      "key": "serveAt",
+      "value": ""
+    },
+    {
+      "key": "monMoiId",
+      "value": ""
+    },
+    {
+      "key": "khongGianId",
+      "value": ""
+    },
+    {
+      "key": "goiId",
+      "value": ""
+    },
+    {
+      "key": "maDon",
+      "value": ""
+    },
+    {
+      "key": "phieuId",
+      "value": ""
+    }
+  ]
+}

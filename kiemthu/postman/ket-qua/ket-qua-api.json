@@ -1,0 +1,607 @@
+{
+  "thoiDiem": "2026-11-20T05:55:42.362Z",
+  "tong": 40,
+  "dat": 40,
+  "ketQua": [
+    {
+      "nhom": "00 - Chuẩn bị",
+      "ten": "Đăng nhập quản trị",
+      "method": "POST",
+      "url": "http://localhost:8080/api/auth/login",
+      "ma": 200,
+      "thoiGianMs": 196,
+      "dat": true,
+      "kiemTra": [
+        {
+          "ten": "Đăng nhập thành công",
+          "dat": true
+        }
+      ]
+    },
+    {
+      "nhom": "00 - Chuẩn bị",
+      "ten": "Lấy một món đang bán",
+      "method": "GET",
+      "url": "http://localhost:8080/api/v1/menu/dishes",
+      "ma": 200,
+      "thoiGianMs": 28,
+      "dat": true,
+      "kiemTra": [
+        {
+          "ten": "Có món đang bán",
+          "dat": true
+        }
+      ]
+    },
+    {
+      "nhom": "00 - Chuẩn bị",
+      "ten": "Lấy danh mục món",
+      "method": "GET",
+      "url": "http://localhost:8080/api/v1/menu/categories",
+      "ma": 200,
+      "thoiGianMs": 3,
+      "dat": true,
+      "kiemTra": [
+        {
+          "ten": "Có danh mục món",
+          "dat": true
+        }
+      ]
+    },
+    {
+      "nhom": "API-NEG - Kiểm thử API ngoại lệ",
+      "ten": "TC-API-01 Từ chối số lượng món vượt giới hạn",
+      "method": "POST",
+      "url": "http://localhost:8080/api/v1/dish-orders",
+      "ma": 400,
+      "thoiGianMs": 12,
+      "dat": true,
+      "kiemTra": [
+        {
+          "ten": "Trả 400 khi số lượng 100.000 phần",
+          "dat": true
+        }
+      ]
+    },
+    {
+      "nhom": "API-NEG - Kiểm thử API ngoại lệ",
+      "ten": "TC-API-02 Từ khóa % được hiểu theo nghĩa đen",
+      "method": "GET",
+      "url": "http://localhost:8080/api/v1/menu/dishes?keyword=%25",
+      "ma": 200,
+      "thoiGianMs": 12,
+      "dat": true,
+      "kiemTra": [
+        {
+          "ten": "Danh sách rỗng với %",
+          "dat": true
+        }
+      ]
+    },
+    {
+      "nhom": "API-NEG - Kiểm thử API ngoại lệ",
+      "ten": "TC-API-02b Từ khóa _ được hiểu theo nghĩa đen",
+      "method": "GET",
+      "url": "http://localhost:8080/api/v1/menu/dishes?keyword=_",
+      "ma": 200,
+      "thoiGianMs": 8,
+      "dat": true,
+      "kiemTra": [
+        {
+          "ten": "Danh sách rỗng với _",
+          "dat": true
+        }
+      ]
+    },
+    {
+      "nhom": "API-NEG - Kiểm thử API ngoại lệ",
+      "ten": "TC-API-03 Lời chào kèm câu hỏi",
+      "method": "POST",
+      "url": "http://localhost:8080/api/v1/assistant/ask",
+      "ma": 200,
+      "thoiGianMs": 7,
+      "dat": true,
+      "kiemTra": [
+        {
+          "ten": "Trả lời theo chủ đề không gian",
+          "dat": true
+        }
+      ]
+    },
+    {
+      "nhom": "API-NEG - Kiểm thử API ngoại lệ",
+      "ten": "TC-API-04 Hỏi giá gói tiệc",
+      "method": "POST",
+      "url": "http://localhost:8080/api/v1/assistant/ask",
+      "ma": 200,
+      "thoiGianMs": 7,
+      "dat": true,
+      "kiemTra": [
+        {
+          "ten": "Trả lời theo chủ đề chi phí",
+          "dat": true
+        }
+      ]
+    },
+    {
+      "nhom": "API-NEG - Kiểm thử API ngoại lệ",
+      "ten": "TC-API-05 Hỏi hủy thì có hoàn cọc không",
+      "method": "POST",
+      "url": "http://localhost:8080/api/v1/assistant/ask",
+      "ma": 200,
+      "thoiGianMs": 3,
+      "dat": true,
+      "kiemTra": [
+        {
+          "ten": "Trả lời theo chính sách hoàn cọc",
+          "dat": true
+        }
+      ]
+    },
+    {
+      "nhom": "API-NEG - Kiểm thử API ngoại lệ",
+      "ten": "TC-API-06 Câu hỏi gộp hai chủ đề",
+      "method": "POST",
+      "url": "http://localhost:8080/api/v1/assistant/ask",
+      "ma": 200,
+      "thoiGianMs": 8,
+      "dat": true,
+      "kiemTra": [
+        {
+          "ten": "Trả lời đủ không gian và thực đơn",
+          "dat": true
+        }
+      ]
+    },
+    {
+      "nhom": "API-NEG - Kiểm thử API ngoại lệ",
+      "ten": "TC-API-07 Lịch quản trị với ngày không có thật",
+      "method": "GET",
+      "url": "http://localhost:8080/api/v1/admin/calendar?tuNgay=2026-02-30&denNgay=2026-03-01",
+      "ma": 400,
+      "thoiGianMs": 16,
+      "dat": true,
+      "kiemTra": [
+        {
+          "ten": "Trả 400 kèm tên tham số",
+          "dat": true
+        }
+      ]
+    },
+    {
+      "nhom": "API-NEG - Kiểm thử API ngoại lệ",
+      "ten": "TC-API-08 Kiểm tra buổi trống với ngày không có thật",
+      "method": "GET",
+      "url": "http://localhost:8080/api/v1/bookings/availability?date=2026-02-30",
+      "ma": 400,
+      "thoiGianMs": 2,
+      "dat": true,
+      "kiemTra": [
+        {
+          "ten": "Trả 400 kèm tên tham số",
+          "dat": true
+        }
+      ]
+    },
+    {
+      "nhom": "API-NEG - Kiểm thử API ngoại lệ",
+      "ten": "TC-API-09 Danh sách đơn với from không có thật",
+      "method": "GET",
+      "url": "http://localhost:8080/api/v1/admin/bookings?from=2026-02-30",
+      "ma": 400,
+      "thoiGianMs": 6,
+      "dat": true,
+      "kiemTra": [
+        {
+          "ten": "Trả 400 kèm tên tham số",
+          "dat": true
+        }
+      ]
+    },
+    {
+      "nhom": "API-NEG - Kiểm thử API ngoại lệ",
+      "ten": "TC-API-10 Danh sách đơn với status không hợp lệ",
+      "method": "GET",
+      "url": "http://localhost:8080/api/v1/admin/bookings?status=ABC",
+      "ma": 400,
+      "thoiGianMs": 7,
+      "dat": true,
+      "kiemTra": [
+        {
+          "ten": "Trả 400 và liệt kê trạng thái hợp lệ",
+          "dat": true
+        }
+      ]
+    },
+    {
+      "nhom": "ADM - Quản trị danh mục, thanh toán, thống kê",
+      "ten": "TC-ADM-01 Thêm món mới hợp lệ",
+      "method": "POST",
+      "url": "http://localhost:8080/api/v1/admin/dishes",
+      "ma": 201,
+      "thoiGianMs": 12,
+      "dat": true,
+      "kiemTra": [
+        {
+          "ten": "Tạo được món",
+          "dat": true
+        }
+      ]
+    },
+    {
+      "nhom": "ADM - Quản trị danh mục, thanh toán, thống kê",
+      "ten": "TC-ADM-01b Món mới hiện trên thực đơn công khai",
+      "method": "GET",
+      "url": "http://localhost:8080/api/v1/menu/dishes?keyword=Món%20kiểm%20thử%20141675",
+      "ma": 200,
+      "thoiGianMs": 9,
+      "dat": true,
+      "kiemTra": [
+        {
+          "ten": "Tìm thấy đúng 1 món",
+          "dat": true
+        }
+      ]
+    },
+    {
+      "nhom": "ADM - Quản trị danh mục, thanh toán, thống kê",
+      "ten": "TC-ADM-02 Thêm món thiếu tên",
+      "method": "POST",
+      "url": "http://localhost:8080/api/v1/admin/dishes",
+      "ma": 400,
+      "thoiGianMs": 32,
+      "dat": true,
+      "kiemTra": [
+        {
+          "ten": "Trả 400",
+          "dat": true
+        }
+      ]
+    },
+    {
+      "nhom": "ADM - Quản trị danh mục, thanh toán, thống kê",
+      "ten": "TC-ADM-03 Sửa giá món",
+      "method": "PUT",
+      "url": "http://localhost:8080/api/v1/admin/dishes/130",
+      "ma": 200,
+      "thoiGianMs": 11,
+      "dat": true,
+      "kiemTra": [
+        {
+          "ten": "Sửa thành công",
+          "dat": true
+        }
+      ]
+    },
+    {
+      "nhom": "ADM - Quản trị danh mục, thanh toán, thống kê",
+      "ten": "TC-ADM-03b Thực đơn công khai hiện giá mới",
+      "method": "GET",
+      "url": "http://localhost:8080/api/v1/menu/dishes?keyword=Món%20kiểm%20thử%20141675",
+      "ma": 200,
+      "thoiGianMs": 7,
+      "dat": true,
+      "kiemTra": [
+        {
+          "ten": "Giá mới 150.000",
+          "dat": true
+        }
+      ]
+    },
+    {
+      "nhom": "ADM - Quản trị danh mục, thanh toán, thống kê",
+      "ten": "TC-ADM-04 Ngừng phục vụ món",
+      "method": "DELETE",
+      "url": "http://localhost:8080/api/v1/admin/dishes/130",
+      "ma": 204,
+      "thoiGianMs": 11,
+      "dat": true,
+      "kiemTra": [
+        {
+          "ten": "Ngừng phục vụ thành công",
+          "dat": true
+        }
+      ]
+    },
+    {
+      "nhom": "ADM - Quản trị danh mục, thanh toán, thống kê",
+      "ten": "TC-ADM-04b Món đã ngừng không còn trên thực đơn",
+      "method": "GET",
+      "url": "http://localhost:8080/api/v1/menu/dishes?keyword=Món%20kiểm%20thử%20141675",
+      "ma": 200,
+      "thoiGianMs": 6,
+      "dat": true,
+      "kiemTra": [
+        {
+          "ten": "Không còn món",
+          "dat": true
+        }
+      ]
+    },
+    {
+      "nhom": "ADM - Quản trị danh mục, thanh toán, thống kê",
+      "ten": "TC-ADM-05 Thêm không gian có sức chứa tối thiểu lớn hơn tối đa",
+      "method": "POST",
+      "url": "http://localhost:8080/api/v1/admin/spaces",
+      "ma": 400,
+      "thoiGianMs": 31,
+      "dat": true,
+      "kiemTra": [
+        {
+          "ten": "Trả 400 kèm lý do",
+          "dat": true
+        }
+      ]
+    },
+    {
+      "nhom": "ADM - Quản trị danh mục, thanh toán, thống kê",
+      "ten": "TC-ADM-06 Thêm không gian hợp lệ",
+      "method": "POST",
+      "url": "http://localhost:8080/api/v1/admin/spaces",
+      "ma": 201,
+      "thoiGianMs": 29,
+      "dat": true,
+      "kiemTra": [
+        {
+          "ten": "Tạo được không gian",
+          "dat": true
+        }
+      ]
+    },
+    {
+      "nhom": "ADM - Quản trị danh mục, thanh toán, thống kê",
+      "ten": "TC-ADM-06b Không gian mới hiện trong danh sách công khai",
+      "method": "GET",
+      "url": "http://localhost:8080/api/v1/spaces",
+      "ma": 200,
+      "thoiGianMs": 7,
+      "dat": true,
+      "kiemTra": [
+        {
+          "ten": "Có không gian mới",
+          "dat": true
+        }
+      ]
+    },
+    {
+      "nhom": "ADM - Quản trị danh mục, thanh toán, thống kê",
+      "ten": "TC-ADM-07 Ngừng kinh doanh không gian",
+      "method": "DELETE",
+      "url": "http://localhost:8080/api/v1/admin/spaces/7",
+      "ma": 204,
+      "thoiGianMs": 8,
+      "dat": true,
+      "kiemTra": [
+        {
+          "ten": "Ngừng thành công",
+          "dat": true
+        }
+      ]
+    },
+    {
+      "nhom": "ADM - Quản trị danh mục, thanh toán, thống kê",
+      "ten": "TC-ADM-07b Không gian đã ngừng không còn trong danh sách",
+      "method": "GET",
+      "url": "http://localhost:8080/api/v1/spaces",
+      "ma": 200,
+      "thoiGianMs": 4,
+      "dat": true,
+      "kiemTra": [
+        {
+          "ten": "Không còn không gian",
+          "dat": true
+        }
+      ]
+    },
+    {
+      "nhom": "ADM - Quản trị danh mục, thanh toán, thống kê",
+      "ten": "TC-ADM-08 Thêm gói tiệc hợp lệ",
+      "method": "POST",
+      "url": "http://localhost:8080/api/v1/admin/packages",
+      "ma": 201,
+      "thoiGianMs": 47,
+      "dat": true,
+      "kiemTra": [
+        {
+          "ten": "Tạo được gói",
+          "dat": true
+        }
+      ]
+    },
+    {
+      "nhom": "ADM - Quản trị danh mục, thanh toán, thống kê",
+      "ten": "TC-ADM-08b Gói mới hiện trên bảng giá",
+      "method": "GET",
+      "url": "http://localhost:8080/api/v1/packages",
+      "ma": 200,
+      "thoiGianMs": 5,
+      "dat": true,
+      "kiemTra": [
+        {
+          "ten": "Có gói mới",
+          "dat": true
+        }
+      ]
+    },
+    {
+      "nhom": "ADM - Quản trị danh mục, thanh toán, thống kê",
+      "ten": "Dọn dữ liệu – ngừng gói kiểm thử",
+      "method": "DELETE",
+      "url": "http://localhost:8080/api/v1/admin/packages/9",
+      "ma": 204,
+      "thoiGianMs": 8,
+      "dat": true,
+      "kiemTra": [
+        {
+          "ten": "Ngừng gói kiểm thử",
+          "dat": true
+        }
+      ]
+    },
+    {
+      "nhom": "ADM - Quản trị danh mục, thanh toán, thống kê",
+      "ten": "Dọn dữ liệu – bảng giá trở lại như cũ",
+      "method": "GET",
+      "url": "http://localhost:8080/api/v1/packages",
+      "ma": 200,
+      "thoiGianMs": 4,
+      "dat": true,
+      "kiemTra": [
+        {
+          "ten": "Không còn gói kiểm thử",
+          "dat": true
+        }
+      ]
+    },
+    {
+      "nhom": "ADM - Quản trị danh mục, thanh toán, thống kê",
+      "ten": "TC-ADM-09 Thêm gói giá âm",
+      "method": "POST",
+      "url": "http://localhost:8080/api/v1/admin/packages",
+      "ma": 400,
+      "thoiGianMs": 55,
+      "dat": true,
+      "kiemTra": [
+        {
+          "ten": "Trả 400",
+          "dat": true
+        }
+      ]
+    },
+    {
+      "nhom": "ADM - Quản trị danh mục, thanh toán, thống kê",
+      "ten": "TC-ADM-10a Tạo đơn món để ghi phiếu thu",
+      "method": "POST",
+      "url": "http://localhost:8080/api/v1/dish-orders",
+      "ma": 201,
+      "thoiGianMs": 17,
+      "dat": true,
+      "kiemTra": [
+        {
+          "ten": "Tạo được đơn",
+          "dat": true
+        }
+      ]
+    },
+    {
+      "nhom": "ADM - Quản trị danh mục, thanh toán, thống kê",
+      "ten": "TC-ADM-10 Ghi phiếu thu dưới 1.000 đồng",
+      "method": "POST",
+      "url": "http://localhost:8080/api/v1/admin/payments",
+      "ma": 400,
+      "thoiGianMs": 13,
+      "dat": true,
+      "kiemTra": [
+        {
+          "ten": "Trả 400 kèm câu báo",
+          "dat": true
+        }
+      ]
+    },
+    {
+      "nhom": "ADM - Quản trị danh mục, thanh toán, thống kê",
+      "ten": "TC-ADM-11 Ghi thu tiền mặt tại quầy",
+      "method": "POST",
+      "url": "http://localhost:8080/api/v1/admin/payments",
+      "ma": 200,
+      "thoiGianMs": 58,
+      "dat": true,
+      "kiemTra": [
+        {
+          "ten": "Phiếu vào sổ ở trạng thái đã xác nhận",
+          "dat": true
+        }
+      ]
+    },
+    {
+      "nhom": "ADM - Quản trị danh mục, thanh toán, thống kê",
+      "ten": "TC-ADM-12a Khách tạo yêu cầu chuyển khoản VietQR",
+      "method": "POST",
+      "url": "http://localhost:8080/api/v1/payments",
+      "ma": 200,
+      "thoiGianMs": 40,
+      "dat": true,
+      "kiemTra": [
+        {
+          "ten": "Tạo được yêu cầu thanh toán",
+          "dat": true
+        }
+      ]
+    },
+    {
+      "nhom": "ADM - Quản trị danh mục, thanh toán, thống kê",
+      "ten": "TC-ADM-12b Phiếu VietQR nằm trong danh sách chờ đối soát",
+      "method": "GET",
+      "url": "http://localhost:8080/api/v1/admin/payments?status=PENDING&keyword=DM-20261120-0007",
+      "ma": 200,
+      "thoiGianMs": 11,
+      "dat": true,
+      "kiemTra": [
+        {
+          "ten": "Có đúng phiếu chờ đối soát của đơn",
+          "dat": true
+        }
+      ]
+    },
+    {
+      "nhom": "ADM - Quản trị danh mục, thanh toán, thống kê",
+      "ten": "TC-ADM-12 Xác nhận phiếu chờ đối soát",
+      "method": "PATCH",
+      "url": "http://localhost:8080/api/v1/admin/payments/96/confirm",
+      "ma": 200,
+      "thoiGianMs": 14,
+      "dat": true,
+      "kiemTra": [
+        {
+          "ten": "Phiếu chuyển sang đã xác nhận",
+          "dat": true
+        }
+      ]
+    },
+    {
+      "nhom": "ADM - Quản trị danh mục, thanh toán, thống kê",
+      "ten": "TC-ADM-13 Thống kê khoảng ngày không có đơn",
+      "method": "GET",
+      "url": "http://localhost:8080/api/v1/admin/statistics?from=2020-01-01&to=2020-01-31",
+      "ma": 200,
+      "thoiGianMs": 56,
+      "dat": true,
+      "kiemTra": [
+        {
+          "ten": "Trả 200, doanh thu bằng 0",
+          "dat": true
+        }
+      ]
+    },
+    {
+      "nhom": "ADM - Quản trị danh mục, thanh toán, thống kê",
+      "ten": "TC-ADM-14 Thống kê mặc định 12 tháng",
+      "method": "GET",
+      "url": "http://localhost:8080/api/v1/admin/statistics",
+      "ma": 200,
+      "thoiGianMs": 24,
+      "dat": true,
+      "kiemTra": [
+        {
+          "ten": "Trả 200 và có số liệu tổng quan",
+          "dat": true
+        }
+      ]
+    },
+    {
+      "nhom": "ADM - Quản trị danh mục, thanh toán, thống kê",
+      "ten": "TC-ADM-15 Gọi API quản trị khi chưa đăng nhập",
+      "method": "GET",
+      "url": "http://localhost:8080/api/v1/admin/dishes",
+      "ma": 403,
+      "thoiGianMs": 17,
+      "dat": true,
+      "kiemTra": [
+        {
+          "ten": "Bị từ chối 401 hoặc 403",
+          "dat": true
+        }
+      ]
+    }
+  ]
+}

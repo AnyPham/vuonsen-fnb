@@ -1,5 +1,6 @@
 package vn.vuonsen.fnb.modules.booking;
 
+import vn.vuonsen.fnb.common.util.TuKhoaTimKiem;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -220,7 +221,7 @@ public class BookingService {
 
     public Page<BookingResponse> search(BookingStatus status, LocalDate from, LocalDate to,
                                         String keyword, Pageable pageable) {
-        String kw = (keyword == null || keyword.isBlank()) ? null : keyword.trim();
+        String kw = TuKhoaTimKiem.choLike(keyword);
         return bookingRepository.search(status, from, to, kw, pageable).map(BookingResponse::from);
     }
 

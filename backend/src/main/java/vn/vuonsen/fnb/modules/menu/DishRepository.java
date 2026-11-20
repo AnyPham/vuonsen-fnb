@@ -19,7 +19,7 @@ public interface DishRepository extends JpaRepository<Dish, Long> {
             SELECT d FROM Dish d JOIN FETCH d.category c
             WHERE d.available = true
               AND (:categoryCode IS NULL OR c.code = :categoryCode)
-              AND (:keyword IS NULL OR LOWER(d.name) LIKE LOWER(CONCAT('%', :keyword, '%')))
+              AND (:keyword IS NULL OR LOWER(d.name) LIKE LOWER(CONCAT('%', :keyword, '%')) ESCAPE '!')
               AND (:chay IS NULL OR d.vegetarian = :chay)
             ORDER BY c.sortOrder ASC, d.sortOrder ASC
             """)

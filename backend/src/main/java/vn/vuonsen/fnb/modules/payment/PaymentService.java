@@ -1,5 +1,6 @@
 package vn.vuonsen.fnb.modules.payment;
 
+import vn.vuonsen.fnb.common.util.TuKhoaTimKiem;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -67,7 +68,7 @@ public class PaymentService {
     }
 
     public Page<PaymentResponse> danhSach(PaymentStatus status, String keyword, Pageable pageable) {
-        String tuKhoa = (keyword == null || keyword.isBlank()) ? null : keyword.trim();
+        String tuKhoa = TuKhoaTimKiem.choLike(keyword);
         return paymentRepository.search(status, tuKhoa, pageable).map(PaymentResponse::from);
     }
 

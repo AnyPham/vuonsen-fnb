@@ -29,9 +29,9 @@ public interface DishOrderRepository extends JpaRepository<DishOrder, Long> {
             WHERE (:status IS NULL OR o.status = :status)
               AND (:type IS NULL OR o.fulfillmentType = :type)
               AND (:keyword IS NULL
-                   OR LOWER(o.code) LIKE LOWER(CONCAT('%', :keyword, '%'))
-                   OR LOWER(o.customerName) LIKE LOWER(CONCAT('%', :keyword, '%'))
-                   OR o.customerPhone LIKE CONCAT('%', :keyword, '%'))
+                   OR LOWER(o.code) LIKE LOWER(CONCAT('%', :keyword, '%')) ESCAPE '!'
+                   OR LOWER(o.customerName) LIKE LOWER(CONCAT('%', :keyword, '%')) ESCAPE '!'
+                   OR o.customerPhone LIKE CONCAT('%', :keyword, '%') ESCAPE '!')
             ORDER BY o.createdAt DESC
             """)
     Page<DishOrder> search(@Param("status") DishOrderStatus status,

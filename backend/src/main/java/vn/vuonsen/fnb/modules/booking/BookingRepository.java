@@ -62,9 +62,9 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
               AND (:from   IS NULL OR b.eventDate >= :from)
               AND (:to     IS NULL OR b.eventDate <= :to)
               AND (:keyword IS NULL
-                   OR LOWER(b.customerName) LIKE LOWER(CONCAT('%', :keyword, '%'))
-                   OR b.customerPhone LIKE CONCAT('%', :keyword, '%')
-                   OR LOWER(b.code) LIKE LOWER(CONCAT('%', :keyword, '%')))
+                   OR LOWER(b.customerName) LIKE LOWER(CONCAT('%', :keyword, '%')) ESCAPE '!'
+                   OR b.customerPhone LIKE CONCAT('%', :keyword, '%') ESCAPE '!'
+                   OR LOWER(b.code) LIKE LOWER(CONCAT('%', :keyword, '%')) ESCAPE '!')
             ORDER BY b.createdAt DESC
             """)
     Page<Booking> search(@Param("status") BookingStatus status,

@@ -10,7 +10,7 @@ import { ErrorBlock } from '@/components/common/StateBlock';
 import Thumb from '@/components/common/Thumb';
 import CanDangNhap from '@/components/common/CanDangNhap';
 import {
-  boMon, chonGioMon, chonHinhThuc, doiHinhThuc, doiSoLuong, xoaGio,
+  boMon, chonGioMon, chonHinhThuc, doiHinhThuc, doiSoLuong, xoaGio, SO_PHAN_TOI_DA,
 } from '@/features/dishorder/cartSlice';
 
 // Giờ mặc định gợi ý: tròn giờ kế tiếp cách hiện tại 3 tiếng, đủ cho hầu hết món
@@ -173,6 +173,7 @@ export default function DishOrderPage() {
                   <button
                     type="button"
                     onClick={() => dispatch(doiSoLuong({ dishId: m.dishId, quantity: m.quantity + 1 }))}
+                    disabled={m.quantity >= SO_PHAN_TOI_DA}
                     data-test="cart-plus"
                     aria-label={t('order.increaseOf', { mon: m.name })}
                   >

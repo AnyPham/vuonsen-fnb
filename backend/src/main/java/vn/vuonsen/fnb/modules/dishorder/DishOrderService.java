@@ -1,5 +1,6 @@
 package vn.vuonsen.fnb.modules.dishorder;
 
+import vn.vuonsen.fnb.common.util.TuKhoaTimKiem;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -158,7 +159,7 @@ public class DishOrderService {
 
     public Page<DishOrderResponse> search(DishOrderStatus status, FulfillmentType type,
             String keyword, Pageable pageable) {
-        String tuKhoa = keyword == null || keyword.isBlank() ? null : keyword.trim();
+        String tuKhoa = TuKhoaTimKiem.choLike(keyword);
         return orderRepository.search(status, type, tuKhoa, pageable).map(DishOrderResponse::from);
     }
 
