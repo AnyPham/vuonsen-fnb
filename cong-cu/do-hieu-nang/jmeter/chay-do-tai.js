@@ -222,7 +222,7 @@ function chayMot(soNguoi, thuTu) {
     `-JCONG=${new URL(GOC).port || 80}`,
     '-l', jtl,
     '-e', '-o', bc,
-  ], { cwd: THU_MUC, stdio: ['ignore', 'pipe', 'pipe'] });
+  ], { cwd: THU_MUC, stdio: ['ignore', 'pipe', 'pipe'], shell: process.platform === 'win32' });
 
   /* jmeter.bat kết thúc bằng lệnh pause nên mã thoát vẫn là 0 dù JMeter lỗi, ví dụ kịch bản
      sai cú pháp. Không có tệp kết quả thì in đầu ra của JMeter ra để biết lỗi gì. */

@@ -201,6 +201,28 @@
           </annotationProcessorPaths>
         </configuration>
       </plugin>
+      <!-- Đo độ phủ mã khi chạy "mvn test": báo cáo HTML ở target/site/jacoco/index.html.
+           Chỉ đo, không đặt ngưỡng chặn build, để số liệu phục vụ báo cáo kiểm thử. -->
+      <plugin>
+        <groupId>org.jacoco</groupId>
+        <artifactId>jacoco-maven-plugin</artifactId>
+        <version>0.8.12</version>
+        <executions>
+          <execution>
+            <id>gan-tac-tu-do-phu</id>
+            <goals>
+              <goal>prepare-agent</goal>
+            </goals>
+          </execution>
+          <execution>
+            <id>bao-cao-do-phu</id>
+            <phase>test</phase>
+            <goals>
+              <goal>report</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
     </plugins>
   </build>
 </project>

@@ -1,0 +1,67 @@
+{
+  "thoiDiem": "2026-11-25T02:44:12.371Z",
+  "tong": 4,
+  "dat": 4,
+  "ketQua": [
+    {
+      "nhom": "AI-BAT - Trợ lý khi bật mô hình ngôn ngữ",
+      "ten": "TC-AI-01 Câu có trong ngân hàng vẫn trả lời từ ngân hàng, không gọi AI",
+      "method": "POST",
+      "url": "http://localhost:8080/api/v1/assistant/ask",
+      "ma": 200,
+      "thoiGianMs": 206,
+      "dat": true,
+      "kiemTra": [
+        {
+          "ten": "Nguồn NGAN_HANG_CAU_HOI, nêu tỉ lệ 30%",
+          "dat": true
+        }
+      ]
+    },
+    {
+      "nhom": "AI-BAT - Trợ lý khi bật mô hình ngôn ngữ",
+      "ten": "TC-AI-02 Câu ngoài ngân hàng do mô hình ngôn ngữ trả lời",
+      "method": "POST",
+      "url": "http://localhost:8080/api/v1/assistant/ask",
+      "ma": 200,
+      "thoiGianMs": 2043,
+      "dat": true,
+      "kiemTra": [
+        {
+          "ten": "Nguồn MO_HINH_NGON_NGU, có lời đáp",
+          "dat": true
+        }
+      ]
+    },
+    {
+      "nhom": "AI-BAT - Trợ lý khi bật mô hình ngôn ngữ",
+      "ten": "TC-AI-03 Câu so sánh với nơi khác chuyển cho mô hình, giữ chủ đề SO_SANH",
+      "method": "POST",
+      "url": "http://localhost:8080/api/v1/assistant/ask",
+      "ma": 200,
+      "thoiGianMs": 1114,
+      "dat": true,
+      "kiemTra": [
+        {
+          "ten": "Chủ đề SO_SANH, nguồn MO_HINH_NGON_NGU",
+          "dat": true
+        }
+      ]
+    },
+    {
+      "nhom": "AI-BAT - Trợ lý khi bật mô hình ngôn ngữ",
+      "ten": "TC-AI-04 Câu hỏi nối tiếp gửi kèm lịch sử trò chuyện",
+      "method": "POST",
+      "url": "http://localhost:8080/api/v1/assistant/ask",
+      "ma": 200,
+      "thoiGianMs": 1127,
+      "dat": true,
+      "kiemTra": [
+        {
+          "ten": "Mô hình trả lời câu nối tiếp",
+          "dat": true
+        }
+      ]
+    }
+  ]
+}

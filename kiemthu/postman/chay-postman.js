@@ -5,7 +5,7 @@
  * pre-request và test với một đối tượng pm rút gọn (đủ cho các phép kiểm tra trong bộ này).
  * Kết quả ghi ra ket-qua/ket-qua-api.json để đưa vào báo cáo.
  *
- * Chạy: node chay-postman.js [collection] [environment]
+ * Chạy: node chay-postman.js [collection] [environment] [tệp kết quả trong ket-qua/]
  */
 const fs = require('fs');
 const path = require('path');
@@ -94,7 +94,7 @@ async function chay() {
   }
   fs.mkdirSync(path.join(thuMuc, 'ket-qua'), { recursive: true });
   const tom = { thoiDiem: new Date().toISOString(), tong: ketQua.length, dat: ketQua.filter((k) => k.dat).length, ketQua };
-  fs.writeFileSync(path.join(thuMuc, 'ket-qua', 'ket-qua-api.json'), JSON.stringify(tom, null, 2));
+  fs.writeFileSync(path.join(thuMuc, 'ket-qua', process.argv[4] || 'ket-qua-api.json'), JSON.stringify(tom, null, 2));
   console.log(`\nTổng: ${tom.dat}/${tom.tong} request đạt`);
   process.exitCode = tom.dat === tom.tong ? 0 : 1;
 }

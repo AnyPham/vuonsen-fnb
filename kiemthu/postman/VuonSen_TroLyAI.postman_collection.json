@@ -1,0 +1,180 @@
+{
+  "info": {
+    "_postman_id": "1c712f64-baa3-5e48-87dd-352eafc05adf",
+    "name": "Vườn Sen – Trợ lý tư vấn chế độ AI (Nhóm 20)",
+    "description": "Chạy khi backend bật mô hình ngôn ngữ (ASSISTANT_LLM_ENABLED=true, Gemini).",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "AI-BAT - Trợ lý khi bật mô hình ngôn ngữ",
+      "item": [
+        {
+          "name": "TC-AI-01 Câu có trong ngân hàng vẫn trả lời từ ngân hàng, không gọi AI",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/assistant/ask",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "assistant",
+                "ask"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"question\": \"Đặt cọc bao nhiêu?\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Nguồn NGAN_HANG_CAU_HOI, nêu tỉ lệ 30%\", function () {",
+                  "  const j = pm.response.json();",
+                  "  pm.expect(j.source).to.eql(\"NGAN_HANG_CAU_HOI\"); pm.expect(j.answer).to.include(\"30%\"); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "TC-AI-02 Câu ngoài ngân hàng do mô hình ngôn ngữ trả lời",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/assistant/ask",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "assistant",
+                "ask"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"question\": \"Nhà hàng có chỗ đậu xe ô tô cho khách dự tiệc không?\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Nguồn MO_HINH_NGON_NGU, có lời đáp\", function () {",
+                  "  const j = pm.response.json();",
+                  "  pm.expect(j.source).to.eql(\"MO_HINH_NGON_NGU\"); pm.expect(j.answer.length).to.be.above(20); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "TC-AI-03 Câu so sánh với nơi khác chuyển cho mô hình, giữ chủ đề SO_SANH",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/assistant/ask",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "assistant",
+                "ask"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"question\": \"Giá ở đây có rẻ hơn nhà hàng khác không?\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Chủ đề SO_SANH, nguồn MO_HINH_NGON_NGU\", function () {",
+                  "  const j = pm.response.json();",
+                  "  pm.expect(j.intent).to.eql(\"SO_SANH\"); pm.expect(j.source).to.eql(\"MO_HINH_NGON_NGU\"); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "TC-AI-04 Câu hỏi nối tiếp gửi kèm lịch sử trò chuyện",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/assistant/ask",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "assistant",
+                "ask"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"question\": \"Vậy chỗ đó có cho mang theo ban nhạc riêng không?\",\n  \"history\": [\n    {\n      \"role\": \"user\",\n      \"content\": \"Sảnh Sen Vàng chứa được bao nhiêu khách?\"\n    },\n    {\n      \"role\": \"assistant\",\n      \"content\": \"Sảnh Sen Vàng nhận từ 200 đến 500 khách.\"\n    }\n  ]\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Mô hình trả lời câu nối tiếp\", function () {",
+                  "  const j = pm.response.json();",
+                  "  pm.expect(j.source).to.eql(\"MO_HINH_NGON_NGU\"); pm.expect(j.answer.length).to.be.above(20); });"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "variable": []
+}

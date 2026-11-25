@@ -1,7 +1,7 @@
 {
-  "thoiDiem": "2026-11-20T05:55:42.362Z",
-  "tong": 40,
-  "dat": 40,
+  "thoiDiem": "2026-11-25T02:36:19.556Z",
+  "tong": 41,
+  "dat": 41,
   "ketQua": [
     {
       "nhom": "00 - Chuẩn bị",
@@ -9,7 +9,7 @@
       "method": "POST",
       "url": "http://localhost:8080/api/auth/login",
       "ma": 200,
-      "thoiGianMs": 196,
+      "thoiGianMs": 224,
       "dat": true,
       "kiemTra": [
         {
@@ -24,7 +24,7 @@
       "method": "GET",
       "url": "http://localhost:8080/api/v1/menu/dishes",
       "ma": 200,
-      "thoiGianMs": 28,
+      "thoiGianMs": 58,
       "dat": true,
       "kiemTra": [
         {
@@ -39,7 +39,7 @@
       "method": "GET",
       "url": "http://localhost:8080/api/v1/menu/categories",
       "ma": 200,
-      "thoiGianMs": 3,
+      "thoiGianMs": 9,
       "dat": true,
       "kiemTra": [
         {
@@ -54,7 +54,7 @@
       "method": "POST",
       "url": "http://localhost:8080/api/v1/dish-orders",
       "ma": 400,
-      "thoiGianMs": 12,
+      "thoiGianMs": 23,
       "dat": true,
       "kiemTra": [
         {
@@ -69,7 +69,7 @@
       "method": "GET",
       "url": "http://localhost:8080/api/v1/menu/dishes?keyword=%25",
       "ma": 200,
-      "thoiGianMs": 12,
+      "thoiGianMs": 11,
       "dat": true,
       "kiemTra": [
         {
@@ -84,7 +84,7 @@
       "method": "GET",
       "url": "http://localhost:8080/api/v1/menu/dishes?keyword=_",
       "ma": 200,
-      "thoiGianMs": 8,
+      "thoiGianMs": 17,
       "dat": true,
       "kiemTra": [
         {
@@ -99,7 +99,7 @@
       "method": "POST",
       "url": "http://localhost:8080/api/v1/assistant/ask",
       "ma": 200,
-      "thoiGianMs": 7,
+      "thoiGianMs": 21,
       "dat": true,
       "kiemTra": [
         {
@@ -114,7 +114,7 @@
       "method": "POST",
       "url": "http://localhost:8080/api/v1/assistant/ask",
       "ma": 200,
-      "thoiGianMs": 7,
+      "thoiGianMs": 8,
       "dat": true,
       "kiemTra": [
         {
@@ -144,7 +144,7 @@
       "method": "POST",
       "url": "http://localhost:8080/api/v1/assistant/ask",
       "ma": 200,
-      "thoiGianMs": 8,
+      "thoiGianMs": 11,
       "dat": true,
       "kiemTra": [
         {
@@ -159,7 +159,7 @@
       "method": "GET",
       "url": "http://localhost:8080/api/v1/admin/calendar?tuNgay=2026-02-30&denNgay=2026-03-01",
       "ma": 400,
-      "thoiGianMs": 16,
+      "thoiGianMs": 15,
       "dat": true,
       "kiemTra": [
         {
@@ -174,7 +174,7 @@
       "method": "GET",
       "url": "http://localhost:8080/api/v1/bookings/availability?date=2026-02-30",
       "ma": 400,
-      "thoiGianMs": 2,
+      "thoiGianMs": 3,
       "dat": true,
       "kiemTra": [
         {
@@ -219,7 +219,7 @@
       "method": "POST",
       "url": "http://localhost:8080/api/v1/admin/dishes",
       "ma": 201,
-      "thoiGianMs": 12,
+      "thoiGianMs": 11,
       "dat": true,
       "kiemTra": [
         {
@@ -232,9 +232,9 @@
       "nhom": "ADM - Quản trị danh mục, thanh toán, thống kê",
       "ten": "TC-ADM-01b Món mới hiện trên thực đơn công khai",
       "method": "GET",
-      "url": "http://localhost:8080/api/v1/menu/dishes?keyword=Món%20kiểm%20thử%20141675",
+      "url": "http://localhost:8080/api/v1/menu/dishes?keyword=Món%20kiểm%20thử%20178812",
       "ma": 200,
-      "thoiGianMs": 9,
+      "thoiGianMs": 15,
       "dat": true,
       "kiemTra": [
         {
@@ -249,7 +249,7 @@
       "method": "POST",
       "url": "http://localhost:8080/api/v1/admin/dishes",
       "ma": 400,
-      "thoiGianMs": 32,
+      "thoiGianMs": 35,
       "dat": true,
       "kiemTra": [
         {
@@ -264,7 +264,7 @@
       "method": "PUT",
       "url": "http://localhost:8080/api/v1/admin/dishes/130",
       "ma": 200,
-      "thoiGianMs": 11,
+      "thoiGianMs": 12,
       "dat": true,
       "kiemTra": [
         {
@@ -277,9 +277,9 @@
       "nhom": "ADM - Quản trị danh mục, thanh toán, thống kê",
       "ten": "TC-ADM-03b Thực đơn công khai hiện giá mới",
       "method": "GET",
-      "url": "http://localhost:8080/api/v1/menu/dishes?keyword=Món%20kiểm%20thử%20141675",
+      "url": "http://localhost:8080/api/v1/menu/dishes?keyword=Món%20kiểm%20thử%20178812",
       "ma": 200,
-      "thoiGianMs": 7,
+      "thoiGianMs": 8,
       "dat": true,
       "kiemTra": [
         {
@@ -294,7 +294,7 @@
       "method": "DELETE",
       "url": "http://localhost:8080/api/v1/admin/dishes/130",
       "ma": 204,
-      "thoiGianMs": 11,
+      "thoiGianMs": 9,
       "dat": true,
       "kiemTra": [
         {
@@ -307,7 +307,7 @@
       "nhom": "ADM - Quản trị danh mục, thanh toán, thống kê",
       "ten": "TC-ADM-04b Món đã ngừng không còn trên thực đơn",
       "method": "GET",
-      "url": "http://localhost:8080/api/v1/menu/dishes?keyword=Món%20kiểm%20thử%20141675",
+      "url": "http://localhost:8080/api/v1/menu/dishes?keyword=Món%20kiểm%20thử%20178812",
       "ma": 200,
       "thoiGianMs": 6,
       "dat": true,
@@ -324,7 +324,7 @@
       "method": "POST",
       "url": "http://localhost:8080/api/v1/admin/spaces",
       "ma": 400,
-      "thoiGianMs": 31,
+      "thoiGianMs": 37,
       "dat": true,
       "kiemTra": [
         {
@@ -339,7 +339,7 @@
       "method": "POST",
       "url": "http://localhost:8080/api/v1/admin/spaces",
       "ma": 201,
-      "thoiGianMs": 29,
+      "thoiGianMs": 27,
       "dat": true,
       "kiemTra": [
         {
@@ -369,7 +369,7 @@
       "method": "DELETE",
       "url": "http://localhost:8080/api/v1/admin/spaces/7",
       "ma": 204,
-      "thoiGianMs": 8,
+      "thoiGianMs": 9,
       "dat": true,
       "kiemTra": [
         {
@@ -384,7 +384,7 @@
       "method": "GET",
       "url": "http://localhost:8080/api/v1/spaces",
       "ma": 200,
-      "thoiGianMs": 4,
+      "thoiGianMs": 5,
       "dat": true,
       "kiemTra": [
         {
@@ -444,7 +444,7 @@
       "method": "GET",
       "url": "http://localhost:8080/api/v1/packages",
       "ma": 200,
-      "thoiGianMs": 4,
+      "thoiGianMs": 6,
       "dat": true,
       "kiemTra": [
         {
@@ -459,7 +459,7 @@
       "method": "POST",
       "url": "http://localhost:8080/api/v1/admin/packages",
       "ma": 400,
-      "thoiGianMs": 55,
+      "thoiGianMs": 53,
       "dat": true,
       "kiemTra": [
         {
@@ -474,7 +474,7 @@
       "method": "POST",
       "url": "http://localhost:8080/api/v1/dish-orders",
       "ma": 201,
-      "thoiGianMs": 17,
+      "thoiGianMs": 14,
       "dat": true,
       "kiemTra": [
         {
@@ -489,7 +489,7 @@
       "method": "POST",
       "url": "http://localhost:8080/api/v1/admin/payments",
       "ma": 400,
-      "thoiGianMs": 13,
+      "thoiGianMs": 12,
       "dat": true,
       "kiemTra": [
         {
@@ -504,7 +504,7 @@
       "method": "POST",
       "url": "http://localhost:8080/api/v1/admin/payments",
       "ma": 200,
-      "thoiGianMs": 58,
+      "thoiGianMs": 53,
       "dat": true,
       "kiemTra": [
         {
@@ -519,7 +519,7 @@
       "method": "POST",
       "url": "http://localhost:8080/api/v1/payments",
       "ma": 200,
-      "thoiGianMs": 40,
+      "thoiGianMs": 28,
       "dat": true,
       "kiemTra": [
         {
@@ -532,9 +532,9 @@
       "nhom": "ADM - Quản trị danh mục, thanh toán, thống kê",
       "ten": "TC-ADM-12b Phiếu VietQR nằm trong danh sách chờ đối soát",
       "method": "GET",
-      "url": "http://localhost:8080/api/v1/admin/payments?status=PENDING&keyword=DM-20261120-0007",
+      "url": "http://localhost:8080/api/v1/admin/payments?status=PENDING&keyword=DM-20261125-0007",
       "ma": 200,
-      "thoiGianMs": 11,
+      "thoiGianMs": 13,
       "dat": true,
       "kiemTra": [
         {
@@ -549,7 +549,7 @@
       "method": "PATCH",
       "url": "http://localhost:8080/api/v1/admin/payments/96/confirm",
       "ma": 200,
-      "thoiGianMs": 14,
+      "thoiGianMs": 13,
       "dat": true,
       "kiemTra": [
         {
@@ -564,7 +564,7 @@
       "method": "GET",
       "url": "http://localhost:8080/api/v1/admin/statistics?from=2020-01-01&to=2020-01-31",
       "ma": 200,
-      "thoiGianMs": 56,
+      "thoiGianMs": 37,
       "dat": true,
       "kiemTra": [
         {
@@ -579,7 +579,7 @@
       "method": "GET",
       "url": "http://localhost:8080/api/v1/admin/statistics",
       "ma": 200,
-      "thoiGianMs": 24,
+      "thoiGianMs": 23,
       "dat": true,
       "kiemTra": [
         {
@@ -594,11 +594,26 @@
       "method": "GET",
       "url": "http://localhost:8080/api/v1/admin/dishes",
       "ma": 403,
-      "thoiGianMs": 17,
+      "thoiGianMs": 15,
       "dat": true,
       "kiemTra": [
         {
           "ten": "Bị từ chối 401 hoặc 403",
+          "dat": true
+        }
+      ]
+    },
+    {
+      "nhom": "AI-TAT - Trợ lý khi tắt mô hình ngôn ngữ",
+      "ten": "TC-AI-05 Tắt AI: câu ngoài ngân hàng trả lời bằng cơ chế dự phòng",
+      "method": "POST",
+      "url": "http://localhost:8080/api/v1/assistant/ask",
+      "ma": 200,
+      "thoiGianMs": 14,
+      "dat": true,
+      "kiemTra": [
+        {
+          "ten": "Nguồn DU_PHONG, vẫn có lời đáp và câu gợi ý",
           "dat": true
         }
       ]

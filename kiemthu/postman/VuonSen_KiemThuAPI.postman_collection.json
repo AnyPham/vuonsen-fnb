@@ -2,7 +2,7 @@
   "info": {
     "_postman_id": "968b3341-f93b-52af-b9e4-585930c7a3e3",
     "name": "Vườn Sen – Kiểm thử API (Nhóm 20)",
-    "description": "Bộ kiểm thử API của đồ án Kiểm thử phần mềm: 10 ca API ngoại lệ (API-NEG) và 15 ca quản trị (ADM).",
+    "description": "Bộ kiểm thử API của đồ án Kiểm thử phần mềm: 10 ca API ngoại lệ (API-NEG) và 15 ca quản trị (ADM). Kèm 1 ca trợ lý khi tắt AI (AI-TAT).",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "item": [
@@ -1598,6 +1598,53 @@
                 "exec": [
                   "pm.test(\"Bị từ chối 401 hoặc 403\", function () {",
                   "  pm.expect(pm.response.code).to.be.oneOf([401, 403]); });"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "AI-TAT - Trợ lý khi tắt mô hình ngôn ngữ",
+      "item": [
+        {
+          "name": "TC-AI-05 Tắt AI: câu ngoài ngân hàng trả lời bằng cơ chế dự phòng",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/assistant/ask",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "assistant",
+                "ask"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"question\": \"Nhà hàng có chỗ đậu xe ô tô cho khách dự tiệc không?\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Nguồn DU_PHONG, vẫn có lời đáp và câu gợi ý\", function () {",
+                  "  const j = pm.response.json();",
+                  "  pm.expect(j.source).to.eql(\"DU_PHONG\"); pm.expect(j.answer.length).to.be.above(20);",
+                  "  pm.expect(j.suggestions.length).to.be.above(0); });"
                 ]
               }
             }
